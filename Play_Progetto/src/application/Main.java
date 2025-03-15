@@ -19,6 +19,7 @@ public class Main extends Application {
 	
 	private static String password = "admin19";
 	private static Integer tentativi = 0;
+	private static String username = "User1";
 	
 	@Override
 	public void start(Stage stage) {
@@ -33,19 +34,22 @@ public class Main extends Application {
 		
 		
 		final PasswordField pf = new PasswordField();
-		final Button b = new Button("Login");
+		final Button b = new Button("Accedi");
 		final Text loginMsg = new Text();
+		final PasswordField un = new PasswordField();
+		final Button r = new Button("Crea un account");
 		
-		Scene home = Home.getScene(stage, s1);
 		
 		
-		EventHandler<ActionEvent> bh = new EventHandler<ActionEvent>() {
+		
+		EventHandler<ActionEvent> accesso = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				tentativi++;
 				
-				if (pf.getText().equals(password)) {
+				if (pf.getText().equals(password) && un.getText().equals(username)) {
 		    			loginMsg.setText("Login successfull!");
 		    			loginMsg.setFill(Color.GREEN);
+						Scene home = Home.getScene(stage, s1);
 		    			stage.setScene(home);
 		    		}
 		    		else {
@@ -56,11 +60,19 @@ public class Main extends Application {
 
 			
 		};
+
+		EventHandler<ActionEvent> register = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event){
+				Scene Crea = CreaAccount.getScene(stage,s1);
+				stage.setScene(Crea);
+			}
+		};
 		
 		
-		b.setOnAction(bh);
+		b.setOnAction(accesso);
+		r.setOnAction(register);
 		
-		root.getChildren().addAll(t, pf, b, loginMsg);
+		root.getChildren().addAll(t, pf, b, loginMsg,r);
 		
     stage.setTitle("Admin panel");
     stage.setScene(s1);
