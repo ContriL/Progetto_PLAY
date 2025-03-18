@@ -70,7 +70,7 @@ public class CreaAccount extends Main{
 	}
 
     public static void scriviFile(File file, String contenuto) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) { 
             writer.write(contenuto);
             writer.newLine();
             System.out.println("Scrittura completata.");
