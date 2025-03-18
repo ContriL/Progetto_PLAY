@@ -16,7 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class Home extends Application {
+public class Home extends Main {
 	
 
 	public static Scene getScene(Stage stage, Scene s1) {
@@ -41,11 +41,8 @@ public class Home extends Application {
 		
 	}
 
-	@Override
-	public void start(Stage arg0) throws Exception {
-		
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'start'");
-	}
+	
+
+	
 
 }
