@@ -1,0 +1,44 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+/*LOGIN */
+.root {
+     background-color: #AABBCC;
+     background-radius: 10;
+     padding: 20px;
+     spacing: 10px;
+     alignment: center;
+     
+     
+}
+
+
+#loginMsg {
+  fill: #660000;
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.button {
+    font-family: "Arial";
+    text-fill: white;
+    background-color: #660000;
+
+    
+}
+.button:hover {
+    background-color: blue;
+   
+}
+.button:pressed {
+    background-color: #154360;
+}
+
+.password-field  {
+	 background-color: rgba(255, 255, 255, 0.8);
+     background-radius: 5px;
+     padding: 8px;
+     font-size: 14px;
+     border-color: transparent;
+	
+}
+
+/* HOME */
