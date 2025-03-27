@@ -17,7 +17,7 @@
             "request": "launch",
             "mainClass": "application.Main",
             "projectName": "Play_Progetto_c60db518",
-           "vmArgs": "--module-path /Users/lorenzocontri/Downloads/javafx-sdk-23.0.2/lib --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path C:/Users/dadas/Downloads/javafx-sdk-20/lib --add-modules javafx.controls,javafx.fxml"
 
         }
     ]
