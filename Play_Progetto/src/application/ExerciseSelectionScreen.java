@@ -106,7 +106,13 @@ public class ExerciseSelectionScreen extends Main {
         whatPrintsBtn.setUserData("WhatPrints");
         whatPrintsBtn.setPrefWidth(200);
 
-        exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn);
+       Button ERexerciseBtn = new Button("Quiz eredità e polimorfismo");
+       ERexerciseBtn.setOnAction(e -> {
+        Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
+        stage.setScene(quiz);
+       });
+
+        exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn,ERexerciseBtn);
         exerciseGrid.add(exerciseTypeBox, 0, 0);
 
         // Colonna per livelli di difficoltà

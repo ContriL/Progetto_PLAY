@@ -45,6 +45,7 @@ public class ExerciseScreen {
         Button homeButton = new Button("Home");
         Button progressButton = new Button("I miei Progressi");
         Button logoutButton = new Button("Logout");
+        
 
         // Gestione eventi dei pulsanti di navigazione
         homeButton.setOnAction(e -> {
@@ -61,6 +62,7 @@ public class ExerciseScreen {
             Main.setCurrentUser("");
             stage.setScene(selectionScene);
         });
+
 
         navBar.getChildren().addAll(homeButton, progressButton, logoutButton);
 

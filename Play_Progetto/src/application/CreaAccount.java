@@ -87,7 +87,8 @@ public class CreaAccount extends Main {
 
                     loginMsg.setText("Registrazione completata!");
                     loginMsg.setFill(Color.GREEN);
-                    stage.setScene(s1);
+                    Scene homeScreen = Home.getScene(stage, crea);
+                    stage.setScene(homeScreen);
 
                 } catch (IllegalArgumentException e) {
                     // Gestione eccezioni di validazione

@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -44,14 +45,13 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		VBox root = new VBox();
-		Scene s1 = new Scene(root, 400, 300);
+		BorderPane root = new BorderPane();
+		Scene s1 = new Scene(root, 700, 550);
 
 		File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
 		s1.getStylesheets().add("file://" + css.getAbsolutePath());
 
-		Text msg = new Text("Inserisci nickname");
-		Text msg2 = new Text("Inserisci password");
+		
 
 		// Gestione accesso
 		EventHandler<ActionEvent> accesso = new EventHandler<ActionEvent>() {
@@ -81,11 +81,32 @@ public class Main extends Application {
 		b.setOnAction(accesso);
 		r.setOnAction(register);
 
-		root.getChildren().addAll(msg, name, msg2, pf, b, r, loginMsg);
+		// Titoli e testi
+	Text titolo = new Text("Benvenuto!");
+	titolo.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+	Text msg = new Text("Nickname:");
+	Text msg2 = new Text("Password:");
 
-		stage.setTitle("Log in panel");
-		stage.setScene(s1);
-		stage.show();
+	// Campi di input con larghezza fissa
+	name.setMaxWidth(250);
+	pf.setMaxWidth(250);
+	b.setMaxWidth(250);
+	r.setMaxWidth(250);
+
+	// Box verticale per il login
+	VBox loginBox = new VBox(10); // spaziatura verticale di 10px
+	loginBox.getChildren().addAll(titolo, msg, name, msg2, pf, b, r, loginMsg);
+	loginBox.setStyle("-fx-padding: 30px; -fx-background-color: #f4f4f4; -fx-border-radius: 10px; -fx-background-radius: 10px;");
+	loginBox.setMaxWidth(300);
+	loginBox.setTranslateY(-30); // leggero spostamento verso l'alto
+
+	// Centrare il loginBox
+	root.setCenter(loginBox);
+	BorderPane.setAlignment(loginBox, javafx.geometry.Pos.CENTER);
+
+	stage.setTitle("Pannello di Login");
+	stage.setScene(s1);
+	stage.show();
 	}
 
 	// Metodo per aggiornare il messaggio di login
