@@ -2,10 +2,14 @@ package application;
 
 import application.exercises.Exercise;
 import application.exercises.OrderStepsExercise;
+import application.exercises.WhatPrintsExercise;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -109,15 +113,18 @@ public class ExerciseScreen {
         final Control[] answerControlRef = new Control[1];
 
         // Diverse interfacce per diversi tipi di esercizi
-        if (exercise instanceof OrderStepsExercise) {
-            // Per "Ordina i Passi" utilizziamo una lista ordinabile
-            answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
+        if (exercise instanceof WhatPrintsExercise) {
+            TextArea answerArea = new TextArea();
+            answerArea.setPromptText("Scrivi l'output atteso, una riga per ogni println");
+            answerArea.setWrapText(true);
+            answerArea.setPrefRowCount(4);
+            answerControlRef[0] = answerArea;
         } else {
-            // Per altri esercizi utilizziamo un campo di testo
             TextField answerField = new TextField();
             answerField.setPromptText("Inserisci la tua risposta qui");
             answerControlRef[0] = answerField;
         }
+
 
         answerBox.getChildren().addAll(answerLabel, answerControlRef[0]);
 
@@ -155,9 +162,10 @@ public class ExerciseScreen {
         submitButton.setOnAction(e -> {
             String userAnswer = "";
 
-            // Ottieni la risposta a seconda del tipo di controllo
             if (answerControlRef[0] instanceof TextField) {
                 userAnswer = ((TextField) answerControlRef[0]).getText().trim();
+            } else if (answerControlRef[0] instanceof TextArea) {
+                userAnswer = ((TextArea) answerControlRef[0]).getText().trim();
             } else if (answerControlRef[0] instanceof ListView) {
                 @SuppressWarnings("unchecked")
                 ListView<String> listView = (ListView<String>) answerControlRef[0];
@@ -165,13 +173,13 @@ public class ExerciseScreen {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < listView.getItems().size(); i++) {
                     if (i > 0) sb.append(",");
-                    // Ottieni l'indice originale dal dato associato all'elemento
                     sb.append(listView.getItems().get(i).split("\\.")[0]);
                 }
                 userAnswer = sb.toString();
             }
 
             boolean isCorrect = exercise.checkAnswer(currentQuestionIndex, userAnswer);
+
 
             if (isCorrect) {
                 resultText.setText("Corretto!");
@@ -189,11 +197,11 @@ public class ExerciseScreen {
         });
 
         retryButton.setOnAction(e -> {
-            // Reset dell'area di risposta per permettere un nuovo tentativo
             if (answerControlRef[0] instanceof TextField) {
                 ((TextField) answerControlRef[0]).clear();
+            } else if (answerControlRef[0] instanceof TextArea) {
+                ((TextArea) answerControlRef[0]).clear();
             } else if (answerControlRef[0] instanceof ListView) {
-                // Per l'esercizio "Ordina i Passi" potremmo voler reinizializzare la lista
                 VBox parent = (VBox) answerControlRef[0].getParent();
                 int controlIndex = parent.getChildren().indexOf(answerControlRef[0]);
                 parent.getChildren().remove(answerControlRef[0]);
@@ -206,6 +214,7 @@ public class ExerciseScreen {
             submitButton.setDisable(false);
             retryButton.setDisable(true);
         });
+
 
         nextButton.setOnAction(e -> {
             currentQuestionIndex++;
@@ -226,6 +235,10 @@ public class ExerciseScreen {
                             submitButton.setDisable(false);
                         }
                     });
+
+                } else if (answerControlRef[0] instanceof TextArea) {
+                    ((TextArea) answerControlRef[0]).clear();
+
                 } else if (answerControlRef[0] instanceof ListView) {
                     // Aggiorna la ListView per la nuova domanda
                     VBox parent = (VBox) answerControlRef[0].getParent();
@@ -236,10 +249,12 @@ public class ExerciseScreen {
                     parent.getChildren().add(controlIndex, answerControlRef[0]);
                 }
 
+
                 resultText.setText("");
                 submitButton.setDisable(false);
                 nextButton.setDisable(true);
                 retryButton.setDisable(true);
+
             } else {
                 // Esercizio completato
                 contentBox.getChildren().clear();
@@ -323,17 +338,83 @@ public class ExerciseScreen {
         ListView<String> stepsListView = new ListView<>();
         stepsListView.setPrefHeight(200);
 
-        // Ottieni i passi per la domanda corrente
         List<String> steps = exercise.getStepsForQuestion(questionIndex);
         List<String> numberedSteps = new ArrayList<>();
 
-        // Aggiungi il numero originale a ogni passo (per tracciare l'ordine originale)
         for (int i = 0; i < steps.size(); i++) {
             numberedSteps.add((i + 1) + ". " + steps.get(i));
         }
 
         stepsListView.getItems().addAll(numberedSteps);
 
+        // Abilita drag and drop con simbolo "≡"
+        stepsListView.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        Label icon = new Label("≡");
+                        icon.setStyle("-fx-font-weight: bold; -fx-padding: 0 10 0 0;");
+                        Label text = new Label(item);
+                        HBox box = new HBox(5, icon, text);
+                        setGraphic(box);
+                    }
+                }
+            };
+
+            // Gestione drag & drop
+            cell.setOnDragDetected(event -> {
+                if (cell.isEmpty()) return;
+                Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(cell.getItem());
+                db.setContent(content);
+                event.consume();
+            });
+
+            cell.setOnDragOver(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+            cell.setOnDragEntered(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    cell.setStyle("-fx-background-color: lightgray;");
+                }
+            });
+
+            cell.setOnDragExited(event -> {
+                cell.setStyle("");
+            });
+
+            cell.setOnDragDropped(event -> {
+                if (cell.isEmpty()) return;
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasString()) {
+                    int draggedIdx = stepsListView.getItems().indexOf(db.getString());
+                    int thisIdx = cell.getIndex();
+
+                    if (draggedIdx != thisIdx) {
+                        String draggedItem = stepsListView.getItems().remove(draggedIdx);
+                        stepsListView.getItems().add(thisIdx, draggedItem);
+                    }
+
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
+
+            return cell;
+        });
+
         return stepsListView;
     }
+
 }
