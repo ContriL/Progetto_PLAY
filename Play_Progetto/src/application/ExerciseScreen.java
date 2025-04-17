@@ -119,12 +119,14 @@ public class ExerciseScreen {
             answerArea.setWrapText(true);
             answerArea.setPrefRowCount(4);
             answerControlRef[0] = answerArea;
+        } else if (exercise instanceof OrderStepsExercise) {
+            // Crea il controllo per l'ordinamento dei passi
+            answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Inserisci la tua risposta qui");
             answerControlRef[0] = answerField;
         }
-
 
         answerBox.getChildren().addAll(answerLabel, answerControlRef[0]);
 
@@ -173,7 +175,14 @@ public class ExerciseScreen {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < listView.getItems().size(); i++) {
                     if (i > 0) sb.append(",");
-                    sb.append(listView.getItems().get(i).split("\\.")[0]);
+                    // Estrai solo il numero dal formato "X. testo"
+                    String item = listView.getItems().get(i);
+                    int dotIndex = item.indexOf('.');
+                    if (dotIndex > 0) {
+                        sb.append(item.substring(0, dotIndex));
+                    } else {
+                        sb.append(item); // Fallback
+                    }
                 }
                 userAnswer = sb.toString();
             }
@@ -345,15 +354,17 @@ public class ExerciseScreen {
             numberedSteps.add((i + 1) + ". " + steps.get(i));
         }
 
+        // Assicurati di svuotare la lista prima di aggiungere i nuovi passi
+        stepsListView.getItems().clear();
         stepsListView.getItems().addAll(numberedSteps);
 
-        // Abilita drag and drop con simbolo "≡"
         stepsListView.setCellFactory(lv -> {
             ListCell<String> cell = new ListCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || item == null) {
+                        setText(null);
                         setGraphic(null);
                     } else {
                         Label icon = new Label("≡");
@@ -361,25 +372,31 @@ public class ExerciseScreen {
                         Label text = new Label(item);
                         HBox box = new HBox(5, icon, text);
                         setGraphic(box);
+                        setText(null); // Importante: non impostare il testo ma solo il grafico
                     }
                 }
             };
 
-            // Gestione drag & drop
+            // Gestione del drag & drop
             cell.setOnDragDetected(event -> {
-                if (cell.isEmpty()) return;
-                Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                content.putString(cell.getItem());
-                db.setContent(content);
-                event.consume();
+                if (!cell.isEmpty()) {
+                    Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(cell.getItem());
+                    db.setContent(content);
+
+                    // Salva l'indice dell'elemento che si sta spostando
+                    stepsListView.getProperties().put("draggedIndex", cell.getIndex());
+
+                    event.consume();
+                }
             });
 
             cell.setOnDragOver(event -> {
                 if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
                     event.acceptTransferModes(TransferMode.MOVE);
+                    event.consume();
                 }
-                event.consume();
             });
 
             cell.setOnDragEntered(event -> {
@@ -393,20 +410,28 @@ public class ExerciseScreen {
             });
 
             cell.setOnDragDropped(event -> {
-                if (cell.isEmpty()) return;
                 Dragboard db = event.getDragboard();
                 boolean success = false;
+
                 if (db.hasString()) {
-                    int draggedIdx = stepsListView.getItems().indexOf(db.getString());
+                    Integer draggedIdx = (Integer) stepsListView.getProperties().get("draggedIndex");
                     int thisIdx = cell.getIndex();
 
-                    if (draggedIdx != thisIdx) {
-                        String draggedItem = stepsListView.getItems().remove(draggedIdx);
-                        stepsListView.getItems().add(thisIdx, draggedItem);
-                    }
+                    if (draggedIdx != null && draggedIdx != thisIdx) {
+                        String draggedItem = stepsListView.getItems().remove(draggedIdx.intValue());
 
-                    success = true;
+                        // Se l'elemento è trascinato più in basso, aggiustare l'indice
+                        if (thisIdx > draggedIdx) {
+                            thisIdx--;
+                        }
+
+                        // Inserisci nel punto esatto
+                        stepsListView.getItems().add(thisIdx, draggedItem);
+                        stepsListView.getSelectionModel().select(thisIdx);
+                        success = true;
+                    }
                 }
+
                 event.setDropCompleted(success);
                 event.consume();
             });
@@ -416,5 +441,4 @@ public class ExerciseScreen {
 
         return stepsListView;
     }
-
 }
