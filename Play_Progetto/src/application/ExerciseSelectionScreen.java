@@ -106,13 +106,17 @@ public class ExerciseSelectionScreen extends Main {
         whatPrintsBtn.setUserData("WhatPrints");
         whatPrintsBtn.setPrefWidth(200);
 
-       Button ERexerciseBtn = new Button("Quiz eredità e polimorfismo");
-       ERexerciseBtn.setOnAction(e -> {
-        Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
-        stage.setScene(quiz);
-       });
+       //ToggleButton ERexerciseBtn = new ToggleButton("Quiz eredità e polimorfismo");
+       //ERexerciseBtn.setOnAction(e -> {
+        //Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
+        //stage.setScene(quiz);
+       //});
+       ToggleButton EPexerciseBtn = new ToggleButton("Quiz eredità e polimorfismo");
+       EPexerciseBtn.setToggleGroup(exerciseTypeGroup);
+       EPexerciseBtn.setUserData("quizEP");
+       EPexerciseBtn.setPrefWidth(200);
 
-        exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn,ERexerciseBtn);
+        exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn,EPexerciseBtn);
         exerciseGrid.add(exerciseTypeBox, 0, 0);
 
         // Colonna per livelli di difficoltà
@@ -162,6 +166,10 @@ public class ExerciseSelectionScreen extends Main {
             }
 
             String exerciseType = (String) exerciseTypeGroup.getSelectedToggle().getUserData();
+            if (exerciseType.equals("quizEP")) {
+                 Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
+                 stage.setScene(quiz);
+            }
             int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
 
             Exercise selectedExercise = ExerciseFactory.createExercise(exerciseType, difficulty);
