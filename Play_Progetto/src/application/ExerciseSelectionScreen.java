@@ -106,11 +106,6 @@ public class ExerciseSelectionScreen extends Main {
         whatPrintsBtn.setUserData("WhatPrints");
         whatPrintsBtn.setPrefWidth(200);
 
-       //ToggleButton ERexerciseBtn = new ToggleButton("Quiz eredità e polimorfismo");
-       //ERexerciseBtn.setOnAction(e -> {
-        //Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
-        //stage.setScene(quiz);
-       //});
        ToggleButton EPexerciseBtn = new ToggleButton("Quiz eredità e polimorfismo");
        EPexerciseBtn.setToggleGroup(exerciseTypeGroup);
        EPexerciseBtn.setUserData("quizEP");

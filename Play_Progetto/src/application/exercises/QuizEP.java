@@ -166,14 +166,14 @@ public class QuizEP extends AbstractExercise {
         ToggleGroup group = new ToggleGroup();
         toggleGroups.add(group);
 
+        questionBox.getChildren().add(questionLabel); // <<--- ADESSO PRIMA la DOMANDA
+
         for (String option : options) {
             RadioButton rb = new RadioButton(option);
             rb.setWrapText(true);
             rb.setToggleGroup(group);
             questionBox.getChildren().add(rb);
         }
-
-        questionBox.getChildren().add(questionLabel);
 
         return questionBox;
     }
