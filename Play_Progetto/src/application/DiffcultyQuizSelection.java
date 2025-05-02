@@ -7,10 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -19,19 +16,20 @@ import javafx.stage.Stage;
 import java.io.File;
 
 import application.exercises.Exercise;
-import application.exercises.ExerciseFactory;
 import application.exercises.QuizEP;
 
 public class DiffcultyQuizSelection {
 
-    public static Scene getScene(Stage stage, Scene  selectionScene){
-        
+    
+
+    public static Scene getScene(Stage stage, Scene selectionScene) {
+
         BorderPane root = new BorderPane();
         Scene DiffquizEP = new Scene(root, 700, 550);
 
         // Configurazione CSS
         File style = new File("Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/style.css");
-        DiffquizEP.getStylesheets().add(style.getAbsolutePath());
+        DiffquizEP.getStylesheets().add(style.toURI().toString());
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
@@ -39,37 +37,21 @@ public class DiffcultyQuizSelection {
         navBar.setAlignment(Pos.CENTER_RIGHT);
         navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
 
-        // Pulsanti di navigazione
         Button homeButton = new Button("Home");
         Button progressButton = new Button("I miei Progressi");
         Button logoutButton = new Button("Logout");
-        Button backButton = new Button("indietro");
+        Button backButton = new Button("Indietro");
         navBar.getChildren().addAll(homeButton, progressButton, logoutButton, backButton);
 
-    
-        // Gestione eventi dei pulsanti di navigazione
-        homeButton.setOnAction(e -> {
-            Scene homeScene = Home.getScene(stage, selectionScene);
-            stage.setScene(homeScene);
-        });
-
-        progressButton.setOnAction(e -> {
-            Scene progressScene = UserProgressScreen.getScene(stage, selectionScene);
-            stage.setScene(progressScene);
-        });
-
+        homeButton.setOnAction(e -> stage.setScene(Home.getScene(stage, selectionScene)));
+        progressButton.setOnAction(e -> stage.setScene(UserProgressScreen.getScene(stage, selectionScene)));
         logoutButton.setOnAction(e -> {
             Main.setCurrentUser("");
             stage.setScene(selectionScene);
         });
+        backButton.setOnAction(e -> stage.setScene(ExerciseSelectionScreen.getScene(stage, selectionScene)));
 
-        backButton.setOnAction(e -> {
-            Scene previousScene = ExerciseSelectionScreen.getScene(stage, selectionScene);
-            stage.setScene(previousScene);
-        });
-
-        VBox topContainer = new VBox();
-        topContainer.getChildren().add(navBar);
+        VBox topContainer = new VBox(navBar);
         root.setTop(topContainer);
 
         // Intestazione
@@ -79,85 +61,92 @@ public class DiffcultyQuizSelection {
         header.setAlignment(Pos.CENTER);
         header.setPadding(new Insets(20, 0, 20, 0));
 
+        VBox contentBox = new VBox(20);
+        contentBox.setAlignment(Pos.CENTER);
 
-        // Contenitore principale con griglia di selezione
-        GridPane exerciseGrid = new GridPane();
-        exerciseGrid.setHgap(15);
-        exerciseGrid.setVgap(15);
-        exerciseGrid.setPadding(new Insets(20));
-        exerciseGrid.setAlignment(Pos.CENTER);
+        // Griglia per bottoni e barre
+        GridPane selectionGrid = new GridPane();
+        selectionGrid.setHgap(20);
+        selectionGrid.setVgap(10);
+        selectionGrid.setAlignment(Pos.CENTER);
 
         ToggleGroup difficultyGroup = new ToggleGroup();
 
-        // Colonna per livelli di difficoltà
-        VBox difficultyBox = new VBox(10);
-        Text difficultyLabel = new Text("Opzioni:");
-        difficultyLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        difficultyBox.getChildren().add(difficultyLabel);
-
-
-        // Pulsanti per i livelli di difficoltà
         ToggleButton beginnerBtn = new ToggleButton("Principiante");
         beginnerBtn.setToggleGroup(difficultyGroup);
         beginnerBtn.setUserData(1);
-        beginnerBtn.setPrefWidth(200);
+        beginnerBtn.setPrefSize(200, 40);
 
         ToggleButton intermediateBtn = new ToggleButton("Intermedio");
         intermediateBtn.setToggleGroup(difficultyGroup);
         intermediateBtn.setUserData(2);
-        intermediateBtn.setPrefWidth(200);
+        intermediateBtn.setPrefSize(200, 40);
 
         ToggleButton advancedBtn = new ToggleButton("Avanzato");
         advancedBtn.setToggleGroup(difficultyGroup);
         advancedBtn.setUserData(3);
-        advancedBtn.setPrefWidth(200);
-
-        difficultyBox.getChildren().addAll(beginnerBtn, intermediateBtn, advancedBtn);
-        exerciseGrid.add(difficultyBox, 0, 0);
-
-        root.setCenter(exerciseGrid);
-
-         // Area per pulsanti di azione
-         HBox buttonBar = new HBox(15);
-         buttonBar.setAlignment(Pos.CENTER);
-         buttonBar.setPadding(new Insets(20));
- 
-         // Label per messaggio di errore
-         Label errorLabel = new Label("");
-         errorLabel.setStyle("-fx-text-fill: red;");
- 
-         // Pulsanti
-         Button startButton = new Button("Inizia Esercizio");
- 
-         // Azione per il pulsante Inizia
-         startButton.setOnAction(e -> {
-             if (difficultyGroup.getSelectedToggle() == null) {
-                 errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
-                 return;
-             }
-             int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
-             Exercise selectedExercise = new QuizEP(difficulty);
-             Scene exerciseScene = ScreenQuizEP.getScene(stage, DiffquizEP, selectedExercise);
-             stage.setScene(exerciseScene);
-         });
- 
-         buttonBar.getChildren().addAll(startButton);
+        advancedBtn.setPrefSize(200, 40);
 
         
+        String styleBar = "-fx-background-color: linear-gradient(to right, red 50%, green 50%);" +
+                          "-fx-border-color: black;" +
+                          "-fx-border-width: 1;" +
+                          "-fx-border-radius: 10;" +
+                          "-fx-background-radius: 10;";
 
-         // Area inferiore con pulsanti e messaggio di errore
-         VBox bottomBox = new VBox(10);
-         bottomBox.setAlignment(Pos.CENTER);
-         bottomBox.getChildren().addAll(errorLabel, buttonBar);
-         root.setBottom(bottomBox);
- 
+        Region beginnerRegion = new Region();
+        beginnerRegion.setPrefSize(200, 40);
+        beginnerRegion.setStyle(styleBar);
 
+        Region intermediateRegion = new Region();
+        intermediateRegion.setPrefSize(200, 40);
+        intermediateRegion.setStyle(styleBar);
 
-        
-        
-        
+        Region advancedRegion = new Region();
+        advancedRegion.setPrefSize(200, 40);
+        advancedRegion.setStyle(styleBar);
+
+        // Aggiunta alla griglia
+        selectionGrid.add(beginnerBtn, 0, 0);
+        selectionGrid.add(beginnerRegion, 1, 0);
+
+        selectionGrid.add(intermediateBtn, 0, 1);
+        selectionGrid.add(intermediateRegion, 1, 1);
+
+        selectionGrid.add(advancedBtn, 0, 2);
+        selectionGrid.add(advancedRegion, 1, 2);
+
+        contentBox.getChildren().addAll(header, selectionGrid);
+        root.setCenter(contentBox);
+
+        // Area inferiore: error label e start button
+        HBox buttonBar = new HBox(15);
+        buttonBar.setAlignment(Pos.CENTER);
+        buttonBar.setPadding(new Insets(20));
+
+        Label errorLabel = new Label("");
+        errorLabel.setStyle("-fx-text-fill: red;");
+
+        Button startButton = new Button("Inizia Esercizio");
+
+        startButton.setOnAction(e -> {
+            if (difficultyGroup.getSelectedToggle() == null) {
+                errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
+                return;
+            }
+            int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
+            Exercise selectedExercise = new QuizEP(difficulty);
+            Scene exerciseScene = ScreenQuizEP.getScene(stage, DiffquizEP, selectedExercise);
+            stage.setScene(exerciseScene);
+        });
+
+        buttonBar.getChildren().addAll(startButton);
+
+        VBox bottomBox = new VBox(10);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.getChildren().addAll(errorLabel, buttonBar);
+        root.setBottom(bottomBox);
+
         return DiffquizEP;
-        
     }
-    
 }

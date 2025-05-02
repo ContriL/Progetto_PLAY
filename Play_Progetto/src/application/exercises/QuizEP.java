@@ -15,14 +15,14 @@ import javafx.scene.layout.VBox;
 
 public class QuizEP extends AbstractExercise {
     private List<String> questionList;
-    private List<String> correctAnswers;
+    private List<String> Answers;
     private List<ToggleGroup> toggleGroups;
 
     public QuizEP(int difficulty) {
         this.difficulty = difficulty;
         this.title = "Quiz sull'ereditarietà e sul polimorfismo";
         this.questionList = new ArrayList<>();
-        this.correctAnswers = new ArrayList<>();
+        this.Answers = new ArrayList<>();
         this.toggleGroups = new ArrayList<>();
 
         switch (difficulty) {
@@ -161,12 +161,12 @@ public class QuizEP extends AbstractExercise {
         questionLabel.setWrapText(true);
 
         questionList.add(questionText);
-        correctAnswers.add(correct);
+        Answers.add(correct);
 
         ToggleGroup group = new ToggleGroup();
         toggleGroups.add(group);
 
-        questionBox.getChildren().add(questionLabel); // <<--- ADESSO PRIMA la DOMANDA
+        questionBox.getChildren().add(questionLabel);
 
         for (String option : options) {
             RadioButton rb = new RadioButton(option);
@@ -185,21 +185,7 @@ public class QuizEP extends AbstractExercise {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        Label resultLabel = new Label();
-        Button submitAll = new Button("Invia tutte le risposte");
-        submitAll.setOnAction(e -> {
-            int correctCount = 0;
-            for (int i = 0; i < toggleGroups.size(); i++) {
-                ToggleGroup group = toggleGroups.get(i);
-                RadioButton selected = (RadioButton) group.getSelectedToggle();
-                if (selected != null && selected.getText().equals(correctAnswers.get(i))) {
-                    correctCount++;
-                }
-            }
-            resultLabel.setText("Hai risposto correttamente a " + correctCount + " su " + correctAnswers.size() + " domande.");
-        });
-
-        VBox container = new VBox(10, scrollPane, submitAll, resultLabel);
+        VBox container = new VBox(10, scrollPane);
         container.setPadding(new Insets(10));
         return container;
     }
@@ -213,6 +199,14 @@ public class QuizEP extends AbstractExercise {
         }
     }
 
+    public List<ToggleGroup> getToggleGroups() {
+        return toggleGroups;
+    }
+
+    public List<String> getAnswers() {
+        return Answers;
+    }
+
     @Override
     public List<String> getQuestions() {
         return questionList;
@@ -220,8 +214,8 @@ public class QuizEP extends AbstractExercise {
 
     @Override
     public boolean checkAnswer(int questionIndex, String userAnswer) {
-        if (questionIndex < 0 || questionIndex >= correctAnswers.size()) return false;
-        return userAnswer.toLowerCase().contains(correctAnswers.get(questionIndex).toLowerCase());
+        if (questionIndex < 0 || questionIndex >= Answers.size()) return false;
+        return userAnswer.toLowerCase().contains(Answers.get(questionIndex).toLowerCase());
     }
 
     @Override
