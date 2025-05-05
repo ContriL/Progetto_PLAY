@@ -28,8 +28,9 @@ public class DiffcultyQuizSelection {
         Scene DiffquizEP = new Scene(root, 700, 550);
 
         // Configurazione CSS
-        File style = new File("Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/style.css");
-        DiffquizEP.getStylesheets().add(style.toURI().toString());
+        //File style = new File("Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/style.css");
+        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        DiffquizEP.getStylesheets().add("file://" + css.getAbsolutePath());
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
@@ -87,13 +88,47 @@ public class DiffcultyQuizSelection {
         advancedBtn.setUserData(3);
         advancedBtn.setPrefSize(200, 40);
 
+        String username = Main.getCurrentUser();
+        String exerciseType = "quizEP";
+        int maxLevel = UserProgress.getMaxLevelForExercise(username,exerciseType);
+        //int diff = QuizEP.getDifficulty();
         
-        String styleBar = "-fx-background-color: linear-gradient(to right, red 50%, green 50%);" +
+        String styleBar = "-fx-background-color: linear-gradient(to right, red 100%, green 0%);" +
                           "-fx-border-color: black;" +
                           "-fx-border-width: 1;" +
                           "-fx-border-radius: 10;" +
                           "-fx-background-radius: 10;";
+        switch (maxLevel) {
+            case 1:  styleBar = "-fx-background-color: linear-gradient(to right, green 33%, red 66%);" +
+                                      "-fx-border-color: black;" +
+                                      "-fx-border-width: 1;" +
+                                      "-fx-border-radius: 10;" +
+                                      "-fx-background-radius: 10;";
 
+                     break;
+            case 2: styleBar = "-fx-background-color: linear-gradient(to right, green 66%, red 35%);" +
+                                      "-fx-border-color: black;" +
+                                      "-fx-border-width: 1;" +
+                                      "-fx-border-radius: 10;" +
+                                      "-fx-background-radius: 10;";
+                    break;
+            case 3: styleBar = "-fx-background-color: linear-gradient(to right, red 0%, green 100%);" +
+                                      "-fx-border-color: black;" +
+                                      "-fx-border-width: 1;" +
+                                      "-fx-border-radius: 10;" +
+                                      "-fx-background-radius: 10;";
+                    break;
+
+        
+            default: styleBar = "-fx-background-color: linear-gradient(to right, red 100%, green 0%);" +
+                                "-fx-border-color: black;" +
+                                "-fx-border-width: 1;" +
+                                "-fx-border-radius: 10;" +
+                                "-fx-background-radius: 10;";
+                break;
+        }
+        
+    
         Region beginnerRegion = new Region();
         beginnerRegion.setPrefSize(200, 40);
         beginnerRegion.setStyle(styleBar);
@@ -149,4 +184,5 @@ public class DiffcultyQuizSelection {
 
         return DiffquizEP;
     }
+
 }

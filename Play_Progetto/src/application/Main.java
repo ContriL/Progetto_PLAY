@@ -19,13 +19,17 @@ public class Main extends Application {
 
 	private static Integer tentativi = 0;
 	private static String currentUser = ""; // Per tenere traccia dell'utente corrente
+	
+
 
 	private PasswordField pf = new PasswordField();
 	private Button b = new Button("Accedi");
 	private Text loginMsg = new Text();
 	private TextField name = new TextField();
 	private Button r = new Button("Crea un account");
-	public static File Utenti_registrati = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
+	//public static File Utenti_registrati = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
+	public static File Utenti_registrati = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
+
 
 	/**
 	 * Ottiene il nome utente correntemente loggato
@@ -48,7 +52,8 @@ public class Main extends Application {
 		BorderPane root = new BorderPane();
 		Scene s1 = new Scene(root, 700, 550);
 
-		File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+		//File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+		File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
 		s1.getStylesheets().add("file://" + css.getAbsolutePath());
 
 		

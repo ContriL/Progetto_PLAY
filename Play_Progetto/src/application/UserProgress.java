@@ -11,7 +11,8 @@ import java.util.List;
  */
 public class UserProgress {
 
-    private static final String PROGRESS_FILE_PATH = "C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/UtentiProgressi.txt";
+    //private static final String PROGRESS_FILE_PATH = "C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/UtentiProgressi.txt";
+    private static final String PROGRESS_FILE_PATH = "/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/UtentiProgressi.txt";
     private static final File progressFile = new File(PROGRESS_FILE_PATH);
 
     /**

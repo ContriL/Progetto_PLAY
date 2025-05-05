@@ -26,8 +26,10 @@ public class ScreenQuizEP {
          Scene screenQuiz = new Scene(root, 700, 550);
 
          // Configurazione CSS
-        File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
         screenQuiz.getStylesheets().add("file://" + css.getAbsolutePath());
+        
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);

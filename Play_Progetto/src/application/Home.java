@@ -20,9 +20,13 @@ public class Home extends Main {
 		BorderPane root = new BorderPane();
 		Scene home = new Scene(root, 600, 400);
 
-		// Configurazione CSS
-		File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+		File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
 		home.getStylesheets().add("file://" + css.getAbsolutePath());
+
+
+		// Configurazione CSS
+		//File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+		//home.getStylesheets().add("file://" + css.getAbsolutePath());
 
 		// Barra di navigazione superiore
 		HBox navBar = new HBox(15);
