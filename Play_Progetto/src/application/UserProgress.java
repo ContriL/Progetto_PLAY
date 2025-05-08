@@ -94,30 +94,54 @@ public class UserProgress {
      * @param exerciseType Tipo di esercizio
      * @return Il livello massimo raggiunto (1-3), o 0 se non è stato completato alcun esercizio
      */
-    public static int getMaxLevelForExercise(String username, String exerciseType) {
-        int maxLevel = 0;
+    
 
+    public static int getDifficultyForExercise(String username, String exerciseType) {
+        int lastDifficulty = 0;
+    
         try (BufferedReader reader = new BufferedReader(new FileReader(progressFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-
+    
                 // Verifica se la riga appartiene all'utente e al tipo di esercizio
                 if (parts.length >= 3 && parts[0].equals(username) && parts[1].equals(exerciseType)) {
-                    int level = Integer.parseInt(parts[2]);
-
-                    // Se il livello è maggiore del massimo trovato, aggiornalo
-                    if (level > maxLevel) {
-                        maxLevel = level;
-                    }
+                    // Aggiorna sempre all'ultimo valore trovato
+                    lastDifficulty = Integer.parseInt(parts[2]);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return maxLevel;
+    
+        return lastDifficulty;
     }
+    
+    public static int getCorrectAnswers(String username, String exerciseType, int difficulty) {
+        int correctAnswers = 0;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(progressFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+    
+                // Verifica se la riga appartiene all'utente, al tipo di esercizio e al livello
+                if (parts.length >= 4 &&
+                    parts[0].equals(username) &&
+                    parts[1].equals(exerciseType) &&
+                    Integer.parseInt(parts[2]) == difficulty) {
+                    
+                    // Usa sempre l'ultima entry valida trovata
+                    correctAnswers = Integer.parseInt(parts[3]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        return correctAnswers;
+    }
+    
 
     /**
      * Controlla se un utente ha completato con successo un determinato livello di un esercizio.

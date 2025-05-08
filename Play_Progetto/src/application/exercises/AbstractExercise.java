@@ -22,4 +22,6 @@ public abstract class AbstractExercise implements Exercise {
     public int getDifficulty() {
         return difficulty;
     }
+
+    
 }

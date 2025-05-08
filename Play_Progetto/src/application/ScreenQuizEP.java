@@ -14,22 +14,22 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ScreenQuizEP {
 
-    private static int correctCount = 0;
+    private static final Map<Integer, Integer> correctCountMap = new HashMap<>();
 
     public static Scene getScene(Stage stage, Scene selectionScene, Exercise exercise) {
-         
-         BorderPane root = new BorderPane();
-         Scene screenQuiz = new Scene(root, 700, 550);
 
-         // Configurazione CSS
-        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        BorderPane root = new BorderPane();
+        Scene screenQuiz = new Scene(root, 700, 550);
+
+        // Configurazione CSS
         File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
         screenQuiz.getStylesheets().add("file://" + css.getAbsolutePath());
-        
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
@@ -89,26 +89,32 @@ public class ScreenQuizEP {
             Label resultLabel = new Label();
             Button submitAll = new Button("Invia tutte le risposte");
             Label saveMessage = new Label();
+
             submitAll.setOnAction(e -> {
-                //int correctCount = 0;
+                submitAll.setDisable(true);
                 List<ToggleGroup> groups = quiz.getToggleGroups();
                 List<String> answers = quiz.getAnswers();
 
+                int localCorrectCount = 0;
                 for (int i = 0; i < groups.size(); i++) {
                     ToggleGroup group = groups.get(i);
                     RadioButton selected = (RadioButton) group.getSelectedToggle();
                     if (selected != null && selected.getText().equals(answers.get(i))) {
-                        correctCount++;
+                        localCorrectCount++;
                     }
                 }
-                resultLabel.setText("Hai risposto correttamente a " + correctCount + " su " + answers.size() + " domande.");
+
+                int difficulty = exercise.getDifficulty();
+                correctCountMap.put(difficulty, localCorrectCount);
+
+                resultLabel.setText("Hai risposto correttamente a " + localCorrectCount + " su " + answers.size() + " domande.");
+
                 String currenUser = Main.getCurrentUser();
                 String type = "quizEP";
-                int diff = exercise.getDifficulty();
                 int totalQuestion = exercise.getTotalQuestions();
-                boolean saved = UserProgress.saveProgress(currenUser, type, diff, answers.size(), totalQuestion);
-                if(saved){
-                    saveMessage.setText("I tuoi progressi sono stati salvati corretamente");
+                boolean saved = UserProgress.saveProgress(currenUser, type, difficulty, localCorrectCount, totalQuestion);
+                if (saved) {
+                    saveMessage.setText("I tuoi progressi sono stati salvati correttamente");
                     saveMessage.setTextFill(Color.GREEN);
                 } else {
                     saveMessage.setText("Errore durante il salvataggio: progressi non salvati");
@@ -116,18 +122,15 @@ public class ScreenQuizEP {
                 }
             });
 
-            VBox quizContainer = new VBox(15, quizBox, submitAll, resultLabel,saveMessage);
+            VBox quizContainer = new VBox(15, quizBox, submitAll, resultLabel, saveMessage);
             quizContainer.setPadding(new Insets(15));
             root.setCenter(quizContainer);
         }
 
-
         return screenQuiz;
     }
 
-    public int getCorrectCount() {
-        return correctCount;
+    public int getCorrectCount(int difficulty) {
+        return correctCountMap.getOrDefault(difficulty, 0);
     }
-
-    
 }
