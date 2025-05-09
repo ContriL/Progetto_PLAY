@@ -22,7 +22,8 @@
 }
 
 .button:hover {
-    -fx-background-color: blue;
+    -fx-background-color: darkblue;
+    -fx-opacity: 0.5;
 }
 
 .button:pressed {
@@ -35,4 +36,34 @@
     -fx-padding: 8px;
     -fx-font-size: 14px;
     -fx-border-color: transparent;
+}
+
+#navBar {
+    -fx-background-color: #fdfeff;
+    -fx-padding: 10px;
+    -fx-spacing: 30px;
+    -fx-alignment: center;
+    -fx-border-color: #111;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.toggle-button {
+    -fx-background-color: #8c1705;
+    -fx-background-radius: 5px;
+    -fx-border-color: black;
+    -fx-text-fill: white;
+
+
+}
+
+.toggle-button:hover {
+    -fx-border-color-: darkblue;
+}
+
+.toggle-button:selected {
+    -fx-border-color: rgb(227, 190, 5);
+    -fx-border-width: 8px;
+    -fx-background-radius: 5px;
+
+
 }

@@ -82,8 +82,11 @@ public class UserProgressScreen {
         Scene scene = new Scene(root, 800, 600);
 
         // Configurazione CSS
-        File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        //scene.getStylesheets().add("file://" + css.getAbsolutePath());
+        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
         scene.getStylesheets().add("file://" + css.getAbsolutePath());
+
 
         // Intestazione
         Text headerText = new Text("I tuoi progressi");
@@ -209,7 +212,7 @@ public class UserProgressScreen {
         // Pulsante per tornare alla home
         Button backButton = new Button("Torna alla Home");
         backButton.setPrefWidth(150);
-        backButton.setOnAction(e -> stage.setScene(homeScene));
+        backButton.setOnAction(e -> stage.setScene(Home.getScene(stage, scene)));
 
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);

@@ -31,6 +31,7 @@ public class DiffcultyQuizSelection {
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
+        navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
         navBar.setAlignment(Pos.CENTER_RIGHT);
         navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
@@ -45,7 +46,8 @@ public class DiffcultyQuizSelection {
         progressButton.setOnAction(e -> stage.setScene(UserProgressScreen.getScene(stage, selectionScene)));
         logoutButton.setOnAction(e -> {
             Main.setCurrentUser("");
-            stage.setScene(Home.getScene(stage, selectionScene));
+	        Scene loginScene = Main.getLoginScene(stage);
+	        stage.setScene(loginScene);
         });
         backButton.setOnAction(e -> stage.setScene(ExerciseSelectionScreen.getScene(stage, selectionScene)));
 

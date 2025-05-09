@@ -33,6 +33,7 @@ public class ExerciseSelectionScreen extends Main {
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
+        navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
         navBar.setAlignment(Pos.CENTER_RIGHT);
         navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
@@ -156,15 +157,13 @@ public class ExerciseSelectionScreen extends Main {
 
         // Azione per il pulsante Inizia
         startButton.setOnAction(e -> {
-            if (exerciseTypeGroup.getSelectedToggle() == null || difficultyGroup.getSelectedToggle() == null) {
-                errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
-                return;
-            }
-
             String exerciseType = (String) exerciseTypeGroup.getSelectedToggle().getUserData();
             if (exerciseType.equals("quizEP")) {
                  Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
                  stage.setScene(quiz);
+            } else if(exerciseTypeGroup.getSelectedToggle() == null || difficultyGroup.getSelectedToggle() == null){
+                errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
+                return;
             }
             int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
 

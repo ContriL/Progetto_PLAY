@@ -33,6 +33,7 @@ public class ScreenQuizEP {
 
         // Barra superiore
         HBox navBar = new HBox(15);
+        navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
         navBar.setAlignment(Pos.CENTER_RIGHT);
         navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
@@ -92,7 +93,7 @@ public class ScreenQuizEP {
                 int difficulty = exercise.getDifficulty();
                 correctCountMap.put(difficulty, localCorrectCount[0]);
 
-                resultLabel.setText("Hai risposto correttamente a " + localCorrectCount[0] + " su " + answers.size() + " domande.");
+                resultLabel.setText("Hai risposto correttamente a " + localCorrectCount[0] + " su 3 domande.");
 
                 String currenUser = Main.getCurrentUser();
                 String type = "quizEP";
@@ -205,7 +206,6 @@ public class ScreenQuizEP {
 
             // Bottone Logout
             logoutButton.setOnAction(e -> {
-                Main.setCurrentUser("");
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Conferma uscita");
                 alert.setHeaderText("Attenzione: stai eseguendo un logout.");
@@ -235,8 +235,10 @@ public class ScreenQuizEP {
                         String type = "quizEP";
                         int totalQuestions = exercise.getTotalQuestions();
                         UserProgress.saveProgress(currentUser, type, difficulty, localCorrectCount[0], totalQuestions);
+                        Main.setCurrentUser("");
 
-                        stage.setScene(Home.getScene(stage, anteprima));
+                        Scene loginScene = Main.getLoginScene(stage);
+	                    stage.setScene(loginScene);
                     }
                 });
             });

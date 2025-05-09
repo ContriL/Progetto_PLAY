@@ -30,6 +30,7 @@ public class Home extends Main {
 
 		// Barra di navigazione superiore
 		HBox navBar = new HBox(15);
+		navBar.setId("navBar");
 		navBar.setPadding(new Insets(10));
 		navBar.setAlignment(Pos.CENTER_RIGHT);
 		navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
@@ -51,7 +52,8 @@ public class Home extends Main {
 
 		logoutButton.setOnAction(e -> {
 			Main.setCurrentUser("");
-			stage.setScene(loginScene);
+			Scene loginScene1 = Main.getLoginScene(stage);
+	        stage.setScene(loginScene1);
 		});
 
 		navBar.getChildren().addAll(homeButton, progressButton, logoutButton);

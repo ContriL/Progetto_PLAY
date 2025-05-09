@@ -36,11 +36,15 @@ public class ExerciseScreen {
         Scene scene = new Scene(root, 700, 550);
 
         // Configurazione CSS
-        File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
+        //scene.getStylesheets().add("file://" + css.getAbsolutePath());
+        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
         scene.getStylesheets().add("file://" + css.getAbsolutePath());
+
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);
+        navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
         navBar.setAlignment(Pos.CENTER_RIGHT);
         navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
@@ -64,7 +68,8 @@ public class ExerciseScreen {
 
         logoutButton.setOnAction(e -> {
             Main.setCurrentUser("");
-            stage.setScene(selectionScene);
+	        Scene loginScene = Main.getLoginScene(stage);
+	        stage.setScene(loginScene);
         });
 
 
