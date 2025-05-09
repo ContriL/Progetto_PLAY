@@ -45,7 +45,7 @@ public class DiffcultyQuizSelection {
         progressButton.setOnAction(e -> stage.setScene(UserProgressScreen.getScene(stage, selectionScene)));
         logoutButton.setOnAction(e -> {
             Main.setCurrentUser("");
-            stage.setScene(selectionScene);
+            stage.setScene(Home.getScene(stage, selectionScene));
         });
         backButton.setOnAction(e -> stage.setScene(ExerciseSelectionScreen.getScene(stage, selectionScene)));
 
@@ -126,7 +126,7 @@ public class DiffcultyQuizSelection {
         Label errorLabel = new Label("");
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        Button startButton = new Button("Inizia Esercizio");
+        Button startButton = new Button("Vai all'anteprima");
 
         startButton.setOnAction(e -> {
             if (difficultyGroup.getSelectedToggle() == null) {
@@ -135,8 +135,8 @@ public class DiffcultyQuizSelection {
             }
             int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
             Exercise selectedExercise = new QuizEP(difficulty);
-            Scene exerciseScene = ScreenQuizEP.getScene(stage, DiffquizEP, selectedExercise);
-            stage.setScene(exerciseScene);
+            Scene anteprima = AnteprimaQuiz.getScene(stage, DiffquizEP, selectedExercise);
+            stage.setScene(anteprima);
         });
 
         buttonBar.getChildren().addAll(startButton);
