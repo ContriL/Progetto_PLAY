@@ -164,9 +164,9 @@ public class UserProgress {
                         parts[1].equals(exerciseType) &&
                         Integer.parseInt(parts[2]) == level) {
 
-                    // Controlla se la percentuale di successo è almeno 70%
+                    // Controlla se la percentuale di successo è almeno 60%
                     double percentage = Double.parseDouble(parts[5]);
-                    if (percentage >= 70.0) {
+                    if (percentage >= 60.0) {
                         return true;
                     }
                 }
@@ -177,4 +177,6 @@ public class UserProgress {
 
         return false;
     }
+
+
 }

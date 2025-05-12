@@ -81,15 +81,21 @@ public class DiffcultyQuizSelection {
         intermediateBtn.setToggleGroup(difficultyGroup);
         intermediateBtn.setUserData(2);
         intermediateBtn.setPrefSize(200, 40);
+        
 
         ToggleButton advancedBtn = new ToggleButton("Avanzato");
         advancedBtn.setToggleGroup(difficultyGroup);
         advancedBtn.setUserData(3);
         advancedBtn.setPrefSize(200, 40);
+        advancedBtn.setDisable(true);
 
         // Recupero dei progressi per ciascun livello
         String username = Main.getCurrentUser();
         String type = "quizEP";
+        intermediateBtn.setDisable(!UserProgress.hasPassedLevel(username, type, 1));
+        advancedBtn.setDisable(!UserProgress.hasPassedLevel(username, type, 2));
+
+        
 
         int beginnerCorrect = UserProgress.getCorrectAnswers(username, type, 1);
         int intermediateCorrect = UserProgress.getCorrectAnswers(username, type, 2);
@@ -119,6 +125,8 @@ public class DiffcultyQuizSelection {
 
         contentBox.getChildren().addAll(header, selectionGrid);
         root.setCenter(contentBox);
+
+        
 
         // Area inferiore: error label e start button
         HBox buttonBar = new HBox(15);

@@ -220,6 +220,6 @@ public class QuizEP extends AbstractExercise {
 
     @Override
     public int getTotalQuestions() {
-        return questionList.size();
+        return 3;
     }
 }
