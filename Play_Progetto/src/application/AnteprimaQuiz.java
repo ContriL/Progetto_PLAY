@@ -26,10 +26,13 @@ public class AnteprimaQuiz {
             ((QuizEP) exercise).getExerciseUI();
         }
 
-        // CSS
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        anteprima.getStylesheets().add("file://" + css.getAbsolutePath());
-
+        // CSS con percorso relativo
+        try {
+            String cssPath = AnteprimaQuiz.class.getResource("/application/application.css").toExternalForm();
+            anteprima.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
         // Navbar
         HBox navBar = new HBox(15);
         navBar.setId("navBar");

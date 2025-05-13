@@ -23,17 +23,21 @@ import javafx.geometry.Pos;
 
 public class CreaAccount extends Main {
 
-    //public static File Utenti_registrati = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
-    public static File Utenti_registrati = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
+    // Utilizza un percorso relativo per il file degli utenti registrati
+    public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/Utenti_registrati.txt");
 
     public static Scene getScene(Stage stage, Scene s1, Text loginMsg) {
         VBox root = new VBox(10); // Aggiunto spacing
         root.setPadding(new Insets(20)); // Aggiunto padding
         Scene crea = new Scene(root, 400, 400); // Aumentata l'altezza
-        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        crea.getStylesheets().add("file://" + css.getAbsolutePath());
 
+        // Configurazione CSS usando percorso relativo
+        try {
+            String cssPath = CreaAccount.class.getResource("/application/application.css").toExternalForm();
+            crea.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
         Text title = new Text("Registrazione Nuovo Utente");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 

@@ -1,6 +1,7 @@
 package application;
 
 import java.io.*;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,10 +12,32 @@ import java.util.List;
  */
 public class UserProgress {
 
-    //private static final String PROGRESS_FILE_PATH = "C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/UtentiProgressi.txt";
-    private static final String PROGRESS_FILE_PATH = "/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/UtentiProgressi.txt";
-    private static final File progressFile = new File(PROGRESS_FILE_PATH);
+    private static File progressFile;
 
+    static {
+        try {
+            // Ottieni il percorso del file come risorsa nel classpath
+            URL resourceURL = UserProgress.class.getResource("/application/UtentiProgressi.txt");
+
+            if (resourceURL != null) {
+                // Converti l'URL in un URI e poi in un oggetto File
+                progressFile = new File(resourceURL.toURI());
+            } else {
+                System.err.println("File non trovato nel classpath.");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        if (progressFile != null && progressFile.exists()) {
+            System.out.println("File trovato: " + progressFile.getAbsolutePath());
+        } else {
+            System.err.println("File non trovato o errore nel percorso.");
+        }
+    }
     /**
      * Salva il risultato di un esercizio completato da un utente.
      *

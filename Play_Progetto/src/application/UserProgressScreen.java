@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -81,12 +83,13 @@ public class UserProgressScreen {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 800, 600);
 
-        // Configurazione CSS
-        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        //scene.getStylesheets().add("file://" + css.getAbsolutePath());
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        scene.getStylesheets().add("file://" + css.getAbsolutePath());
+        try {
+            // Usa il percorso relativo
+            File file = new File("src/application/Utenti_registrati.txt");
 
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
 
         // Intestazione
         Text headerText = new Text("I tuoi progressi");

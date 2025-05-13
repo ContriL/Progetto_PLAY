@@ -26,8 +26,13 @@ public class DiffcultyQuizSelection {
         Scene DiffquizEP = new Scene(root, 700, 550);
 
         // Configurazione CSS
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        DiffquizEP.getStylesheets().add("file://" + css.getAbsolutePath());
+        try {
+            String cssPath = ClassLoader.getSystemResource("application/application.css").toExternalForm();
+            // Aggiungi il foglio di stile SOLO UNA VOLTA
+            DiffquizEP.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
 
         // Barra di navigazione superiore
         HBox navBar = new HBox(15);

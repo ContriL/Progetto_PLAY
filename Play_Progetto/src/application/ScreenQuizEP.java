@@ -27,11 +27,14 @@ public class ScreenQuizEP {
         BorderPane root = new BorderPane();
         Scene screenQuiz = new Scene(root, 700, 550);
 
-        // CSS
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        screenQuiz.getStylesheets().add("file://" + css.getAbsolutePath());
+        try {
+            String cssPath = ScreenQuizEP.class.getResource("/application/application.css").toExternalForm();
+            screenQuiz.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
 
-        // Barra superiore
+            // Barra superiore
         HBox navBar = new HBox(15);
         navBar.setId("navBar");
         navBar.setPadding(new Insets(10));

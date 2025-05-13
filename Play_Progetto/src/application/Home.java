@@ -20,15 +20,14 @@ public class Home extends Main {
 		BorderPane root = new BorderPane();
 		Scene home = new Scene(root, 600, 400);
 
-		File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-		home.getStylesheets().add("file://" + css.getAbsolutePath());
+		try {
+			String cssPath = Home.class.getResource("/application/application.css").toExternalForm();
+			home.getStylesheets().add(cssPath);
+		} catch (Exception e) {
+			System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+		}
 
-
-		// Configurazione CSS
-		//File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
-		//home.getStylesheets().add("file://" + css.getAbsolutePath());
-
-		// Barra di navigazione superiore
+			// Barra di navigazione superiore
 		HBox navBar = new HBox(15);
 		navBar.setId("navBar");
 		navBar.setPadding(new Insets(10));

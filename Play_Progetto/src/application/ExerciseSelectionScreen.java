@@ -27,11 +27,13 @@ public class ExerciseSelectionScreen extends Main {
         Scene scene = new Scene(root, 700, 500);
 
         // Configurazione CSS
-        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        scene.getStylesheets().add("file://" + css.getAbsolutePath());
-
-        // Barra di navigazione superiore
+        try {
+            String cssPath = ExerciseSelectionScreen.class.getResource("/application/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
+            // Barra di navigazione superiore
         HBox navBar = new HBox(15);
         navBar.setId("navBar");
         navBar.setPadding(new Insets(10));

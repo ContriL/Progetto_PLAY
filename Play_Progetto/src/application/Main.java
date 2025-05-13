@@ -20,7 +20,8 @@ public class Main extends Application {
 	private static Integer tentativi = 0;
 	private static String currentUser = "";
 
-	public static File Utenti_registrati = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/Utenti_registrati.txt");
+	// Percorso relativo per il file degli utenti registrati
+	public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/exercises/Utenti_registrati.txt");
 
 	public static String getCurrentUser() {
 		return currentUser;
@@ -43,10 +44,15 @@ public class Main extends Application {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root, 700, 550);
 
-		File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-		scene.getStylesheets().add("file://" + css.getAbsolutePath());
+		// Configurazione CSS con percorso relativo
+		try {
+			String cssPath = Main.class.getResource("/application/application.css").toExternalForm();
+			scene.getStylesheets().add(cssPath);
+		} catch (Exception e) {
+			System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+		}
 
-		PasswordField pf = new PasswordField();
+			PasswordField pf = new PasswordField();
 		TextField name = new TextField();
 		Button loginButton = new Button("Accedi");
 		Button registerButton = new Button("Crea un account");

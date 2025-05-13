@@ -35,14 +35,15 @@ public class ExerciseScreen {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 700, 550);
 
-        // Configurazione CSS
-        //File css = new File("C:/Users/dadas/IdeaProjects/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        //scene.getStylesheets().add("file://" + css.getAbsolutePath());
-        File css = new File("/Users/lorenzocontri/Desktop/Progetto_Programmazione/Progetto_PLAY/Play_Progetto/src/application/application.css");
-        scene.getStylesheets().add("file://" + css.getAbsolutePath());
+        // Configurazione CSS con percorso relativo
+        try {
+            String cssPath = ExerciseScreen.class.getResource("/application/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
+        }
 
-
-        // Barra di navigazione superiore
+            // Barra di navigazione superiore
         HBox navBar = new HBox(15);
         navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
