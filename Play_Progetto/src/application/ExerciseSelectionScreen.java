@@ -115,7 +115,13 @@ public class ExerciseSelectionScreen extends Main {
        EPexerciseBtn.setUserData("quizEP");
        EPexerciseBtn.setPrefWidth(200);
 
-        exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn,EPexerciseBtn);
+       ToggleButton completeCodeBtn = new ToggleButton("Completa il Codice");
+       completeCodeBtn.setToggleGroup(exerciseTypeGroup);
+       completeCodeBtn.setUserData("CompleteCode");
+       completeCodeBtn.setPrefWidth(200);
+
+exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn, EPexerciseBtn, completeCodeBtn);
+        //exerciseTypeBox.getChildren().addAll(findErrorBtn, orderStepsBtn, whatPrintsBtn,EPexerciseBtn);
         exerciseGrid.add(exerciseTypeBox, 0, 0);
 
         // Colonna per livelli di difficoltà
@@ -159,20 +165,25 @@ public class ExerciseSelectionScreen extends Main {
 
         // Azione per il pulsante Inizia
         startButton.setOnAction(e -> {
+            
             String exerciseType = (String) exerciseTypeGroup.getSelectedToggle().getUserData();
             if (exerciseType.equals("quizEP")) {
-                 Scene quiz = DiffcultyQuizSelection.getScene(stage,loginScene);
+                 Scene quiz = DiffcultyQuizSelection.getScene(stage, loginScene);
                  stage.setScene(quiz);
-            } else if(exerciseTypeGroup.getSelectedToggle() == null || difficultyGroup.getSelectedToggle() == null){
-                errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
-                return;
-            }
+        } else if (exerciseType.equals("CompleteCode")) {
+                 Scene complete = DiffCompleteCode.getScene(stage, loginScene);
+                 stage.setScene(complete);
+        } else if (exerciseTypeGroup.getSelectedToggle() == null || difficultyGroup.getSelectedToggle() == null) {
+                 errorLabel.setText("Seleziona un tipo di esercizio e un livello di difficoltà!");
+                 return;
+        } else {
             int difficulty = (int) difficultyGroup.getSelectedToggle().getUserData();
-
             Exercise selectedExercise = ExerciseFactory.createExercise(exerciseType, difficulty);
             Scene exerciseScene = ExerciseScreen.getScene(stage, scene, selectedExercise);
             stage.setScene(exerciseScene);
-        });
+        }
+
+     });
 
         buttonBar.getChildren().addAll(startButton);
 

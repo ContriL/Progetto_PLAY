@@ -15,22 +15,6 @@ public class UserProgress {
     //private static File progressFile;
     public static File progressFile = new File(System.getProperty("user.dir") + "/src/application/UtentiProgressi.txt");
 
-   /*  static {
-        try {
-            // Ottieni il percorso del file come risorsa nel classpath
-            URL resourceURL = UserProgress.class.getResource("/application/UtentiProgressi.txt");
-
-            if (resourceURL != null) {
-                // Converti l'URL in un URI e poi in un oggetto File
-                progressFile = new File(resourceURL.toURI());
-            } else {
-                System.err.println("File non trovato nel classpath.");
-            }
-
-        } catch (Exception e) {
-            System.err.println("Errore nel caricamento del file: " + e.getMessage());
-        }
-    } */
 
     public static void main(String[] args) {
         if (progressFile != null && progressFile.exists()) {
