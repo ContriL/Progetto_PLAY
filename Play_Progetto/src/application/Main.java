@@ -21,7 +21,7 @@ public class Main extends Application {
 	private static String currentUser = "";
 
 	// Percorso relativo per il file degli utenti registrati
-	public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/exercises/Utenti_registrati.txt");
+	public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/Utenti_registrati.txt");
 
 	public static String getCurrentUser() {
 		return currentUser;

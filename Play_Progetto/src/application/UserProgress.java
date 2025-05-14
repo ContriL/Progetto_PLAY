@@ -12,9 +12,10 @@ import java.util.List;
  */
 public class UserProgress {
 
-    private static File progressFile;
+    //private static File progressFile;
+    public static File progressFile = new File(System.getProperty("user.dir") + "/src/application/UtentiProgressi.txt");
 
-    static {
+   /*  static {
         try {
             // Ottieni il percorso del file come risorsa nel classpath
             URL resourceURL = UserProgress.class.getResource("/application/UtentiProgressi.txt");
@@ -29,7 +30,7 @@ public class UserProgress {
         } catch (Exception e) {
             System.err.println("Errore nel caricamento del file: " + e.getMessage());
         }
-    }
+    } */
 
     public static void main(String[] args) {
         if (progressFile != null && progressFile.exists()) {
