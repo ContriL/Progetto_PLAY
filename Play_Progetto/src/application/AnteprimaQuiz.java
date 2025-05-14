@@ -1,6 +1,6 @@
 package application;
 
-import java.io.File;
+
 
 import application.exercises.Exercise;
 import application.exercises.QuizEP;
@@ -9,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;

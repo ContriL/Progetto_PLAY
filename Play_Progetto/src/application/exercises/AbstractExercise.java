@@ -1,6 +1,6 @@
 package application.exercises;
 
-import java.util.List;
+
 
 // Classe astratta base per implementare logiche comuni
 public abstract class AbstractExercise implements Exercise {

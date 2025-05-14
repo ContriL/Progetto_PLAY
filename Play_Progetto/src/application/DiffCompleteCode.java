@@ -2,7 +2,6 @@ package application;
 
 import application.exercises.CompleteCode;
 import application.exercises.Exercise;
-import application.exercises.QuizEP;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

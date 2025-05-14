@@ -1,9 +1,7 @@
 package application;
 
-
-
 import java.io.File;
-
+import application.exercises.CompleteCode;
 import application.exercises.Exercise;
 import application.exercises.QuizEP;
 import javafx.geometry.Insets;
@@ -17,7 +15,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
 public class AnteprimaCC {
 
     public static Scene getScene(Stage stage, Scene selectionScene, Exercise exercise) {
@@ -25,8 +22,10 @@ public class AnteprimaCC {
         Scene anteprima = new Scene(root, 700, 550);
 
         // Forza la generazione dell'interfaccia per popolare le domande
-        if (exercise instanceof QuizEP) {
-            ((QuizEP) exercise).getExerciseUI();
+        if (exercise instanceof QuizEP quiz) {
+            quiz.getExerciseUI();
+        } else if (exercise instanceof CompleteCode cc) {
+            cc.getExerciseUI();  // Popola questionList
         }
 
         // CSS con percorso relativo
@@ -36,6 +35,7 @@ public class AnteprimaCC {
         } catch (Exception e) {
             System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
         }
+
         // Navbar
         HBox navBar = new HBox(15);
         navBar.setId("navBar");
@@ -70,13 +70,25 @@ public class AnteprimaCC {
         header.setPadding(new Insets(20, 0, 20, 0));
 
         // Domande mostrate
-        VBox questionsBox = new VBox(10);
+        VBox questionsBox = new VBox(20);
         questionsBox.setPadding(new Insets(10));
 
-        for (String question : exercise.getQuestions()) {
-            Label qLabel = new Label("• " + question);
-            qLabel.setWrapText(true);
-            questionsBox.getChildren().add(qLabel);
+        if (exercise instanceof CompleteCode cc) {
+            for (String codeSnippet : cc.getQuestions()) {
+                VBox block = new VBox();
+                Label codeLabel = new Label(codeSnippet);
+                codeLabel.setWrapText(true);
+                codeLabel.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 13;");
+                block.getChildren().add(codeLabel);
+                block.setStyle("-fx-border-color: gray; -fx-border-radius: 5; -fx-padding: 10;");
+                questionsBox.getChildren().add(block);
+            }
+        } else {
+            for (String question : exercise.getQuestions()) {
+                Label qLabel = new Label("• " + question);
+                qLabel.setWrapText(true);
+                questionsBox.getChildren().add(qLabel);
+            }
         }
 
         ScrollPane scrollPane = new ScrollPane(questionsBox);
@@ -90,7 +102,7 @@ public class AnteprimaCC {
 
         // Bottone per cambiare difficoltà
         Button changeDifficultyButton = new Button("Cambia Difficoltà");
-        changeDifficultyButton.setOnAction(e -> stage.setScene(DiffcultyQuizSelection.getScene(stage, selectionScene)));
+        changeDifficultyButton.setOnAction(e -> stage.setScene(DiffCompleteCode.getScene(stage, selectionScene)));
         changeDifficultyButton.setPrefWidth(200);
 
         HBox buttonBox = new HBox(20, startButton, changeDifficultyButton);
@@ -104,5 +116,3 @@ public class AnteprimaCC {
         return anteprima;
     }
 }
-
-

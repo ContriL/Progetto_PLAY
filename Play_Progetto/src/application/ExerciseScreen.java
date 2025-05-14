@@ -3,7 +3,6 @@ package application;
 import application.exercises.Exercise;
 import application.exercises.OrderStepsExercise;
 import application.exercises.WhatPrintsExercise;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,7 +17,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
