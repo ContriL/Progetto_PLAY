@@ -84,12 +84,12 @@ public class UserProgressScreen {
         Scene scene = new Scene(root, 800, 600);
 
         try {
-            // Usa il percorso relativo
-            File file = new File("src/application/Utenti_registrati.txt");
-
+            String cssPath = AnteprimaCC.class.getResource("/application/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
         } catch (Exception e) {
             System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
         }
+
 
         // Intestazione
         Text headerText = new Text("I tuoi progressi");
@@ -119,7 +119,7 @@ public class UserProgressScreen {
                 int correctAnswers = Integer.parseInt(parts[3]);
                 int totalQuestions = Integer.parseInt(parts[4]);
                 double percentage = Double.parseDouble(parts[5]);
-                String timestamp = parts[6];
+                String timestamp = parts[7];
 
                 progressEntries.add(new ProgressEntry(
                         exerciseType, difficulty, correctAnswers, totalQuestions, percentage, timestamp

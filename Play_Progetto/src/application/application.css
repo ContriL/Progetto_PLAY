@@ -1,6 +1,6 @@
 /* JavaFX CSS - Leave this comment until you have at least created one rule which uses -fx-Property */
 
-/* LOGIN */
+
 .root {
     -fx-background-color: #AABBCC;
     -fx-background-radius: 10;
@@ -62,8 +62,8 @@
 
 .toggle-button:selected {
     -fx-border-color: rgb(227, 190, 5);
-    -fx-border-width: 8px;
-    -fx-background-radius: 5px;
+    -fx-border-width: 5px;
+    -fx-background-radius: 10px;
 
 
 }
