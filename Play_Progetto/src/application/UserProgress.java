@@ -6,6 +6,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.*;
+import javafx.scene.effect.*;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 /**
  * Classe per gestire e salvare i progressi degli utenti nel sistema PLAY.
@@ -13,7 +17,8 @@ import java.util.List;
 public class UserProgress {
 
     //private static File progressFile;
-    public static File progressFile = new File(System.getProperty("user.dir") + "/src/application/UtentiProgressi.txt");
+    // In UserProgress.java - cambia questa riga:
+    public static File progressFile = new File(System.getProperty("user.dir") + "/Play_Progetto/src/application/resources/Utenti_Progressi.txt");
 
 
     public static void main(String[] args) {
@@ -160,6 +165,27 @@ public class UserProgress {
      * @param level Livello dell'esercizio
      * @return true se l'utente ha completato con successo il livello, false altrimenti
      */
+    /**
+     * Ottiene il numero totale di esercizi completati da un utente
+     */
+    public static int getTotalExercisesCompleted(String username) {
+        List<String> userProgress = getUserProgress(username);
+        int completedCount = 0;
+
+        for (String progress : userProgress) {
+            String[] parts = progress.split(",");
+            if (parts.length >= 6) {
+                double percentage = Double.parseDouble(parts[5]);
+                if (percentage >= 60.0) { // Considerato "completato" se >= 60%
+                    completedCount++;
+                }
+            }
+        }
+
+        return completedCount;
+    }
+
+
     public static boolean hasPassedLevel(String username, String exerciseType, int level) {
         try (BufferedReader reader = new BufferedReader(new FileReader(progressFile))) {
             String line;

@@ -62,15 +62,10 @@ public class User {
 
     public void setPassword(String p) {
         if (isValidPassword(p)) {
-            this.password = hashPassword(p);
+            this.password = p;
         } else {
             throw new IllegalArgumentException("Password does not meet requirements");
         }
-    }
-
-    // Simple password hashing (not cryptographically secure, for educational purposes)
-    private String hashPassword(String password) {
-        return String.valueOf(password.hashCode());
     }
 
     @Override

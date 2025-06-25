@@ -1,7 +1,6 @@
 package application.exercises;
 
 
-
 // Classe astratta base per implementare logiche comuni
 public abstract class AbstractExercise implements Exercise {
     protected String title;

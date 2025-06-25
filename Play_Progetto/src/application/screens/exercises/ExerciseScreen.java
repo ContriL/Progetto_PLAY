@@ -1,8 +1,14 @@
-package application;
+package application.screens.exercises;
 
+import application.screens.auth.Main;
+import application.UserProgress;
+import application.screens.user.UserProgressScreen;
+import application.core.StyleManager;
 import application.exercises.Exercise;
+import application.exercises.FindErrorExercise;
 import application.exercises.OrderStepsExercise;
 import application.exercises.WhatPrintsExercise;
+import application.screens.home.Home;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,14 +40,9 @@ public class ExerciseScreen {
         Scene scene = new Scene(root, 700, 550);
 
         // Configurazione CSS con percorso relativo
-        try {
-            String cssPath = ExerciseScreen.class.getResource("/application/application.css").toExternalForm();
-            scene.getStylesheets().add(cssPath);
-        } catch (Exception e) {
-            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
-        }
+        StyleManager.applyMainStyles(scene);
 
-            // Barra di navigazione superiore
+        // Barra di navigazione superiore
         HBox navBar = new HBox(15);
         navBar.setId("navBar");
         navBar.setPadding(new Insets(10));
@@ -52,7 +53,7 @@ public class ExerciseScreen {
         Button homeButton = new Button("Home");
         Button progressButton = new Button("I miei Progressi");
         Button logoutButton = new Button("Logout");
-        
+
 
         // Gestione eventi dei pulsanti di navigazione
         homeButton.setOnAction(e -> {
@@ -67,8 +68,8 @@ public class ExerciseScreen {
 
         logoutButton.setOnAction(e -> {
             Main.setCurrentUser("");
-	        Scene loginScene = Main.getLoginScene(stage);
-	        stage.setScene(loginScene);
+            Scene loginScene = Main.getLoginScene(stage);
+            stage.setScene(loginScene);
         });
 
 
@@ -276,11 +277,11 @@ public class ExerciseScreen {
 
                 // Ottieni il tipo di esercizio
                 String exerciseType = "";
-                if (exercise instanceof application.exercises.FindErrorExercise) {
+                if (exercise instanceof FindErrorExercise) {
                     exerciseType = "FindError";
-                } else if (exercise instanceof application.exercises.OrderStepsExercise) {
+                } else if (exercise instanceof OrderStepsExercise) {
                     exerciseType = "OrderSteps";
-                } else if (exercise instanceof application.exercises.WhatPrintsExercise) {
+                } else if (exercise instanceof WhatPrintsExercise) {
                     exerciseType = "WhatPrints";
                 }
 

@@ -1,5 +1,8 @@
-package application;
+package application.screens.auth;
 
+import application.User;
+import application.core.StyleManager;
+import application.screens.home.Home;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -24,7 +27,7 @@ import javafx.geometry.Pos;
 public class CreaAccount extends Main {
 
     // Utilizza un percorso relativo per il file degli utenti registrati
-    public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/Utenti_registrati.txt");
+    public static File Utenti_registrati = new File("Play_Progetto/src/application/resources/Utenti_registrati.txt");
 
     public static Scene getScene(Stage stage, Scene s1, Text loginMsg) {
         VBox root = new VBox(10); // Aggiunto spacing
@@ -32,12 +35,8 @@ public class CreaAccount extends Main {
         Scene crea = new Scene(root, 400, 400); // Aumentata l'altezza
 
         // Configurazione CSS usando percorso relativo
-        try {
-            String cssPath = CreaAccount.class.getResource("/application/application.css").toExternalForm();
-            crea.getStylesheets().add(cssPath);
-        } catch (Exception e) {
-            System.err.println("Errore nel caricamento del file CSS: " + e.getMessage());
-        }
+        StyleManager.applyMainStyles(crea);
+
         Text title = new Text("Registrazione Nuovo Utente");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
@@ -148,11 +147,16 @@ public class CreaAccount extends Main {
 
     public static void scriviFile(File file, String contenuto) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            System.out.println("🐛 DEBUG: Tentativo scrittura file: " + file.getAbsolutePath());
+            System.out.println("🐛 DEBUG: Contenuto da scrivere: " + contenuto);
+
             writer.write(contenuto);
             writer.newLine();
-            System.out.println("Scrittura completata.");
+
+            System.out.println("✅ DEBUG: Scrittura completata!");
         } catch (IOException e) {
-            System.err.println("Errore nella scrittura del file: " + e.getMessage());
+            System.err.println("❌ DEBUG: Errore nella scrittura: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
