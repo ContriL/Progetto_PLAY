@@ -7,6 +7,7 @@ import application.screens.exercises.ScreenCompleteCode;
 import application.screens.exercises.ScreenQuizEP;
 import application.screens.home.ExerciseGridScreen;
 import application.screens.home.Home;
+import application.screens.user.ProfileScreen;
 import application.screens.user.UserProgressScreen;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -61,6 +62,11 @@ public class NavigationManager {
         Scene currentScene = primaryStage.getScene();
         Scene progressScene = UserProgressScreen.getScene(primaryStage, currentScene);
         primaryStage.setScene(progressScene);
+    }
+
+    public void goToProfile() {
+        Scene profileScene = ProfileScreen.createScene(primaryStage);
+        primaryStage.setScene(profileScene);
     }
 
     /**

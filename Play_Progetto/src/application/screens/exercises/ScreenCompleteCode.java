@@ -39,7 +39,7 @@ public class ScreenCompleteCode extends BaseScreen {
     private Button passToNextLevel;
 
     public ScreenCompleteCode(Stage stage, Exercise exercise, Scene returnScene) {
-        super(stage, 700, 550);
+        super(stage, 1200, 800);
         this.exercise = exercise;
         this.returnScene = returnScene;
 

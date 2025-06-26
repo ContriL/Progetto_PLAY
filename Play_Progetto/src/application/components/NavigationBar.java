@@ -15,6 +15,7 @@ public class NavigationBar extends HBox {
     private NavigationManager navigationManager;
     private Button homeButton;
     private Button progressButton;
+    private Button profileButton;  // ← AGGIUNTO COME CAMPO DELLA CLASSE
     private Button logoutButton;
     private Button backButton;
 
@@ -30,23 +31,23 @@ public class NavigationBar extends HBox {
 
     private void initializeNavBar(boolean showBackButton) {
         // Configurazione del layout
-        setSpacing(15);
+        setSpacing(20);  // ← AUMENTATO DA 15 A 20 PER PIÙ SPAZIO
         setId("navBar");
-        setPadding(new Insets(10));
+        setPadding(new Insets(15, 25, 15, 25));  // ← PADDING UNIFORME
         setAlignment(Pos.CENTER_RIGHT);
-        setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
 
-        // Creazione dei pulsanti
-        homeButton = new Button("Home");
-        progressButton = new Button("I miei Progressi");
-        logoutButton = new Button("Logout");
+        // Creazione dei pulsanti con emoji
+        homeButton = new Button("🏠 Home");
+        progressButton = new Button("📊 I miei Progressi");
+        profileButton = new Button("👤 Profilo");
+        logoutButton = new Button("👋 Logout");
 
         // Aggiunta dei pulsanti principali
-        getChildren().addAll(homeButton, progressButton, logoutButton);
+        getChildren().addAll(homeButton, progressButton, profileButton, logoutButton);
 
         // Aggiunta condizionale del pulsante indietro
         if (showBackButton) {
-            backButton = new Button("Indietro");
+            backButton = new Button("⬅️ Indietro");
             getChildren().add(backButton);
         }
     }
@@ -54,6 +55,7 @@ public class NavigationBar extends HBox {
     private void setupEventHandlers() {
         homeButton.setOnAction(e -> navigationManager.goToHome());
         progressButton.setOnAction(e -> navigationManager.goToUserProgress());
+        profileButton.setOnAction(e -> navigationManager.goToProfile());  // ← AGGIUNTO EVENT HANDLER
         logoutButton.setOnAction(e -> navigationManager.logout());
     }
 
@@ -103,6 +105,9 @@ public class NavigationBar extends HBox {
             case "progress":
                 progressButton.setDisable(!enabled);
                 break;
+            case "profile":  // ← AGGIUNTO SUPPORTO PER PROFILO
+                profileButton.setDisable(!enabled);
+                break;
             case "logout":
                 logoutButton.setDisable(!enabled);
                 break;
@@ -125,6 +130,9 @@ public class NavigationBar extends HBox {
             case "progress":
                 progressButton.setVisible(visible);
                 break;
+            case "profile":  // ← AGGIUNTO SUPPORTO PER PROFILO
+                profileButton.setVisible(visible);
+                break;
             case "logout":
                 logoutButton.setVisible(visible);
                 break;
@@ -143,6 +151,7 @@ public class NavigationBar extends HBox {
         NavigationBar navbar = new NavigationBar(false);
         navbar.setButtonVisible("home", false);
         navbar.setButtonVisible("progress", false);
+        navbar.setButtonVisible("profile", false);  // ← NASCOSTO ANCHE PROFILO NEL LOGIN
         return navbar;
     }
 

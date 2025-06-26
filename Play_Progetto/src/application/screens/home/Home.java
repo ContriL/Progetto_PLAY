@@ -5,6 +5,7 @@ import application.core.NavigationManager;
 import application.components.NavigationBar;
 import application.core.StyleManager;
 import application.screens.auth.Main;
+import application.UserProgress;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,58 +17,243 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 /**
- * Schermata Home dell'applicazione PLAY.
- * REFACTORATO per usare BaseScreen ed eliminare duplicazioni.
+ * Schermata Home dell'applicazione PLAY - BELLISSIMA! 🌟
+ * Completamente ridisegnata con statistiche, emoji e glassmorphism
  */
 public class Home extends BaseScreen {
 
 	public Home(Stage stage) {
-		super(stage, 600, 400); // Dimensioni originali mantenute
+		super(stage, 1200, 800); // Dimensioni aumentate per la nuova grafica
 	}
 
 	@Override
 	protected NavigationBar createNavigationBar() {
-		return NavigationBar.forMainScreens();
+		// Navbar personalizzata per Home
+		NavigationBar navbar = new NavigationBar(false); // Senza pulsante indietro
+
+		// Personalizza i pulsanti con emoji
+		Button homeButton = new Button("🏠 Home");
+		Button progressButton = new Button("📊 I miei Progressi");
+		Button logoutButton = new Button("👋 Logout");
+
+		homeButton.getStyleClass().add("secondary");
+		progressButton.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white; " +
+				"-fx-background-radius: 25; -fx-effect: dropshadow(gaussian, rgba(155, 89, 182, 0.4), 8, 0, 0, 4);");
+		logoutButton.getStyleClass().add("secondary");
+
+		// Event handlers
+		progressButton.setOnAction(e -> NavigationManager.getInstance().goToUserProgress());
+		logoutButton.setOnAction(e -> NavigationManager.getInstance().logout());
+
+		return navbar;
 	}
 
 	@Override
 	protected String getScreenTitle() {
-		return "Benvenuto a PLAY!";
+		return "Ciao " + Main.getCurrentUser() + "! 👋";
 	}
 
 	@Override
 	protected String getScreenDescription() {
-		return "Play, Learn, Assess Yourself - Impara a programmare divertendoti";
+		return "Pronto per una nuova avventura di programmazione? 🚀";
 	}
 
 	@Override
 	protected void initializeContent() {
-		VBox centerBox = createHomeContent();
-		setCenter(centerBox);
+		VBox mainContent = createBeautifulHomeContent();
+
+		// Container con glassmorphism
+		VBox contentContainer = new VBox();
+		contentContainer.getStyleClass().add("content-container");
+		contentContainer.getChildren().add(mainContent);
+
+		setCenter(contentContainer);
 	}
 
 	/**
-	 * Crea il contenuto centrale della home
+	 * Crea il contenuto principale della Home BELLISSIMO
 	 */
-	private VBox createHomeContent() {
-		VBox centerBox = new VBox(20);
+	private VBox createBeautifulHomeContent() {
+		VBox centerBox = new VBox(40);
 		centerBox.setAlignment(Pos.CENTER);
-		centerBox.setPadding(new Insets(20));
+		centerBox.setPadding(new Insets(30));
 
-		// Pulsante principale per iniziare gli esercizi
-		Button startButton = new Button("Inizia gli Esercizi");
-		startButton.setPrefWidth(200);
-		startButton.setPrefHeight(40);
-		startButton.setFont(Font.font("Arial", 14));
+		// === STATISTICHE RAPIDE ===
+		HBox statsBox = createStatsSection();
 
-		startButton.setOnAction(e -> {
-			// Usa il NavigationManager per andare alla griglia degli esercizi
-			NavigationManager.getInstance().goToExerciseGrid();
-		});
+		// === PULSANTE PRINCIPALE FIGISSIMO ===
+		Button startButton = createMainActionButton();
 
-		centerBox.getChildren().add(startButton);
+		// === CITAZIONE MOTIVAZIONALE ===
+		Text motivationText = createMotivationalQuote();
+
+		centerBox.getChildren().addAll(statsBox, startButton, motivationText);
 		return centerBox;
+	}
+
+	/**
+	 * Crea le statistiche cards colorate
+	 */
+	private HBox createStatsSection() {
+		HBox statsBox = new HBox(25);
+		statsBox.setAlignment(Pos.CENTER);
+
+		// Calcola statistiche reali dell'utente
+		Map<String, String> userStats = calculateUserStats();
+
+		VBox exercisesCard = createStatCard("🎯", "Esercizi", "Completati", userStats.get("total"), "#e74c3c");
+		VBox streakCard = createStatCard("🔥", "Percentuale", "Successo", userStats.get("percentage") + "%", "#f39c12");
+		VBox levelCard = createStatCard("⭐", "Livello", "Preferito", userStats.get("favorite"), "#9b59b6");
+		VBox todayCard = createStatCard("📅", "Oggi", "Sessioni", userStats.get("today"), "#2ecc71");
+
+		statsBox.getChildren().addAll(exercisesCard, streakCard, levelCard, todayCard);
+		return statsBox;
+	}
+
+	/**
+	 * Crea una singola stat card colorata
+	 */
+	private VBox createStatCard(String icon, String title, String subtitle, String value, String borderColor) {
+		VBox card = new VBox(12);
+		card.getStyleClass().add("stats-container");
+		card.setAlignment(Pos.CENTER);
+		card.setPrefWidth(180);
+		card.setPrefHeight(140);
+
+		// Bordo colorato in basso
+		card.setStyle(card.getStyle() + "-fx-border-color: " + borderColor + "; -fx-border-width: 0 0 4 0;");
+
+		Text iconText = new Text(icon);
+		iconText.setStyle("-fx-font-size: 36px;");
+
+		Text valueText = new Text(value);
+		valueText.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; " +
+				"-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 3, 0, 0, 1);");
+
+		Text titleText = new Text(title);
+		titleText.setStyle("-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;");
+
+		Text subtitleText = new Text(subtitle);
+		subtitleText.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.8);");
+
+		card.getChildren().addAll(iconText, valueText, titleText, subtitleText);
+		return card;
+	}
+
+	/**
+	 * Crea il pulsante principale stilizzato
+	 */
+	private Button createMainActionButton() {
+		Button startButton = new Button("🚀 Inizia gli Esercizi");
+		startButton.setPrefWidth(320);
+		startButton.setPrefHeight(65);
+		startButton.getStyleClass().add("start-button");
+		startButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+		startButton.setOnAction(e -> NavigationManager.getInstance().goToExerciseGrid());
+
+		return startButton;
+	}
+
+	/**
+	 * Crea la citazione motivazionale
+	 */
+	private Text createMotivationalQuote() {
+		String[] quotes = {
+				"\"Il successo è la somma di piccoli sforzi ripetuti giorno dopo giorno\" 💪",
+				"\"Ogni esperto è stato una volta un principiante\" 🌱",
+				"\"Il codice è poesia, ogni bug è una metafora\" 🎭",
+				"\"Programmare è come risolvere puzzle infiniti\" 🧩",
+				"\"L'errore di oggi è la conoscenza di domani\" 🔮"
+		};
+
+		String randomQuote = quotes[(int) (Math.random() * quotes.length)];
+
+		Text motivationText = new Text(randomQuote);
+		motivationText.setStyle("-fx-font-size: 16px; -fx-font-style: italic; " +
+				"-fx-text-fill: rgba(255,255,255,0.8); -fx-text-alignment: center;");
+		motivationText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+		motivationText.setWrappingWidth(600);
+
+		return motivationText;
+	}
+
+	/**
+	 * Calcola le statistiche reali dell'utente
+	 */
+	private Map<String, String> calculateUserStats() {
+		Map<String, String> stats = new HashMap<>();
+
+		try {
+			List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
+
+			// Calcoli reali
+			int totalExercises = progressData.size();
+			int totalCorrect = 0;
+			int totalQuestions = 0;
+			Map<String, Integer> exerciseCount = new HashMap<>();
+			int todaySessions = 0;
+
+			String today = java.time.LocalDate.now().toString();
+
+			for (String progress : progressData) {
+				String[] parts = progress.split(",");
+				if (parts.length >= 6) {
+					totalCorrect += Integer.parseInt(parts[3]);
+					totalQuestions += Integer.parseInt(parts[4]);
+
+					// Conta per tipo di esercizio
+					String type = parts[1];
+					exerciseCount.put(type, exerciseCount.getOrDefault(type, 0) + 1);
+
+					// Sessioni di oggi
+					if (parts.length >= 7 && parts[6].startsWith(today)) {
+						todaySessions++;
+					}
+				}
+			}
+
+			// Trova esercizio preferito
+			String favoriteExercise = exerciseCount.entrySet().stream()
+					.max(Map.Entry.comparingByValue())
+					.map(entry -> getFriendlyExerciseName(entry.getKey()))
+					.orElse("Nessuno");
+
+			int percentage = totalQuestions > 0 ? (totalCorrect * 100 / totalQuestions) : 0;
+
+			stats.put("total", String.valueOf(totalExercises));
+			stats.put("percentage", String.valueOf(percentage));
+			stats.put("favorite", favoriteExercise);
+			stats.put("today", String.valueOf(todaySessions));
+
+		} catch (Exception e) {
+			// Valori di fallback se ci sono errori
+			stats.put("total", "0");
+			stats.put("percentage", "0");
+			stats.put("favorite", "Quiz");
+			stats.put("today", "0");
+		}
+
+		return stats;
+	}
+
+	/**
+	 * Converte i nomi interni in nomi user-friendly
+	 */
+	private String getFriendlyExerciseName(String internalName) {
+		switch (internalName) {
+			case "FindError": return "Debug";
+			case "OrderSteps": return "Logica";
+			case "WhatPrints": return "Output";
+			case "quizEP": return "Quiz";
+			case "CompleteCode": return "Coding";
+			default: return "Misto";
+		}
 	}
 
 	@Override
@@ -78,112 +264,9 @@ public class Home extends BaseScreen {
 		}
 	}
 
-	/// Modifica per Home.java - Schermata Home più bella
-
+	// === METODO STATICO PER COMPATIBILITÀ ===
 	public static Scene getScene(Stage stage, Scene loginScene) {
-		BorderPane root = new BorderPane();
-		Scene home = new Scene(root, 900, 700);
-
-		StyleManager.applyMainStyles(home);
-
-		// === NAVBAR GLASSMORPHISM ===
-		HBox navBar = new HBox(20);
-		navBar.setId("navBar");
-		navBar.setPadding(new Insets(15, 25, 15, 25));
-		navBar.setAlignment(Pos.CENTER_RIGHT);
-
-		Button homeButton = new Button("🏠 Home");
-		Button progressButton = new Button("📊 I miei Progressi");
-		Button logoutButton = new Button("👋 Logout");
-
-		homeButton.getStyleClass().add("secondary");
-		progressButton.setStyle("-fx-background-color: linear-gradient(135deg, #667eea, #764ba2);");
-		logoutButton.getStyleClass().add("secondary");
-
-		progressButton.setOnAction(e -> NavigationManager.getInstance().goToUserProgress());
-		logoutButton.setOnAction(e -> NavigationManager.getInstance().logout());
-
-		navBar.getChildren().addAll(homeButton, progressButton, logoutButton);
-		root.setTop(navBar);
-
-		// === CONTENUTO CENTRALE BELLISSIMO ===
-		VBox centerBox = new VBox(40);
-		centerBox.setAlignment(Pos.CENTER);
-		centerBox.setPadding(new Insets(50));
-
-		// Hero Section
-		VBox heroSection = new VBox(20);
-		heroSection.setAlignment(Pos.CENTER);
-
-		Text welcomeText = new Text("Ciao " + Main.getCurrentUser() + "! 👋");
-		welcomeText.getStyleClass().add("main-title");
-
-		Text heroSubtitle = new Text("Pronto per una nuova avventura di programmazione?");
-		heroSubtitle.getStyleClass().add("section-title");
-		heroSubtitle.setStyle("-fx-font-size: 20px; -fx-text-fill: rgba(255,255,255,0.9);");
-
-		// Statistiche rapide in cards
-		HBox statsBox = new HBox(20);
-		statsBox.setAlignment(Pos.CENTER);
-
-		VBox exercisesCard = createStatCard("🎯", "Esercizi", "Completati", "12");
-		VBox streakCard = createStatCard("🔥", "Giorni", "Consecutivi", "5");
-		VBox levelCard = createStatCard("⭐", "Livello", "Attuale", "Intermedio");
-
-		statsBox.getChildren().addAll(exercisesCard, streakCard, levelCard);
-
-		// Pulsante principale elegante
-		Button startButton = new Button("🚀 Inizia gli Esercizi");
-		startButton.setPrefWidth(300);
-		startButton.setPrefHeight(60);
-		startButton.setStyle("-fx-font-size: 18px; -fx-font-weight: 700; " +
-				"-fx-background-color: linear-gradient(135deg, #ff6b6b, #ee5a24); " +
-				"-fx-effect: dropshadow(gaussian, rgba(238, 90, 36, 0.5), 15, 0, 0, 8);");
-
-		startButton.setOnAction(e -> NavigationManager.getInstance().goToExerciseGrid());
-
-		// Motivational quote
-		Text motivationText = new Text("\"Il successo è la somma di piccoli sforzi ripetuti giorno dopo giorno\" 💪");
-		motivationText.setStyle("-fx-font-size: 16px; -fx-font-style: italic; " +
-				"-fx-text-fill: rgba(255,255,255,0.8); -fx-text-alignment: center;");
-		motivationText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-
-		heroSection.getChildren().addAll(welcomeText, heroSubtitle);
-		centerBox.getChildren().addAll(heroSection, statsBox, startButton, motivationText);
-
-		// Container con glassmorphism
-		VBox contentContainer = new VBox();
-		contentContainer.getStyleClass().add("content-container");
-		contentContainer.getChildren().add(centerBox);
-
-		root.setCenter(contentContainer);
-		stage.setTitle("PLAY - Home");
-
-		return home;
-	}
-
-	private static VBox createStatCard(String icon, String title, String subtitle, String value) {
-		VBox card = new VBox(8);
-		card.getStyleClass().add("stats-container");
-		card.setAlignment(Pos.CENTER);
-		card.setPrefWidth(150);
-		card.setPrefHeight(120);
-
-		Text iconText = new Text(icon);
-		iconText.setStyle("-fx-font-size: 32px;");
-
-		Text valueText = new Text(value);
-		valueText.getStyleClass().add("stat-value");
-		valueText.setStyle("-fx-font-size: 24px;");
-
-		Text titleText = new Text(title);
-		titleText.getStyleClass().add("stat-label");
-
-		Text subtitleText = new Text(subtitle);
-		subtitleText.getStyleClass().add("stat-label");
-		subtitleText.setStyle("-fx-font-size: 12px;");
-
-		card.getChildren().addAll(iconText, valueText, titleText, subtitleText);
-		return card;
+		Home homeScreen = new Home(stage);
+		return homeScreen.createScene();
 	}
 }

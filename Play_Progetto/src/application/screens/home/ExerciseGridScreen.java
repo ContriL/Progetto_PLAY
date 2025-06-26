@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 public class ExerciseGridScreen extends BaseScreen {
 
     public ExerciseGridScreen(Stage stage) {
-        super(stage, 800, 600);
+        super(stage, 1200, 800);
     }
 
     @Override

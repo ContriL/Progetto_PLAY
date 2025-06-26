@@ -1,6 +1,7 @@
 package application.screens.user;
 
 import application.UserProgress;
+import application.components.NavigationBar;
 import application.core.NavigationManager;
 import application.core.StyleManager;
 import application.screens.auth.Main;
@@ -31,7 +32,7 @@ public class UserProgressScreen {
         StyleManager.applyMainStyles(scene);
 
         // === NAVBAR BELLA ===
-        HBox navBar = createModernNavBar();
+        NavigationBar navBar = NavigationBar.forMainScreens();
         root.setTop(navBar);
 
         // === CONTENUTO PRINCIPALE ===
@@ -49,26 +50,9 @@ public class UserProgressScreen {
         return scene;
     }
 
-    private static HBox createModernNavBar() {
-        HBox navBar = new HBox(20);
-        navBar.setId("navBar");
-        navBar.setPadding(new Insets(15, 25, 15, 25));
-        navBar.setAlignment(Pos.CENTER_RIGHT);
 
-        Button homeButton = new Button("🏠 Home");
-        Button gridButton = new Button("🎯 Esercizi");
-        Button logoutButton = new Button("👋 Logout");
-
-        homeButton.getStyleClass().add("secondary");
-        gridButton.getStyleClass().add("secondary");
-        logoutButton.getStyleClass().add("secondary");
-
-        homeButton.setOnAction(e -> NavigationManager.getInstance().goToHome());
-        gridButton.setOnAction(e -> NavigationManager.getInstance().goToExerciseGrid());
-        logoutButton.setOnAction(e -> NavigationManager.getInstance().logout());
-
-        navBar.getChildren().addAll(homeButton, gridButton, logoutButton);
-        return navBar;
+    protected NavigationBar createNavigationBar() {
+        return NavigationBar.forMainScreens();  // ← USA LA CLASSE!
     }
 
     private static VBox createMainContent() {

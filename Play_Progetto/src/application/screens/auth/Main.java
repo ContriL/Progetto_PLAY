@@ -51,7 +51,7 @@ public class Main extends Application {
 
 	public static Scene getLoginScene(Stage stage) {
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 800, 600);
+		Scene scene = new Scene(root, 1200, 800);
 
 		// Applica il nostro bellissimo CSS
 		StyleManager.applyMainStyles(scene);

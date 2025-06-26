@@ -32,7 +32,7 @@ public class CreaAccount extends Main {
     public static Scene getScene(Stage stage, Scene s1, Text loginMsg) {
         VBox root = new VBox(10); // Aggiunto spacing
         root.setPadding(new Insets(20)); // Aggiunto padding
-        Scene crea = new Scene(root, 400, 400); // Aumentata l'altezza
+        Scene crea = new Scene(root, 1200, 800); // Aumentata l'altezza
 
         // Configurazione CSS usando percorso relativo
         StyleManager.applyMainStyles(crea);

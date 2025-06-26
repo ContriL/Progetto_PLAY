@@ -37,7 +37,7 @@ public class ExerciseScreen {
         correctAnswers = 0;
 
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 700, 550);
+        Scene scene = new Scene(root, 1200, 800);
 
         // Configurazione CSS con percorso relativo
         StyleManager.applyMainStyles(scene);

@@ -41,7 +41,7 @@ public class ScreenQuizEP extends BaseScreen {
     private Exercise exercise;
 
     public ScreenQuizEP(Stage stage, Exercise exercise, Scene returnScene) {
-        super(stage, 700, 550);
+        super(stage, 1200, 800);
         this.exercise = exercise;
 
         if (!(exercise instanceof QuizEP)) {

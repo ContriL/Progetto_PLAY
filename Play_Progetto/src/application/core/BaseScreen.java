@@ -23,8 +23,8 @@ public abstract class BaseScreen extends BorderPane {
     protected Text headerText;
     protected Text descriptionText;
     protected Stage stage;
-    protected int width = 700;
-    protected int height = 550;
+    protected int width = 1200;
+    protected int height = 800;
 
     public BaseScreen(Stage stage) {
         this.stage = stage;
