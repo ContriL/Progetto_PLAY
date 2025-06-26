@@ -212,7 +212,7 @@ public class UserProgressScreen {
             String[] parts = progress.split(",");
             if (parts.length >= 6) {
                 String level = "Livello " + parts[2];
-                double percentage = Double.parseDouble(parts[5]);
+                double percentage = Double.parseDouble(parts[6]);
                 levelPerformance.computeIfAbsent(level, k -> new ArrayList<>()).add(percentage);
             }
         }
@@ -287,7 +287,7 @@ public class UserProgressScreen {
             if (parts.length >= 7) {
                 entries.add(new ProgressEntry(
                         parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]), Double.parseDouble(parts[5]), parts[6]
+                        Integer.parseInt(parts[4]), Double.parseDouble(parts[5]), parts[7]
                 ));
             }
         }
