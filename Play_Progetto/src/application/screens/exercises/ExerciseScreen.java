@@ -1,5 +1,6 @@
 package application.screens.exercises;
 
+import application.components.NavigationBar;
 import application.screens.auth.Main;
 import application.UserProgress;
 import application.screens.user.UserProgressScreen;
@@ -42,38 +43,8 @@ public class ExerciseScreen {
         // Configurazione CSS con percorso relativo
         StyleManager.applyMainStyles(scene);
 
-        // Barra di navigazione superiore
-        HBox navBar = new HBox(15);
-        navBar.setId("navBar");
-        navBar.setPadding(new Insets(10));
-        navBar.setAlignment(Pos.CENTER_RIGHT);
-        navBar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;");
-
-        // Pulsanti di navigazione
-        Button homeButton = new Button("Home");
-        Button progressButton = new Button("I miei Progressi");
-        Button logoutButton = new Button("Logout");
-
-
-        // Gestione eventi dei pulsanti di navigazione
-        homeButton.setOnAction(e -> {
-            Scene homeScene = Home.getScene(stage, selectionScene);
-            stage.setScene(homeScene);
-        });
-
-        progressButton.setOnAction(e -> {
-            Scene progressScene = UserProgressScreen.getScene(stage, selectionScene);
-            stage.setScene(progressScene);
-        });
-
-        logoutButton.setOnAction(e -> {
-            Main.setCurrentUser("");
-            Scene loginScene = Main.getLoginScene(stage);
-            stage.setScene(loginScene);
-        });
-
-
-        navBar.getChildren().addAll(homeButton, progressButton, logoutButton);
+        // Navbar standard con pulsante indietro
+        NavigationBar navBar = NavigationBar.forSubScreens("grid");
 
         VBox topContainer = new VBox();
         topContainer.getChildren().add(navBar);

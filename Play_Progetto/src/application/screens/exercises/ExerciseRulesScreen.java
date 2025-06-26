@@ -28,7 +28,7 @@ public class ExerciseRulesScreen extends BaseScreen {
     private String returnDestination;
 
     public ExerciseRulesScreen(Stage stage, Exercise exercise, String returnDestination) {
-        super(stage, 700, 550);
+        super(stage, 1200, 800);
         this.exercise = exercise;
         this.returnDestination = returnDestination;
 
