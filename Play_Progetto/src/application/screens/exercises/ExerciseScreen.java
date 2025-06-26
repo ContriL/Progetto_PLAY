@@ -167,7 +167,6 @@ public class ExerciseScreen {
 
             boolean isCorrect = exercise.checkAnswer(currentQuestionIndex, userAnswer);
 
-
             if (isCorrect) {
                 resultText.setText("Corretto!");
                 resultText.setFill(Color.GREEN);
@@ -202,7 +201,6 @@ public class ExerciseScreen {
             retryButton.setDisable(true);
         });
 
-
         nextButton.setOnAction(e -> {
             currentQuestionIndex++;
 
@@ -236,7 +234,6 @@ public class ExerciseScreen {
                     parent.getChildren().add(controlIndex, answerControlRef[0]);
                 }
 
-
                 resultText.setText("");
                 submitButton.setDisable(false);
                 nextButton.setDisable(true);
@@ -247,14 +244,7 @@ public class ExerciseScreen {
                 contentBox.getChildren().clear();
 
                 // Ottieni il tipo di esercizio
-                String exerciseType = "";
-                if (exercise instanceof FindErrorExercise) {
-                    exerciseType = "FindError";
-                } else if (exercise instanceof OrderStepsExercise) {
-                    exerciseType = "OrderSteps";
-                } else if (exercise instanceof WhatPrintsExercise) {
-                    exerciseType = "WhatPrints";
-                }
+                String exerciseType = getExerciseType(exercise);
 
                 // Salva il progresso dell'utente (usando il nickname dell'utente corrente)
                 String currentUser = Main.getCurrentUser();
@@ -284,7 +274,7 @@ public class ExerciseScreen {
 
                 // Messaggio sul risultato del livello
                 Text resultLevelText = new Text();
-                if (percentage >= 70) {
+                if (percentage >= 60) {
                     resultLevelText.setText("Congratulazioni! Hai superato questo livello.");
                     resultLevelText.setFill(Color.GREEN);
                 } else {
@@ -311,13 +301,81 @@ public class ExerciseScreen {
             }
         });
 
-        backButton.setOnAction(e -> stage.setScene(selectionScene));
+        // ⭐ NUOVO: Conferma di uscita con salvataggio automatico
+        backButton.setOnAction(e -> {
+            showExitConfirmation(() -> {
+                // Salva i progressi parziali se ha fatto almeno una domanda
+                if (currentQuestionIndex > 0 || correctAnswers > 0) {
+                    savePartialProgress(exercise, correctAnswers, currentQuestionIndex + 1);
+                }
+                stage.setScene(selectionScene);
+            });
+        });
 
         // Aggiungiamo tutti i pulsanti, incluso il pulsante Riprova
         buttonBar.getChildren().addAll(submitButton, retryButton, nextButton, backButton);
         root.setBottom(buttonBar);
 
         return scene;
+    }
+
+    // ⭐ NUOVO: Mostra conferma di uscita - CONFORME ALLE SPECIFICHE DEL PROF
+    private static void showExitConfirmation(Runnable onConfirm) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conferma Uscita");
+        alert.setHeaderText("⚠️ Attenzione: stai per uscire dall'esercizio");
+        alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
+                "Vuoi continuare e uscire dall'esercizio?");
+
+        // Pulsanti personalizzati
+        ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
+        ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        // Styling dell'alert
+        alert.getDialogPane().getStylesheets().add(
+                ExerciseScreen.class.getResource("/application/application.css").toExternalForm()
+        );
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == confirmButton) {
+                onConfirm.run();
+            }
+            // Se clicca "No" o chiude, non fa nulla (continua l'esercizio)
+        });
+    }
+
+    // Salva progresso parziale con percentuale corretta
+    private static void savePartialProgress(Exercise exercise, int correctAnswers, int questionsAttempted) {
+        String exerciseType = getExerciseType(exercise);
+        String currentUser = Main.getCurrentUser();
+
+        // Salva con il totale VERO dell'esercizio per calcolare la percentuale corretta
+        boolean saved = UserProgress.saveProgress(
+                currentUser,
+                exerciseType,
+                exercise.getDifficulty(),
+                correctAnswers,                    // Risposte corrette fino a ora
+                exercise.getTotalQuestions()       // Totale domande dell'esercizio (sempre 3)
+        );
+
+        if (saved) {
+            System.out.println("✅ Progresso parziale salvato: " + correctAnswers + "/" + exercise.getTotalQuestions() +
+                    " (fatto " + questionsAttempted + " domande)");
+        }
+    }
+
+    // Estrae il tipo di esercizio (DRY principle)
+    private static String getExerciseType(Exercise exercise) {
+        if (exercise instanceof FindErrorExercise) {
+            return "FindError";
+        } else if (exercise instanceof OrderStepsExercise) {
+            return "OrderSteps";
+        } else if (exercise instanceof WhatPrintsExercise) {
+            return "WhatPrints";
+        }
+        return "Unknown";
     }
 
     // Crea un controllo per l'esercizio "Ordina i Passi"
@@ -350,7 +408,7 @@ public class ExerciseScreen {
                         Label text = new Label(item);
                         HBox box = new HBox(5, icon, text);
                         setGraphic(box);
-                        setText(null); // Importante: non impostare il testo ma solo il grafico
+                        setText(null);
                     }
                 }
             };
@@ -363,9 +421,7 @@ public class ExerciseScreen {
                     content.putString(cell.getItem());
                     db.setContent(content);
 
-                    // Salva l'indice dell'elemento che si sta spostando
                     stepsListView.getProperties().put("draggedIndex", cell.getIndex());
-
                     event.consume();
                 }
             });
@@ -398,12 +454,10 @@ public class ExerciseScreen {
                     if (draggedIdx != null && draggedIdx != thisIdx) {
                         String draggedItem = stepsListView.getItems().remove(draggedIdx.intValue());
 
-                        // Se l'elemento è trascinato più in basso, aggiustare l'indice
                         if (thisIdx > draggedIdx) {
                             thisIdx--;
                         }
 
-                        // Inserisci nel punto esatto
                         stepsListView.getItems().add(thisIdx, draggedItem);
                         stepsListView.getSelectionModel().select(thisIdx);
                         success = true;

@@ -328,21 +328,26 @@ public class ScreenQuizEP extends BaseScreen {
     }
 
     /**
-     * Conferma di uscita con salvataggio parziale
+     * Conferma di uscita con salvataggio parziale - CONFORME ALLE SPECIFICHE DEL PROF
      */
-    private void confirmExit(Runnable exitAction) {
-        if (!quizCompleted && hasAnsweredAtLeastOne()) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Conferma uscita");
-            alert.setHeaderText("Attenzione: stai per uscire dal quiz.");
-            alert.setContentText("Le risposte mancanti verranno considerate sbagliate. Vuoi salvare e continuare?");
+    private static void confirmExit(Runnable exitAction) {
+        // Se il quiz non è completato ma ha risposto ad almeno una domanda
+        if (!quizCompleted && currentQuiz.getUserAnswers().stream().anyMatch(answer -> answer != null && !answer.trim().isEmpty())) {
 
-            ButtonType yesButton = new ButtonType("Sì", ButtonBar.ButtonData.YES);
-            ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-            alert.getButtonTypes().setAll(yesButton, noButton);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Conferma Uscita");
+            alert.setHeaderText("⚠️ Attenzione: stai per uscire dal quiz");
+            alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
+                    "Vuoi continuare e uscire dal quiz?");
+
+            // Pulsanti personalizzati
+            ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
+            ButtonType cancelButton = new ButtonType("❌ No, continua quiz", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(confirmButton, cancelButton);
 
             alert.showAndWait().ifPresent(response -> {
-                if (response == yesButton) {
+                if (response == confirmButton) {
                     // Salva progresso parziale
                     int answeredQuestions = 0;
                     for (String answer : currentQuiz.getUserAnswers()) {
@@ -352,13 +357,27 @@ public class ScreenQuizEP extends BaseScreen {
                     }
 
                     if (answeredQuestions > 0) {
-                        saveProgress(currentQuiz.calculateScore(), answeredQuestions);
-                    }
+                        // Salva progresso direttamente usando UserProgress
+                        String currentUser = Main.getCurrentUser();
+                        boolean saved = UserProgress.saveProgress(
+                                currentUser,
+                                "quizEP",
+                                currentQuiz.getDifficulty(),
+                                currentQuiz.calculateScore(),
+                                currentQuiz.getTotalQuestions()
+                        );
+
+                        if (saved) {
+                            System.out.println("✅ Progresso parziale salvato prima dell'uscita");
+                        }
+                           }
 
                     exitAction.run();
                 }
+                // Se clicca "No" o chiude, non fa nulla (continua il quiz)
             });
         } else {
+            // Se non ha risposto a nulla o il quiz è completato, esce direttamente
             exitAction.run();
         }
     }

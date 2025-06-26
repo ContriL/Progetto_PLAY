@@ -66,8 +66,13 @@ public class ScreenCompleteCode extends BaseScreen {
         NavigationBar navbar = new NavigationBar(true); // Con pulsante indietro
 
         // Azione personalizzata per il pulsante indietro con conferma
-        EventHandler<ActionEvent> confirmHandler = createConfirmAndExitHandler(() -> NavigationManager.getInstance().goToExerciseGrid());
-        navbar.setBackAction(() -> confirmHandler.handle(new ActionEvent()));
+        navbar.setBackAction(() -> {
+            showExitConfirmation(() -> {
+                // Salva progressi prima di uscire
+                saveProgressBeforeExit();
+                NavigationManager.getInstance().goToExerciseGrid();
+            });
+        });
 
         return navbar;
     }
@@ -180,6 +185,51 @@ public class ScreenCompleteCode extends BaseScreen {
     }
 
     /**
+     * Mostra popup di conferma uscita - CONFORME ALLE SPECIFICHE DEL PROF
+     */
+    private void showExitConfirmation(Runnable onConfirm) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conferma Uscita");
+        alert.setHeaderText("⚠️ Attenzione: stai per uscire dall'esercizio");
+        alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
+                "Vuoi continuare e uscire dall'esercizio?");
+
+        // Pulsanti personalizzati
+        ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
+        ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == confirmButton) {
+                onConfirm.run();
+            }
+            // Se clicca "No" o chiude, non fa nulla (continua l'esercizio)
+        });
+    }
+
+    /**
+     * Salva i progressi prima di uscire
+     */
+    private void saveProgressBeforeExit() {
+        if (exercise instanceof CompleteCode) {
+            CompleteCode codeExercise = (CompleteCode) exercise;
+            List<Boolean> results = codeExercise.evaluateUserInput();
+            int correctCount = (int) results.stream().filter(b -> b).count();
+            int totalQuestions = results.size();
+            int difficulty = exercise.getDifficulty();
+
+            correctCountMap.put(difficulty, correctCount);
+
+            String currentUser = Main.getCurrentUser();
+            String type = "CompleteCode";
+            UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
+
+            System.out.println("✅ Progresso salvato prima dell'uscita: " + correctCount + "/" + totalQuestions);
+        }
+    }
+
+    /**
      * Mostra contenuto di errore se l'esercizio non è del tipo corretto
      */
     private void showErrorContent() {
@@ -196,41 +246,6 @@ public class ScreenCompleteCode extends BaseScreen {
 
         errorBox.getChildren().addAll(errorLabel, backButton);
         setCenter(errorBox);
-    }
-
-    /**
-     * Gestisce la logica di conferma e salvataggio per i pulsanti di uscita
-     */
-    private EventHandler<ActionEvent> createConfirmAndExitHandler(Runnable exitAction) {
-        return event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Conferma uscita");
-            alert.setHeaderText("Attenzione: stai per uscire.");
-            alert.setContentText("Le risposte mancanti verranno considerate sbagliate. Vuoi salvare e continuare?");
-            ButtonType yesButton = new ButtonType("Sì", ButtonBar.ButtonData.YES);
-            ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-            alert.getButtonTypes().setAll(yesButton, noButton);
-
-            alert.showAndWait().ifPresent(response -> {
-                if (response == yesButton) {
-                    if (exercise instanceof CompleteCode) {
-                        CompleteCode codeExercise = (CompleteCode) exercise;
-                        List<Boolean> results = codeExercise.evaluateUserInput();
-                        int correctCount = (int) results.stream().filter(b -> b).count();
-                        int totalQuestions = results.size();
-                        int difficulty = exercise.getDifficulty();
-
-                        correctCountMap.put(difficulty, correctCount);
-
-                        String currentUser = Main.getCurrentUser();
-                        String type = "CompleteCode";
-                        UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
-                    }
-
-                    exitAction.run();
-                }
-            });
-        };
     }
 
     @Override
