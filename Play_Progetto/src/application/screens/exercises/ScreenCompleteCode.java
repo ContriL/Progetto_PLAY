@@ -37,6 +37,9 @@ public class ScreenCompleteCode extends BaseScreen {
     private Label saveMessage;
     private Button submitAll;
     private Button passToNextLevel;
+    private Button nextExercise; // NUOVO PULSANTE
+    private Button previousExercise; // NUOVO PULSANTE
+    private VBox codeContainer; // Reference al container per aggiornamenti
 
     public ScreenCompleteCode(Stage stage, Exercise exercise, Scene returnScene) {
         super(stage, 1200, 800);
@@ -52,8 +55,8 @@ public class ScreenCompleteCode extends BaseScreen {
      */
     private void loadRealContent() {
         if (exercise != null && exercise instanceof CompleteCode) {
-            VBox contentBox = createCompleteCodeContent((CompleteCode) exercise);
-            setCenter(contentBox);
+            codeContainer = createCompleteCodeContent((CompleteCode) exercise);
+            setCenter(codeContainer);
 
             // Aggiorna anche l'header
             updateTitle(exercise.getTitle() + " - Livello " + exercise.getDifficulty());
@@ -99,14 +102,13 @@ public class ScreenCompleteCode extends BaseScreen {
     @Override
     public void onShow() {
         super.onShow();
-        // Non fare nulla qui - il contenuto è già caricato da loadRealContent()
     }
 
     /**
      * Crea il contenuto per l'esercizio Complete Code
      */
     private VBox createCompleteCodeContent(CompleteCode codeExercise) {
-        VBox codeContainer = new VBox(15);
+        codeContainer = new VBox(15);
         codeContainer.setPadding(new Insets(15));
 
         // Inizializza componenti UI
@@ -116,55 +118,156 @@ public class ScreenCompleteCode extends BaseScreen {
         passToNextLevel = new Button("Prossimo Livello");
         passToNextLevel.setDisable(true); // inizialmente disabilitato
 
+        // NUOVI PULSANTI per navigazione esercizi
+        nextExercise = new Button("Prossimo Esercizio →");
+        previousExercise = new Button("← Esercizio Precedente");
+
         // Ottieni l'UI del codice dall'esercizio
-        VBox codeUI = codeExercise.getCodeUI();
+        VBox codeUI = codeExercise.getCurrentQuestionUI();
 
         // Configura i pulsanti
         setupSubmitButton(codeExercise);
         setupNextLevelButton();
+        setupNavigationButtons(codeExercise); // NUOVO METODO
 
-        // Layout dei pulsanti
-        HBox buttonRow = new HBox(15, submitAll, passToNextLevel);
-        buttonRow.setAlignment(Pos.CENTER);
+        // Layout dei pulsanti - dividiamo in due righe
+        HBox navigationRow = new HBox(15, previousExercise, nextExercise);
+        navigationRow.setAlignment(Pos.CENTER);
 
-        codeContainer.getChildren().addAll(codeUI, buttonRow, resultLabel, saveMessage);
+        HBox actionRow = new HBox(15, submitAll, passToNextLevel);
+        actionRow.setAlignment(Pos.CENTER);
+
+        // Aggiorna la disponibilità dei pulsanti navigazione
+        updateNavigationButtons(codeExercise);
+
+        codeContainer.getChildren().addAll(codeUI, navigationRow, actionRow, resultLabel, saveMessage);
         return codeContainer;
     }
 
     /**
-     * Configura il pulsante di submit
+     * NUOVO: Configura i pulsanti di navigazione tra esercizi
+     */
+    private void setupNavigationButtons(CompleteCode codeExercise) {
+        nextExercise.setOnAction(e -> {
+            if (codeExercise.goToNextQuestion()) {
+                refreshCodeUI(codeExercise);
+                updateNavigationButtons(codeExercise);
+                clearMessages(); // Pulisce messaggi di risultato
+            }
+        });
+
+        previousExercise.setOnAction(e -> {
+            if (codeExercise.goToPreviousQuestion()) {
+                refreshCodeUI(codeExercise);
+                updateNavigationButtons(codeExercise);
+                clearMessages(); // Pulisce messaggi di risultato
+            }
+        });
+    }
+
+    /**
+     * NUOVO: Aggiorna la disponibilità dei pulsanti di navigazione
+     */
+    private void updateNavigationButtons(CompleteCode codeExercise) {
+        nextExercise.setDisable(!codeExercise.hasNextQuestion());
+        previousExercise.setDisable(!codeExercise.hasPreviousQuestion());
+
+        // Aggiorna il testo per mostrare l'esercizio corrente
+        int current = codeExercise.getCurrentQuestionNumber();
+        int total = codeExercise.getTotalQuestions();
+        
+        nextExercise.setText(String.format("Prossimo Esercizio → (%d/%d)", 
+            Math.min(current + 1, total), total));
+        previousExercise.setText(String.format("← Esercizio Precedente (%d/%d)", 
+            Math.max(current - 1, 1), total));
+    }
+
+    /**
+     * NUOVO: Ricarica l'UI del codice quando si cambia esercizio
+     */
+    private void refreshCodeUI(CompleteCode codeExercise) {
+        // Rimuovi la vecchia UI del codice (primo elemento dopo padding)
+        if (codeContainer.getChildren().size() > 0) {
+            codeContainer.getChildren().remove(0);
+        }
+
+        // Aggiungi la nuova UI del codice all'inizio
+        VBox newCodeUI = codeExercise.getCurrentQuestionUI();
+        codeContainer.getChildren().add(0, newCodeUI);
+
+        // Aggiorna il titolo dell'header
+        int current = codeExercise.getCurrentQuestionNumber();
+        int total = codeExercise.getTotalQuestions();
+        updateTitle(String.format("%s - Livello %d - Esercizio %d/%d", 
+            exercise.getTitle(), exercise.getDifficulty(), current, total));
+    }
+
+    /**
+     * NUOVO: Pulisce i messaggi di risultato e salvataggio
+     */
+    private void clearMessages() {
+        resultLabel.setText("");
+        saveMessage.setText("");
+        passToNextLevel.setDisable(true);
+    }
+
+    /**
+     * Configura il pulsante di submit - MODIFICATO per gestire singolo esercizio
      */
     private void setupSubmitButton(CompleteCode codeExercise) {
         submitAll.setOnAction(e -> {
-            List<Boolean> results = codeExercise.evaluateUserInput();
-            int correctCount = (int) results.stream().filter(b -> b).count();
-            int totalQuestions = results.size();
-            int difficulty = exercise.getDifficulty();
+            // Verifica solo l'esercizio corrente
+            int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
+            List<String> userAnswers = codeExercise.getUserAnswers();
+            
+            if (currentIndex < userAnswers.size()) {
+                String userAnswer = userAnswers.get(currentIndex); 
+                boolean isCorrect = codeExercise.checkAnswer(currentIndex, userAnswer);
+                
+                if (isCorrect) {
+                    resultLabel.setText("✔ Esercizio corretto!");
+                    resultLabel.setTextFill(Color.GREEN);
+                    
+                    // Se è l'ultimo esercizio e tutti sono stati tentati, abilita prossimo livello
+                    if (!codeExercise.hasNextQuestion() && codeExercise.allQuestionsAttempted()) {
+                        int totalScore = codeExercise.calculateScore();
+                        if (totalScore == codeExercise.getTotalQuestions()) {
+                            passToNextLevel.setDisable(false);
+                        }
+                    }
+                } else {
+                    resultLabel.setText("✘ Esercizio non corretto. Riprova!");
+                    resultLabel.setTextFill(Color.RED);
+                }
 
-            if (correctCount == totalQuestions) {
-                resultLabel.setText("✔ Tutti i frammenti sono corretti!");
-                resultLabel.setTextFill(Color.GREEN);
-                passToNextLevel.setDisable(false);
-            } else {
-                resultLabel.setText("✘ Alcuni frammenti contengono errori.");
-                resultLabel.setTextFill(Color.RED);
-            }
-
-            correctCountMap.put(difficulty, correctCount);
-
-            // Salvataggio dei progressi
-            String currentUser = Main.getCurrentUser();
-            String type = "CompleteCode";
-            boolean saved = UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
-
-            if (saved) {
-                saveMessage.setText("I tuoi progressi sono stati salvati correttamente.");
-                saveMessage.setTextFill(Color.GREEN);
-            } else {
-                saveMessage.setText("Errore durante il salvataggio dei progressi.");
-                saveMessage.setTextFill(Color.RED);
+                // Salvataggio progressi per tutto il livello
+                saveCurrentProgress(codeExercise);
             }
         });
+    }
+
+    /**
+     * NUOVO: Salva il progresso corrente
+     */
+    private void saveCurrentProgress(CompleteCode codeExercise) {
+        int correctCount = codeExercise.calculateScore();
+        int totalQuestions = codeExercise.getTotalQuestions();
+        int difficulty = exercise.getDifficulty();
+
+        correctCountMap.put(difficulty, correctCount);
+
+        String currentUser = Main.getCurrentUser();
+        String type = "CompleteCode";
+        boolean saved = UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
+
+        if (saved) {
+            saveMessage.setText(String.format("Progresso salvato: %d/%d esercizi corretti.", 
+                correctCount, totalQuestions));
+            saveMessage.setTextFill(Color.GREEN);
+        } else {
+            saveMessage.setText("Errore durante il salvataggio dei progressi.");
+            saveMessage.setTextFill(Color.RED);
+        }
     }
 
     /**
@@ -214,9 +317,8 @@ public class ScreenCompleteCode extends BaseScreen {
     private void saveProgressBeforeExit() {
         if (exercise instanceof CompleteCode) {
             CompleteCode codeExercise = (CompleteCode) exercise;
-            List<Boolean> results = codeExercise.evaluateUserInput();
-            int correctCount = (int) results.stream().filter(b -> b).count();
-            int totalQuestions = results.size();
+            int correctCount = codeExercise.calculateScore();
+            int totalQuestions = codeExercise.getTotalQuestions();
             int difficulty = exercise.getDifficulty();
 
             correctCountMap.put(difficulty, correctCount);

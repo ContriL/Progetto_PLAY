@@ -302,57 +302,48 @@ public class CompleteCode extends AbstractExercise {
     }
 
     @Override
-    public boolean checkAnswer(int questionIndex, String userAnswer) {
-        if (questionIndex < 0 || questionIndex >= Answers.size()) return false;
+public boolean checkAnswer(int questionIndex, String userAnswer) {
+    if (questionIndex < 0 || questionIndex >= Answers.size()) return false;
 
-        String expected = Answers.get(questionIndex);
-        String actual = userAnswer;
+    String expected = Answers.get(questionIndex);
+    String actual = userAnswer;
 
-        // DEBUG: Stampa i valori per vedere cosa sta succedendo
-        System.out.println("=== DEBUG COMPLETE CODE ===");
-        System.out.println("Question Index: " + questionIndex);
-        System.out.println("Expected RAW: '" + expected + "'");
-        System.out.println("Actual RAW: '" + actual + "'");
+    String expectedNorm = normalize(expected);
+    String actualNorm = normalize(actual);
 
-        // Normalizza entrambe le stringhe
-        String expectedNorm = expected.toLowerCase()
-                .trim()
-                .replaceAll("\\\\n", "\n")  // Converte \n letterali
-                .replaceAll("\\s+", " ");   // Normalizza spazi
-
-        String actualNorm = actual.toLowerCase()
-                .trim()
-                .replaceAll("\\s+", " ");      // Normalizza spazi
-
-        System.out.println("Expected NORM: '" + expectedNorm + "'");
-        System.out.println("Actual NORM: '" + actualNorm + "'");
-
-        // Prova diversi tipi di controlli
-        boolean containsCheck = actualNorm.contains(expectedNorm);
-        boolean equalsCheck = actualNorm.equals(expectedNorm);
-
-        System.out.println("Contains check: " + containsCheck);
-        System.out.println("Equals check: " + equalsCheck);
-
-        // Verifica parola per parola
-        String[] expectedWords = expectedNorm.split("\\s+");
-        boolean allWordsPresent = true;
-
-        System.out.println("Expected words: " + java.util.Arrays.toString(expectedWords));
-
-        for (String word : expectedWords) {
-            if (!word.isEmpty() && !actualNorm.contains(word)) {
-                System.out.println("Missing word: '" + word + "'");
-                allWordsPresent = false;
-            }
-        }
-
-        System.out.println("All words present: " + allWordsPresent);
-        System.out.println("=== END DEBUG ===");
-
-        // Usa il controllo più permissivo
-        return containsCheck || equalsCheck || allWordsPresent;
+    // Match esatto
+    if (expectedNorm.equals(actualNorm)) {
+        return true;
     }
+
+    // Match linea per linea, ignorando spazi e capitalizzazione
+    String[] expectedLines = expected.trim().split("\\n+");
+    String[] actualLines = actual.trim().split("\\n+");
+
+    if (expectedLines.length != actualLines.length) return false;
+
+    for (int i = 0; i < expectedLines.length; i++) {
+        String expectedLine = expectedLines[i].trim().replaceAll("\\s+", " ");
+        String actualLine = actualLines[i].trim().replaceAll("\\s+", " ");
+        if (!expectedLine.equalsIgnoreCase(actualLine)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Normalizza una stringa per il confronto semantico.
+ */
+private String normalize(String s) {
+    return s.toLowerCase()
+            .replaceAll("\\\\n", "\n")         // Interpreta \n testuali
+            .replaceAll("\\s+", " ")           // Rimuove spazi multipli
+            .replaceAll("[;{}]", "")           // Ignora ; e graffe per confronto semantico
+            .trim();
+}
+
 
     @Override
     public int getTotalQuestions() {
