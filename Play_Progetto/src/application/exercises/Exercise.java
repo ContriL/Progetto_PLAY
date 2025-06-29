@@ -6,7 +6,7 @@ import java.util.List;
 public interface Exercise {
     String getTitle();
     String getDescription();
-    int getDifficulty(); // 1 (principiante), 2 (intermedio), 3 (avanzato)
+    int getDifficulty();
     List<String> getQuestions();
     boolean checkAnswer(int questionIndex, String userAnswer);
     int getTotalQuestions();

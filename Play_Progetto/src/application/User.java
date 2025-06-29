@@ -13,15 +13,12 @@ public class User {
         this.password = "";
     }
 
-    // Add validation methods
+    
     public boolean isValidName(String name) {
         return name != null && !name.trim().isEmpty() && name.length() >= 2;
     }
 
     public boolean isValidPassword(String password) {
-        // Example password requirements:
-        // - At least 8 characters
-        // - Contains at least one uppercase, one lowercase, and one number
         return password != null &&
                 password.length() >= 8 &&
                 password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$");
@@ -35,7 +32,7 @@ public class User {
                 nickname.matches("^[a-zA-Z0-9_]+$");
     }
 
-    // Setters with validation
+    
     public void setNome(String n) {
         if (isValidName(n)) {
             this.nome = n.trim();
@@ -73,7 +70,7 @@ public class User {
         return String.join(",", nome, cognome, nickname, password);
     }
 
-    // Getters (optional, but useful for future extensions)
+    
     public String getNome() { return nome; }
     public String getCognome() { return cognome; }
     public String getNickname() { return nickname; }

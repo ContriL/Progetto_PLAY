@@ -18,7 +18,8 @@ public class UserProgress {
 
     //private static File progressFile;
     // In UserProgress.java - cambia questa riga:
-    public static File progressFile = new File(System.getProperty("user.dir") + "/Play_Progetto/src/application/resources/Utenti_Progressi.txt");
+    public static File progressFile = new File(System.getProperty("user.dir") + "/src/application/resources/Utenti_Progressi.txt");
+
 
 
     public static void main(String[] args) {
@@ -41,15 +42,15 @@ public class UserProgress {
     public static boolean saveProgress(String username, String exerciseType, int difficulty,
                                        int correctAnswers, int totalQuestions) {
         try {
-            // Verifica se il file esiste, altrimenti lo crea
+            
             if (!progressFile.exists()) {
                 progressFile.createNewFile();
             }
 
-            // Calcola la percentuale di successo
+            
             double percentage = (double) correctAnswers / totalQuestions * 100;
 
-            // Ottieni la data e l'ora correnti
+            
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String timestamp = now.format(formatter);
@@ -58,7 +59,7 @@ public class UserProgress {
             String progressLine = String.format("%s,%s,%d,%d,%d,%.2f,%s",
                     username, exerciseType, difficulty, correctAnswers, totalQuestions, percentage, timestamp);
 
-            // Scrive la riga nel file
+            
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(progressFile, true))) {
                 writer.write(progressLine);
                 writer.newLine();
@@ -70,8 +71,7 @@ public class UserProgress {
             return false;
         }
 
-        // Rimuovi questa riga: non verrà mai raggiunta
-        // return false;
+
     }
 
     /**
@@ -88,7 +88,7 @@ public class UserProgress {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
 
-                // Se la prima parte corrisponde allo username, aggiungi alla lista
+                
                 if (parts.length > 0 && parts[0].equals(username)) {
                     userProgressList.add(line);
                 }
@@ -103,8 +103,8 @@ public class UserProgress {
     /**
      * Recupera il livello massimo raggiunto da un utente per un tipo di esercizio.
      *
-     * @param username Nome utente
-     * @param exerciseType Tipo di esercizio
+     * @param username Nome 
+     * @param exerciseType 
      * @return Il livello massimo raggiunto (1-3), o 0 se non è stato completato alcun esercizio
      */
     
@@ -129,7 +129,8 @@ public class UserProgress {
     
         return lastDifficulty;
     }
-    
+
+
     public static int getCorrectAnswers(String username, String exerciseType, int difficulty) {
         int correctAnswers = 0;
     
@@ -138,13 +139,13 @@ public class UserProgress {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
     
-                // Verifica se la riga appartiene all'utente, al tipo di esercizio e al livello
+                
                 if (parts.length >= 4 &&
                     parts[0].equals(username) &&
                     parts[1].equals(exerciseType) &&
                     Integer.parseInt(parts[2]) == difficulty) {
                     
-                    // Usa sempre l'ultima entry valida trovata
+                    
                     correctAnswers = Integer.parseInt(parts[3]);
                 }
             }
@@ -160,9 +161,9 @@ public class UserProgress {
      * Controlla se un utente ha completato con successo un determinato livello di un esercizio.
      * Il successo è definito come almeno il 70% di risposte corrette.
      *
-     * @param username Nome utente
-     * @param exerciseType Tipo di esercizio
-     * @param level Livello dell'esercizio
+     * @param username 
+     * @param exerciseType 
+     * @param level 
      * @return true se l'utente ha completato con successo il livello, false altrimenti
      */
     /**
@@ -176,7 +177,7 @@ public class UserProgress {
             String[] parts = progress.split(",");
             if (parts.length >= 6) {
                 double percentage = Double.parseDouble(parts[5]);
-                if (percentage >= 60.0) { // Considerato "completato" se >= 60%
+                if (percentage >= 60.0) { 
                     completedCount++;
                 }
             }
@@ -192,13 +193,13 @@ public class UserProgress {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
 
-                // Verifica se la riga appartiene all'utente, al tipo di esercizio e al livello
+                
                 if (parts.length >= 6 &&
                         parts[0].equals(username) &&
                         parts[1].equals(exerciseType) &&
                         Integer.parseInt(parts[2]) == level) {
 
-                    // Controlla se la percentuale di successo è almeno 60%
+                    
                     double percentage = Double.parseDouble(parts[5]);
                     if (percentage >= 60.0) {
                         return true;

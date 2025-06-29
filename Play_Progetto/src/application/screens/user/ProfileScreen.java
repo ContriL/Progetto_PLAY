@@ -17,8 +17,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Schermata Profilo Semplice e Bilanciata 👤
- * Layout rivisitato con proporzioni migliorate, spaziatura uniforme e design pulito.
+ * Schermata Profilo 
  */
 public class ProfileScreen extends BaseScreen {
 

@@ -22,8 +22,8 @@ public class Main extends Application {
 	private static Integer tentativi = 0;
 	private static String currentUser = "";
 
-	// Percorso relativo per il file degli utenti registrati
-	public static File Utenti_registrati = new File("Play_Progetto/src/application/resources/Utenti_registrati.txt");
+	
+	 public static File Utenti_registrati = new File("src/application/resources/Utenti_registrati.txt");
 
 	public static String getCurrentUser() {
 		return currentUser;
@@ -46,22 +46,21 @@ public class Main extends Application {
 		stage.show();
 	}
 
-	// Metodo per costruire la schermata di login (refactored)
-	// Modifica per Main.java - Login Screen più bello
+	
 
 	public static Scene getLoginScene(Stage stage) {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root, 1200, 800);
 
-		// Applica il nostro bellissimo CSS
+		
 		StyleManager.applyMainStyles(scene);
 
-		// Container principale centrato
+		// Container principale 
 		VBox mainContainer = new VBox(30);
 		mainContainer.setAlignment(Pos.CENTER);
 		mainContainer.setPadding(new Insets(50));
 
-		// Logo/Titolo con stile
+		
 		Text logo = new Text("PLAY");
 		logo.setStyle("-fx-font-size: 48px; -fx-font-weight: 800; -fx-text-fill: white; " +
 				"-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 3);");
@@ -74,18 +73,18 @@ public class Main extends Application {
 		logoBox.setAlignment(Pos.CENTER);
 		logoBox.getChildren().addAll(logo, subtitle);
 
-		// Container login card
+		
 		VBox loginCard = new VBox(20);
 		loginCard.getStyleClass().add("login-container");
 		loginCard.setAlignment(Pos.CENTER);
 		loginCard.setMaxWidth(400);
 		loginCard.setPrefWidth(400);
 
-		// Benvenuto
+		
 		Text welcomeText = new Text("Benvenuto!");
 		welcomeText.setStyle("-fx-font-size: 24px; -fx-font-weight: 600; -fx-text-fill: white;");
 
-		// Campi input
+		
 		TextField usernameField = new TextField();
 		usernameField.setPromptText("✨ Il tuo nickname");
 		usernameField.setMaxWidth(300);
@@ -96,7 +95,7 @@ public class Main extends Application {
 		passwordField.setMaxWidth(300);
 		passwordField.setPrefHeight(45);
 
-		// Pulsanti stilizzati
+		
 		Button loginButton = new Button("🚀 Accedi");
 		loginButton.setMaxWidth(300);
 		loginButton.setPrefHeight(45);
@@ -108,11 +107,11 @@ public class Main extends Application {
 		registerButton.setPrefHeight(45);
 		registerButton.setStyle("-fx-font-size: 16px; -fx-font-weight: 600;");
 
-		// Messaggio di stato
+		
 		Text loginMsg = new Text();
 		loginMsg.setStyle("-fx-font-size: 14px; -fx-font-weight: 500;");
 
-		// Logica esistente
+		
 		NavigationManager navManager = NavigationManager.getInstance();
 
 		loginButton.setOnAction(event -> {
@@ -133,7 +132,7 @@ public class Main extends Application {
 			stage.setScene(registerScene);
 		});
 
-		// Assembla la card
+		
 		loginCard.getChildren().addAll(
 				welcomeText,
 				usernameField,
@@ -148,7 +147,7 @@ public class Main extends Application {
 
 		return scene;
 	}
-	//login
+	
 	public static boolean login(File file, String username, String password) {
 		System.out.println("🐛 PERCORSO FILE LOGIN: " + file.getAbsolutePath());
 		System.out.println("🐛 FILE EXISTS: " + file.exists());
@@ -163,7 +162,7 @@ public class Main extends Application {
 					String nickname = l[2];
 					String storedPassword = l[3];
 
-					// CONFRONTO DIRETTO - NO HASH
+					
 					if (username.equals(nickname) && password.equals(storedPassword)) {
 						System.out.println("✅ DEBUG LOGIN: Match trovato!");
 						return true;
@@ -176,7 +175,7 @@ public class Main extends Application {
 		return false;
 	}
 
-	// Verifica se un nickname è già registrato (rimane invariato)
+	
 	public static boolean isNicknameDuplicated(String nickname, Text loginMsg) {
 		try (BufferedReader br = new BufferedReader(new FileReader(Utenti_registrati))) {
 			String line;
@@ -194,7 +193,7 @@ public class Main extends Application {
 		return false;
 	}
 
-	// Scrittura dell'account nel file (rimane invariato)
+	
 	public static void scriviFile(File file, String contenuto) {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 			writer.write(contenuto);

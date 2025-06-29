@@ -5,7 +5,7 @@ import java.util.List;
 
 public class WhatPrintsExercise extends AbstractExercise {
     private List<String> codeSnippets; // Frammenti di codice per l'output
-    private List<String> correctOutputs; // Risposte corrette (output atteso)
+    private List<String> correctOutputs; // Risposte corrette
 
     public WhatPrintsExercise(int difficulty) {
         this.difficulty = difficulty;
@@ -295,7 +295,6 @@ public class WhatPrintsExercise extends AbstractExercise {
         }
 
         // Normalizziamo le risposte per il confronto
-        // Rimuoviamo gli spazi in eccesso e normalizziamo le interruzioni di linea
         String normalizedUserAnswer = userAnswer.trim().replaceAll("\\r\\n", "\n");
         String normalizedCorrectOutput = correctOutputs.get(questionIndex).trim().replaceAll("\\r\\n", "\n");
 

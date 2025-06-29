@@ -204,8 +204,7 @@ public class OrderStepsExercise extends AbstractExercise {
 
     @Override
     public List<String> getQuestions() {
-        // Per semplicità, restituiamo le stringhe dei passi da ordinare
-        // separate da newline
+        
         List<String> formattedSteps = new ArrayList<>();
 
         for (List<String> steps : stepsList) {
@@ -219,7 +218,7 @@ public class OrderStepsExercise extends AbstractExercise {
         return formattedSteps;
     }
 
-    // Metodo per ottenere l'elenco di passi non formattati (utile per l'interfaccia)
+    
     public List<String> getStepsForQuestion(int questionIndex) {
         if (questionIndex >= 0 && questionIndex < stepsList.size()) {
             return new ArrayList<>(stepsList.get(questionIndex));
@@ -234,8 +233,6 @@ public class OrderStepsExercise extends AbstractExercise {
         }
 
         // Parsing della risposta dell'utente
-        // Ci aspettiamo una stringa con numeri separati da virgole o spazi
-        // es. "1,3,2,5,4" o "1 3 2 5 4"
         List<Integer> userOrder = new ArrayList<>();
         String[] parts = userAnswer.replaceAll("\\s+", ",").split(",");
 
@@ -246,22 +243,22 @@ public class OrderStepsExercise extends AbstractExercise {
                 }
             }
         } catch (NumberFormatException e) {
-            return false; // Formato non valido
+            return false; 
         }
 
-        // Controlliamo che ci siano abbastanza numeri
+        
         if (userOrder.size() != correctOrdersList.get(questionIndex).size()) {
             return false;
         }
 
-        // Controlliamo che i numeri siano validi (1-based)
+       
         for (int num : userOrder) {
             if (num < 1 || num > correctOrdersList.get(questionIndex).size()) {
                 return false;
             }
         }
 
-        // Confrontiamo l'ordine dell'utente con l'ordine corretto
+       
         List<String> shuffledSteps = stepsList.get(questionIndex);
         List<String> userOrderedSteps = new ArrayList<>();
 

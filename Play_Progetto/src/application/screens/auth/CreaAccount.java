@@ -26,7 +26,7 @@ import javafx.geometry.Pos;
 
 public class CreaAccount extends Main {
 
-    // Utilizza un percorso relativo per il file degli utenti registrati
+    
     public static File Utenti_registrati = new File("Play_Progetto/src/application/resources/Utenti_registrati.txt");
 
     public static Scene getScene(Stage stage, Scene s1, Text loginMsg) {
@@ -34,7 +34,7 @@ public class CreaAccount extends Main {
         root.setPadding(new Insets(20)); // Aggiunto padding
         Scene crea = new Scene(root, 1200, 800); // Aumentata l'altezza
 
-        // Configurazione CSS usando percorso relativo
+        
         StyleManager.applyMainStyles(crea);
 
         Text title = new Text("Registrazione Nuovo Utente");
@@ -51,19 +51,19 @@ public class CreaAccount extends Main {
         final PasswordField p = new PasswordField();
 
         Button r = new Button("Registrati");
-        Button backButton = new Button("Indietro");  // Nuovo pulsante Indietro
+        Button backButton = new Button("Indietro"); 
 
         // Contenitore per i pulsanti
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(r, backButton);
 
-        Text errorMsg = new Text(); // Testo per messaggi di errore
+        Text errorMsg = new Text(); 
         errorMsg.setFill(Color.RED);
 
         EventHandler<ActionEvent> pressed = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
-                // Reset error message
+                
                 errorMsg.setText("");
 
                 // Controllo per campi vuoti
@@ -96,15 +96,15 @@ public class CreaAccount extends Main {
                     stage.setScene(homeScreen);
 
                 } catch (IllegalArgumentException e) {
-                    // Gestione eccezioni di validazione
+                    
                     errorMsg.setText(e.getMessage());
                 }
             }
         };
 
-        // Azione per il pulsante Indietro
+        
         backButton.setOnAction(e -> {
-            // Torna alla schermata di login
+            
             stage.setScene(s1);
         });
 
@@ -118,17 +118,17 @@ public class CreaAccount extends Main {
                 cognome, c,
                 nickname, nick,
                 pswd, p,
-                buttonBox,  // Ora includiamo entrambi i pulsanti tramite l'HBox
+                buttonBox,  
                 errorMsg
         );
 
-        // Centrare il contenuto della pagina
+        
         root.setAlignment(Pos.CENTER);
 
         return crea;
     }
 
-    // Metodi isNicknameDuplicated e scriviFile rimangono invariati
+    
     public static boolean isNicknameDuplicated(String nickname, Text loginMsg) {
         try (BufferedReader br = new BufferedReader(new FileReader(Utenti_registrati))) {
             String line;

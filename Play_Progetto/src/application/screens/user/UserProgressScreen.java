@@ -31,11 +31,11 @@ public class UserProgressScreen {
         Scene scene = new Scene(root, 1200, 800);
         StyleManager.applyMainStyles(scene);
 
-        // === NAVBAR BELLA ===
+        
         NavigationBar navBar = NavigationBar.forMainScreens();
         root.setTop(navBar);
 
-        // === CONTENUTO PRINCIPALE ===
+        
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -52,7 +52,7 @@ public class UserProgressScreen {
 
 
     protected NavigationBar createNavigationBar() {
-        return NavigationBar.forMainScreens();  // ← USA LA CLASSE!
+        return NavigationBar.forMainScreens(); 
     }
 
     private static VBox createMainContent() {
@@ -60,16 +60,16 @@ public class UserProgressScreen {
         mainContent.setPadding(new Insets(30));
         mainContent.setAlignment(Pos.TOP_CENTER);
 
-        // === HEADER BELLISSIMO ===
+        
         VBox header = createHeader();
 
-        // === STATISTICHE OVERVIEW ===
+        
         HBox statsOverview = createStatsOverview();
 
-        // === GRAFICI FIGHI ===
+       
         HBox chartsSection = createChartsSection();
 
-        // === TABELLA DETTAGLI ===
+        
         VBox tableSection = createTableSection();
 
         mainContent.getChildren().addAll(header, statsOverview, chartsSection, tableSection);
@@ -95,7 +95,7 @@ public class UserProgressScreen {
         HBox statsBox = new HBox(25);
         statsBox.setAlignment(Pos.CENTER);
 
-        // Calcola statistiche reali
+        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, Integer> stats = calculateStats(progressData);
 
@@ -128,7 +128,7 @@ public class UserProgressScreen {
         Text subtitleText = new Text(subtitle);
         subtitleText.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.8);");
 
-        // Bordo colorato
+        
         card.setStyle(card.getStyle() + "-fx-border-color: " + color + "; -fx-border-width: 0 0 4 0;");
 
         card.getChildren().addAll(iconText, valueText, titleText, subtitleText);
@@ -139,11 +139,11 @@ public class UserProgressScreen {
         HBox chartsBox = new HBox(30);
         chartsBox.setAlignment(Pos.CENTER);
 
-        // === GRAFICO A TORTA ESERCIZI ===
+        
         PieChart exerciseChart = createExerciseTypeChart();
         VBox pieChartContainer = createChartContainer("📈 Esercizi per Tipo", exerciseChart);
 
-        // === GRAFICO A BARRE LIVELLI ===
+        
         BarChart<String, Number> levelChart = createLevelChart();
         VBox barChartContainer = createChartContainer("📊 Prestazioni per Livello", levelChart);
 
@@ -169,7 +169,7 @@ public class UserProgressScreen {
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, Integer> exerciseCount = new HashMap<>();
 
-        // Conta esercizi per tipo
+        
         for (String progress : progressData) {
             String[] parts = progress.split(",");
             if (parts.length >= 2) {
@@ -204,7 +204,7 @@ public class UserProgressScreen {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Percentuale Successo");
 
-        // Calcola performance per livello
+        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, List<Double>> levelPerformance = new HashMap<>();
 
@@ -278,7 +278,7 @@ public class UserProgressScreen {
 
         table.getColumns().addAll(exerciseCol, levelCol, scoreCol, percentageCol, statusCol, dateCol);
 
-        // Carica dati
+        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         ObservableList<ProgressEntry> entries = FXCollections.observableArrayList();
 
@@ -292,14 +292,14 @@ public class UserProgressScreen {
             }
         }
 
-        // Ordina per data (più recenti prima)
+        
         entries.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
         table.setItems(entries);
 
         return table;
     }
 
-    // === METODI DI SUPPORTO ===
+    
 
     private static Map<String, Integer> calculateStats(List<String> progressData) {
         Map<String, Integer> stats = new HashMap<>();
@@ -348,7 +348,7 @@ public class UserProgressScreen {
         }
     }
 
-    // Classe per la tabella (già esistente nel codice originale)
+    
     public static class ProgressEntry {
         private final String exerciseType;
         private final int difficulty;

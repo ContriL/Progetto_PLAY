@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FindErrorExercise extends AbstractExercise {
-    private List<String> codeSnippets; // Frammenti di codice con errori
-    private List<String> correctAnswers; // Le risposte corrette
+    private List<String> codeSnippets;
+    private List<String> correctAnswers; 
 
     public FindErrorExercise(int difficulty) {
         this.difficulty = difficulty;
@@ -229,7 +229,7 @@ public class FindErrorExercise extends AbstractExercise {
             return false;
         }
 
-        // La verifica della risposta potrebbe essere più sofisticata nella versione finale
+        
         return userAnswer.toLowerCase().contains(correctAnswers.get(questionIndex).toLowerCase());
     }
 

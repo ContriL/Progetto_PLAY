@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Schermata per l'esercizio Complete Code.
- * REFACTORATO per usare BaseScreen ed eliminare duplicazioni navbar.
+ * 
  */
 public class ScreenCompleteCode extends BaseScreen {
 
@@ -37,22 +37,20 @@ public class ScreenCompleteCode extends BaseScreen {
     private Label saveMessage;
     private Button submitAll;
     private Button passToNextLevel;
-    private Button nextExercise; // NUOVO PULSANTE
-    private Button previousExercise; // NUOVO PULSANTE
-    private VBox codeContainer; // Reference al container per aggiornamenti
+    private Button nextExercise; 
+    private Button previousExercise; 
+    private VBox codeContainer; 
 
     public ScreenCompleteCode(Stage stage, Exercise exercise, Scene returnScene) {
         super(stage, 1200, 800);
         this.exercise = exercise;
         this.returnScene = returnScene;
 
-        // Ora che exercise è assegnato, carica il contenuto vero
+        
         loadRealContent();
     }
 
-    /**
-     * Carica il contenuto vero dopo che exercise è stato assegnato
-     */
+    
     private void loadRealContent() {
         if (exercise != null && exercise instanceof CompleteCode) {
             codeContainer = createCompleteCodeContent((CompleteCode) exercise);
@@ -66,12 +64,11 @@ public class ScreenCompleteCode extends BaseScreen {
 
     @Override
     protected NavigationBar createNavigationBar() {
-        NavigationBar navbar = new NavigationBar(true); // Con pulsante indietro
+        NavigationBar navbar = new NavigationBar(true); 
 
-        // Azione personalizzata per il pulsante indietro con conferma
+        
         navbar.setBackAction(() -> {
             showExitConfirmation(() -> {
-                // Salva progressi prima di uscire
                 saveProgressBeforeExit();
                 NavigationManager.getInstance().goToExerciseGrid();
             });
@@ -92,8 +89,6 @@ public class ScreenCompleteCode extends BaseScreen {
 
     @Override
     protected void initializeContent() {
-        // Durante l'inizializzazione BaseScreen, exercise è null
-        // Crea placeholder che verrà sostituito da loadRealContent()
         VBox placeholderBox = new VBox();
         placeholderBox.setPadding(new Insets(20));
         setCenter(placeholderBox);
@@ -111,48 +106,43 @@ public class ScreenCompleteCode extends BaseScreen {
         codeContainer = new VBox(15);
         codeContainer.setPadding(new Insets(15));
 
-        // Inizializza componenti UI
+        
         resultLabel = new Label();
         saveMessage = new Label();
         submitAll = new Button("Verifica Codice");
         passToNextLevel = new Button("Prossimo Livello");
-        passToNextLevel.setDisable(true); // inizialmente disabilitato
+        passToNextLevel.setDisable(true);
 
-        // NUOVI PULSANTI per navigazione esercizi
+        
         nextExercise = new Button("Prossimo Esercizio →");
         previousExercise = new Button("← Esercizio Precedente");
 
-        // Ottieni l'UI del codice dall'esercizio
+        
         VBox codeUI = codeExercise.getCurrentQuestionUI();
 
-        // Configura i pulsanti
         setupSubmitButton(codeExercise);
         setupNextLevelButton();
-        setupNavigationButtons(codeExercise); // NUOVO METODO
+        setupNavigationButtons(codeExercise); 
 
-        // Layout dei pulsanti - dividiamo in due righe
         HBox navigationRow = new HBox(15, previousExercise, nextExercise);
         navigationRow.setAlignment(Pos.CENTER);
 
         HBox actionRow = new HBox(15, submitAll, passToNextLevel);
         actionRow.setAlignment(Pos.CENTER);
 
-        // Aggiorna la disponibilità dei pulsanti navigazione
         updateNavigationButtons(codeExercise);
 
         codeContainer.getChildren().addAll(codeUI, navigationRow, actionRow, resultLabel, saveMessage);
         return codeContainer;
     }
 
-    /**
-     * NUOVO: Configura i pulsanti di navigazione tra esercizi
-     */
+    
     private void setupNavigationButtons(CompleteCode codeExercise) {
         nextExercise.setOnAction(e -> {
             if (codeExercise.goToNextQuestion()) {
                 refreshCodeUI(codeExercise);
                 updateNavigationButtons(codeExercise);
-                clearMessages(); // Pulisce messaggi di risultato
+                clearMessages(); 
             }
         });
 
@@ -160,19 +150,16 @@ public class ScreenCompleteCode extends BaseScreen {
             if (codeExercise.goToPreviousQuestion()) {
                 refreshCodeUI(codeExercise);
                 updateNavigationButtons(codeExercise);
-                clearMessages(); // Pulisce messaggi di risultato
+                clearMessages();
             }
         });
     }
 
-    /**
-     * NUOVO: Aggiorna la disponibilità dei pulsanti di navigazione
-     */
+
     private void updateNavigationButtons(CompleteCode codeExercise) {
         nextExercise.setDisable(!codeExercise.hasNextQuestion());
         previousExercise.setDisable(!codeExercise.hasPreviousQuestion());
 
-        // Aggiorna il testo per mostrare l'esercizio corrente
         int current = codeExercise.getCurrentQuestionNumber();
         int total = codeExercise.getTotalQuestions();
         
@@ -182,41 +169,33 @@ public class ScreenCompleteCode extends BaseScreen {
             Math.max(current - 1, 1), total));
     }
 
-    /**
-     * NUOVO: Ricarica l'UI del codice quando si cambia esercizio
-     */
+ 
     private void refreshCodeUI(CompleteCode codeExercise) {
-        // Rimuovi la vecchia UI del codice (primo elemento dopo padding)
         if (codeContainer.getChildren().size() > 0) {
             codeContainer.getChildren().remove(0);
         }
 
-        // Aggiungi la nuova UI del codice all'inizio
+        
         VBox newCodeUI = codeExercise.getCurrentQuestionUI();
         codeContainer.getChildren().add(0, newCodeUI);
 
-        // Aggiorna il titolo dell'header
+        
         int current = codeExercise.getCurrentQuestionNumber();
         int total = codeExercise.getTotalQuestions();
         updateTitle(String.format("%s - Livello %d - Esercizio %d/%d", 
             exercise.getTitle(), exercise.getDifficulty(), current, total));
     }
 
-    /**
-     * NUOVO: Pulisce i messaggi di risultato e salvataggio
-     */
+ 
     private void clearMessages() {
         resultLabel.setText("");
         saveMessage.setText("");
         passToNextLevel.setDisable(true);
     }
 
-    /**
-     * Configura il pulsante di submit - MODIFICATO per gestire singolo esercizio
-     */
+ 
     private void setupSubmitButton(CompleteCode codeExercise) {
         submitAll.setOnAction(e -> {
-            // Verifica solo l'esercizio corrente
             int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
             List<String> userAnswers = codeExercise.getUserAnswers();
             
@@ -228,7 +207,7 @@ public class ScreenCompleteCode extends BaseScreen {
                     resultLabel.setText("✔ Esercizio corretto!");
                     resultLabel.setTextFill(Color.GREEN);
                     
-                    // Se è l'ultimo esercizio e tutti sono stati tentati, abilita prossimo livello
+                    
                     if (!codeExercise.hasNextQuestion() && codeExercise.allQuestionsAttempted()) {
                         int totalScore = codeExercise.calculateScore();
                         if (totalScore == codeExercise.getTotalQuestions()) {
@@ -240,15 +219,13 @@ public class ScreenCompleteCode extends BaseScreen {
                     resultLabel.setTextFill(Color.RED);
                 }
 
-                // Salvataggio progressi per tutto il livello
+                
                 saveCurrentProgress(codeExercise);
             }
         });
     }
 
-    /**
-     * NUOVO: Salva il progresso corrente
-     */
+   
     private void saveCurrentProgress(CompleteCode codeExercise) {
         int correctCount = codeExercise.calculateScore();
         int totalQuestions = codeExercise.getTotalQuestions();
@@ -270,9 +247,7 @@ public class ScreenCompleteCode extends BaseScreen {
         }
     }
 
-    /**
-     * Configura il pulsante per il livello successivo
-     */
+
     private void setupNextLevelButton() {
         passToNextLevel.setOnAction(e -> {
             int nextLevel = exercise.getDifficulty() + 1;
@@ -287,9 +262,7 @@ public class ScreenCompleteCode extends BaseScreen {
         });
     }
 
-    /**
-     * Mostra popup di conferma uscita - CONFORME ALLE SPECIFICHE DEL PROF
-     */
+  
     private void showExitConfirmation(Runnable onConfirm) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Conferma Uscita");
@@ -297,7 +270,7 @@ public class ScreenCompleteCode extends BaseScreen {
         alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
                 "Vuoi continuare e uscire dall'esercizio?");
 
-        // Pulsanti personalizzati
+        
         ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
         ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
 
@@ -307,13 +280,11 @@ public class ScreenCompleteCode extends BaseScreen {
             if (response == confirmButton) {
                 onConfirm.run();
             }
-            // Se clicca "No" o chiude, non fa nulla (continua l'esercizio)
+            
         });
     }
 
-    /**
-     * Salva i progressi prima di uscire
-     */
+  
     private void saveProgressBeforeExit() {
         if (exercise instanceof CompleteCode) {
             CompleteCode codeExercise = (CompleteCode) exercise;
@@ -331,9 +302,7 @@ public class ScreenCompleteCode extends BaseScreen {
         }
     }
 
-    /**
-     * Mostra contenuto di errore se l'esercizio non è del tipo corretto
-     */
+   
     private void showErrorContent() {
         VBox errorBox = new VBox(20);
         errorBox.setAlignment(Pos.CENTER);
@@ -358,13 +327,13 @@ public class ScreenCompleteCode extends BaseScreen {
         }
     }
 
-    // Metodo statico per compatibilità con il codice esistente
+    
     public static Scene getScene(Stage stage, Scene anteprima, Exercise exercise) {
         ScreenCompleteCode screen = new ScreenCompleteCode(stage, exercise, anteprima);
         return screen.createScene();
     }
 
-    // Metodo per compatibilità con eventuali chiamate esterne
+    
     public int getCorrectCount(int difficulty) {
         return correctCountMap.getOrDefault(difficulty, 0);
     }

@@ -11,14 +11,14 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
 /**
- * Quiz su Ereditarietà e Polimorfismo - CONFORME ALLE SPECIFICHE
- * Mostra UNA domanda alla volta come richiesto dal PDF del professore
+ * Quiz su Ereditarietà e Polimorfismo
+ * 
  */
 public class QuizEP extends AbstractExercise {
 
-    // Struttura per memorizzare domande e opzioni
+    
     private List<QuestionData> questionsList;
-    private List<String> userAnswers; // Risposte dell'utente
+    private List<String> userAnswers; 
     private int currentQuestionIndex = 0;
 
     public QuizEP(int difficulty) {
@@ -44,15 +44,13 @@ public class QuizEP extends AbstractExercise {
                 throw new IllegalArgumentException("Livello di difficoltà non valido");
         }
 
-        // Inizializza array risposte utente
+        
         for (int i = 0; i < questionsList.size(); i++) {
             userAnswers.add(null);
         }
     }
 
-    /**
-     * Crea l'UI per UNA SINGOLA domanda - CONFORME ALLE SPECIFICHE
-     */
+    
     public VBox getCurrentQuestionUI() {
         if (currentQuestionIndex >= questionsList.size()) {
             return createNoMoreQuestionsUI();
@@ -64,18 +62,17 @@ public class QuizEP extends AbstractExercise {
 
         QuestionData currentQuestion = questionsList.get(currentQuestionIndex);
 
-        // Titolo con contatore - COME NEL PDF: "Quiz (1/3)"
+        
         Label titleLabel = new Label(String.format("%s (%d/%d)",
                 title, currentQuestionIndex + 1, questionsList.size()));
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // Testo della domanda
+        
         Label questionLabel = new Label(currentQuestion.questionText);
         questionLabel.setWrapText(true);
         questionLabel.setStyle("-fx-font-size: 14px; -fx-padding: 0 0 15 0;");
         questionLabel.setPrefWidth(600);
 
-        // Gruppo di radio button per le opzioni
         ToggleGroup answerGroup = new ToggleGroup();
         VBox optionsBox = new VBox(10);
 
@@ -85,7 +82,6 @@ public class QuizEP extends AbstractExercise {
             radioButton.setWrapText(true);
             radioButton.setPrefWidth(550);
 
-            // Se l'utente aveva già selezionato una risposta, ripristinala
             if (userAnswers.get(currentQuestionIndex) != null &&
                     userAnswers.get(currentQuestionIndex).equals(option)) {
                 radioButton.setSelected(true);
@@ -94,7 +90,7 @@ public class QuizEP extends AbstractExercise {
             optionsBox.getChildren().add(radioButton);
         }
 
-        // Salva la selezione quando l'utente cambia risposta
+        
         answerGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
                 RadioButton selected = (RadioButton) newToggle;
@@ -106,9 +102,7 @@ public class QuizEP extends AbstractExercise {
         return questionContainer;
     }
 
-    /**
-     * UI quando non ci sono più domande
-     */
+    
     private VBox createNoMoreQuestionsUI() {
         VBox container = new VBox(20);
         container.setAlignment(Pos.CENTER);
@@ -121,52 +115,40 @@ public class QuizEP extends AbstractExercise {
         return container;
     }
 
-    /**
-     * Naviga alla domanda successiva
-     */
+    
     public boolean goToNextQuestion() {
         if (currentQuestionIndex < questionsList.size() - 1) {
             currentQuestionIndex++;
             return true;
         }
-        return false; // Non ci sono più domande
+        return false; 
     }
 
-    /**
-     * Naviga alla domanda precedente
-     */
+    
     public boolean goToPreviousQuestion() {
         if (currentQuestionIndex > 0) {
             currentQuestionIndex--;
             return true;
         }
-        return false; // Già alla prima domanda
+        return false; 
     }
 
-    /**
-     * Verifica se ci sono altre domande dopo quella corrente
-     */
+    
     public boolean hasNextQuestion() {
         return currentQuestionIndex < questionsList.size() - 1;
     }
 
-    /**
-     * Verifica se ci sono domande prima di quella corrente
-     */
+    
     public boolean hasPreviousQuestion() {
         return currentQuestionIndex > 0;
     }
 
-    /**
-     * Ottiene il numero della domanda corrente (1-based)
-     */
+    
     public int getCurrentQuestionNumber() {
         return currentQuestionIndex + 1;
     }
 
-    /**
-     * Verifica se tutte le domande sono state risponde
-     */
+    
     public boolean allQuestionsAnswered() {
         for (String answer : userAnswers) {
             if (answer == null || answer.trim().isEmpty()) {
@@ -176,9 +158,7 @@ public class QuizEP extends AbstractExercise {
         return true;
     }
 
-    /**
-     * Calcola il punteggio finale
-     */
+    
     public int calculateScore() {
         int correctCount = 0;
         for (int i = 0; i < questionsList.size(); i++) {
@@ -190,7 +170,7 @@ public class QuizEP extends AbstractExercise {
         return correctCount;
     }
 
-    // === INIZIALIZZAZIONE DOMANDE ===
+   
 
     private void initBeginnerQuestions() {
         questionsList.add(new QuestionData(
@@ -297,11 +277,11 @@ public class QuizEP extends AbstractExercise {
         ));
     }
 
-    // === IMPLEMENTAZIONE INTERFACCIA Exercise ===
+    
 
     @Override
     public List<String> getQuestions() {
-        // Restituisce solo i testi delle domande per compatibilità
+        
         List<String> questions = new ArrayList<>();
         for (QuestionData q : questionsList) {
             questions.add(q.questionText);
@@ -324,18 +304,12 @@ public class QuizEP extends AbstractExercise {
         return questionsList.size();
     }
 
-    // === METODI PER COMPATIBILITÀ CON CODICE ESISTENTE ===
-
-    /**
-     * Ottiene le risposte dell'utente
-     */
+    
     public List<String> getUserAnswers() {
         return new ArrayList<>(userAnswers);
     }
 
-    /**
-     * Ottiene le risposte corrette
-     */
+    
     public List<String> getCorrectAnswers() {
         List<String> correct = new ArrayList<>();
         for (QuestionData q : questionsList) {
@@ -345,8 +319,8 @@ public class QuizEP extends AbstractExercise {
     }
 
     /**
-     * @deprecated Usa getCurrentQuestionUI() per il nuovo flusso domanda-per-domanda
-     * Mantiene compatibilità con il vecchio codice che mostra tutte le domande insieme
+     * @deprecated 
+     * 
      */
     @Deprecated
     public VBox getExerciseUI() {
@@ -359,7 +333,7 @@ public class QuizEP extends AbstractExercise {
     }
 
     /**
-     * @deprecated Mantiene compatibilità - mostra tutte le domande insieme (vecchio modo)
+     * @deprecated 
      */
     @Deprecated
     public VBox createBeginnerExerciseUI() {
@@ -367,7 +341,7 @@ public class QuizEP extends AbstractExercise {
     }
 
     /**
-     * @deprecated Mantiene compatibilità - mostra tutte le domande insieme (vecchio modo)
+     * @deprecated 
      */
     @Deprecated
     public VBox createIntermediateExerciseUI() {
@@ -375,16 +349,13 @@ public class QuizEP extends AbstractExercise {
     }
 
     /**
-     * @deprecated Mantiene compatibilità - mostra tutte le domande insieme (vecchio modo)
+     * @deprecated 
      */
     @Deprecated
     public VBox createAdvancedExerciseUI() {
         return createAllQuestionsUI();
     }
 
-    /**
-     * Crea UI che mostra tutte le domande insieme (per compatibilità con codice esistente)
-     */
     private VBox createAllQuestionsUI() {
         VBox container = new VBox(20);
         container.setPadding(new Insets(20));
@@ -400,9 +371,7 @@ public class QuizEP extends AbstractExercise {
         return container;
     }
 
-    /**
-     * Crea una singola question box per il vecchio formato
-     */
+    
     private VBox createQuestionBox(QuestionData question, int questionIndex) {
         VBox questionBox = new VBox(10);
         questionBox.setPrefWidth(400);
@@ -419,13 +388,13 @@ public class QuizEP extends AbstractExercise {
             rb.setWrapText(true);
             rb.setToggleGroup(group);
 
-            // Se l'utente aveva già selezionato questa risposta, mantienila
+            
             if (userAnswers.get(questionIndex) != null &&
                     userAnswers.get(questionIndex).equals(option)) {
                 rb.setSelected(true);
             }
 
-            // Salva la selezione quando cambia
+            
             rb.setOnAction(e -> {
                 if (rb.isSelected()) {
                     userAnswers.set(questionIndex, option);
@@ -439,15 +408,12 @@ public class QuizEP extends AbstractExercise {
         return questionBox;
     }
 
-    /**
-     * Ottiene i ToggleGroup per compatibilità con ScreenQuizEP esistente
-     */
+    
     public List<ToggleGroup> getToggleGroups() {
-        // Questo metodo è chiamato dal vecchio ScreenQuizEP
-        // Restituisce i toggle group delle domande create con getExerciseUI()
+        
         List<ToggleGroup> groups = new ArrayList<>();
 
-        // Per ora restituiamo groups vuoti - il vecchio codice dovrebbe usare il nuovo flusso
+        
         for (int i = 0; i < questionsList.size(); i++) {
             groups.add(new ToggleGroup());
         }
@@ -455,16 +421,12 @@ public class QuizEP extends AbstractExercise {
         return groups;
     }
 
-    /**
-     * Alias per getCorrectAnswers() - compatibilità
-     */
+    
     public List<String> getAnswers() {
         return getCorrectAnswers();
     }
 
-    /**
-     * Reset del quiz per ricominciare
-     */
+    
     public void resetQuiz() {
         currentQuestionIndex = 0;
         for (int i = 0; i < userAnswers.size(); i++) {
@@ -472,7 +434,7 @@ public class QuizEP extends AbstractExercise {
         }
     }
 
-    // === CLASSE INTERNA PER RAPPRESENTARE UNA DOMANDA ===
+    
 
     private static class QuestionData {
         public final String questionText;

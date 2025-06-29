@@ -33,23 +33,23 @@ public class ExerciseScreen {
     private static int correctAnswers = 0;
 
     public static Scene getScene(Stage stage, Scene selectionScene, Exercise exercise) {
-        // Reset contatori per una nuova sessione di esercizi
+        
         currentQuestionIndex = 0;
         correctAnswers = 0;
 
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 1200, 800);
 
-        // Configurazione CSS con percorso relativo
+        
         StyleManager.applyMainStyles(scene);
 
-        // Navbar standard con pulsante indietro
+        
         NavigationBar navBar = NavigationBar.forSubScreens("grid");
 
         VBox topContainer = new VBox();
         topContainer.getChildren().add(navBar);
 
-        // Intestazione
+        
         Text headerText = new Text(exercise.getTitle() + " - Livello " + exercise.getDifficulty());
         headerText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         Text descriptionText = new Text(exercise.getDescription());
@@ -62,35 +62,35 @@ public class ExerciseScreen {
         topContainer.getChildren().add(headerBox);
         root.setTop(topContainer);
 
-        // Contenuto principale
+        
         VBox contentBox = new VBox(15);
         contentBox.setPadding(new Insets(15));
 
-        // Contatore domande
+        
         Label questionCountLabel = new Label("Domanda " + (currentQuestionIndex + 1) + " di " + exercise.getTotalQuestions());
         questionCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        // Area per visualizzare l'esercizio
+        
         TextArea codeSnippetArea = new TextArea();
         codeSnippetArea.setEditable(false);
         codeSnippetArea.setPrefRowCount(12);
         codeSnippetArea.setFont(Font.font("Monospaced", 13));
         codeSnippetArea.setWrapText(true);
 
-        // Carica il primo esercizio
+        
         List<String> questions = exercise.getQuestions();
         if (!questions.isEmpty()) {
             codeSnippetArea.setText(questions.get(currentQuestionIndex));
         }
 
-        // Area per la risposta dell'utente (varia in base al tipo di esercizio)
+        
         VBox answerBox = new VBox(10);
         Label answerLabel = new Label("La tua risposta:");
 
-        // Riferimento finale a Control (usato nei lambda)
+        
         final Control[] answerControlRef = new Control[1];
 
-        // Diverse interfacce per diversi tipi di esercizi
+        
         if (exercise instanceof WhatPrintsExercise) {
             TextArea answerArea = new TextArea();
             answerArea.setPromptText("Scrivi l'output atteso, una riga per ogni println");
@@ -98,7 +98,7 @@ public class ExerciseScreen {
             answerArea.setPrefRowCount(4);
             answerControlRef[0] = answerArea;
         } else if (exercise instanceof OrderStepsExercise) {
-            // Crea il controllo per l'ordinamento dei passi
+            
             answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
         } else {
             TextField answerField = new TextField();
@@ -108,15 +108,15 @@ public class ExerciseScreen {
 
         answerBox.getChildren().addAll(answerLabel, answerControlRef[0]);
 
-        // Area per i messaggi di risultato
+        
         Text resultText = new Text();
         resultText.setFill(Color.GREEN);
 
-        // Aggiunta dei componenti all'area del contenuto
+        
         contentBox.getChildren().addAll(questionCountLabel, codeSnippetArea, answerBox, resultText);
         root.setCenter(contentBox);
 
-        // Barra dei pulsanti
+        
         HBox buttonBar = new HBox(10);
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.setPadding(new Insets(15));
@@ -129,7 +129,7 @@ public class ExerciseScreen {
         nextButton.setDisable(true);
         retryButton.setDisable(true);
 
-        // Aggiungi listener per abilitare il pulsante Verifica quando si cambia il testo
+        
         if (answerControlRef[0] instanceof TextField) {
             TextField textField = (TextField) answerControlRef[0];
             textField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -153,13 +153,13 @@ public class ExerciseScreen {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < listView.getItems().size(); i++) {
                     if (i > 0) sb.append(",");
-                    // Estrai solo il numero dal formato "X. testo"
+                    
                     String item = listView.getItems().get(i);
                     int dotIndex = item.indexOf('.');
                     if (dotIndex > 0) {
                         sb.append(item.substring(0, dotIndex));
                     } else {
-                        sb.append(item); // Fallback
+                        sb.append(item); 
                     }
                 }
                 userAnswer = sb.toString();
@@ -205,15 +205,15 @@ public class ExerciseScreen {
             currentQuestionIndex++;
 
             if (currentQuestionIndex < exercise.getTotalQuestions()) {
-                // Carica la prossima domanda
+                
                 codeSnippetArea.setText(questions.get(currentQuestionIndex));
                 questionCountLabel.setText("Domanda " + (currentQuestionIndex + 1) + " di " + exercise.getTotalQuestions());
 
-                // Reset dell'area di risposta
+                
                 if (answerControlRef[0] instanceof TextField) {
                     ((TextField) answerControlRef[0]).clear();
 
-                    // Ricolleghiamo il listener per questa nuova istanza
+                    
                     TextField textField = (TextField) answerControlRef[0];
                     textField.textProperty().addListener((observable, oldValue, newValue) -> {
                         if (submitButton.isDisabled() && !textField.getText().isEmpty()) {
@@ -225,7 +225,7 @@ public class ExerciseScreen {
                     ((TextArea) answerControlRef[0]).clear();
 
                 } else if (answerControlRef[0] instanceof ListView) {
-                    // Aggiorna la ListView per la nuova domanda
+                    
                     VBox parent = (VBox) answerControlRef[0].getParent();
                     int controlIndex = parent.getChildren().indexOf(answerControlRef[0]);
                     parent.getChildren().remove(answerControlRef[0]);
@@ -240,10 +240,10 @@ public class ExerciseScreen {
                 retryButton.setDisable(true);
 
             } else {
-                // Esercizio completato
+                
                 contentBox.getChildren().clear();
 
-                // Ottieni il tipo di esercizio
+                
                 String exerciseType = getExerciseType(exercise);
 
                 // Salva il progresso dell'utente (usando il nickname dell'utente corrente)
@@ -294,17 +294,17 @@ public class ExerciseScreen {
                         newExerciseButton
                 );
 
-                // Disabilita i pulsanti non necessari
+                
                 submitButton.setDisable(true);
                 nextButton.setDisable(true);
                 retryButton.setDisable(true);
             }
         });
 
-        // ⭐ NUOVO: Conferma di uscita con salvataggio automatico
+        
         backButton.setOnAction(e -> {
             showExitConfirmation(() -> {
-                // Salva i progressi parziali se ha fatto almeno una domanda
+                
                 if (currentQuestionIndex > 0 || correctAnswers > 0) {
                     savePartialProgress(exercise, correctAnswers, currentQuestionIndex + 1);
                 }
@@ -312,14 +312,14 @@ public class ExerciseScreen {
             });
         });
 
-        // Aggiungiamo tutti i pulsanti, incluso il pulsante Riprova
+        
         buttonBar.getChildren().addAll(submitButton, retryButton, nextButton, backButton);
         root.setBottom(buttonBar);
 
         return scene;
     }
 
-    // ⭐ NUOVO: Mostra conferma di uscita - CONFORME ALLE SPECIFICHE DEL PROF
+    
     private static void showExitConfirmation(Runnable onConfirm) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Conferma Uscita");
@@ -327,13 +327,13 @@ public class ExerciseScreen {
         alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
                 "Vuoi continuare e uscire dall'esercizio?");
 
-        // Pulsanti personalizzati
+        
         ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
         ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(confirmButton, cancelButton);
 
-        // Styling dell'alert
+        
         alert.getDialogPane().getStylesheets().add(
                 ExerciseScreen.class.getResource("/application/application.css").toExternalForm()
         );
@@ -342,22 +342,22 @@ public class ExerciseScreen {
             if (response == confirmButton) {
                 onConfirm.run();
             }
-            // Se clicca "No" o chiude, non fa nulla (continua l'esercizio)
+            
         });
     }
 
-    // Salva progresso parziale con percentuale corretta
+    // Salva progresso parziale con percentuale
     private static void savePartialProgress(Exercise exercise, int correctAnswers, int questionsAttempted) {
         String exerciseType = getExerciseType(exercise);
         String currentUser = Main.getCurrentUser();
 
-        // Salva con il totale VERO dell'esercizio per calcolare la percentuale corretta
+        
         boolean saved = UserProgress.saveProgress(
                 currentUser,
                 exerciseType,
                 exercise.getDifficulty(),
-                correctAnswers,                    // Risposte corrette fino a ora
-                exercise.getTotalQuestions()       // Totale domande dell'esercizio (sempre 3)
+                correctAnswers,                    
+                exercise.getTotalQuestions()      
         );
 
         if (saved) {
@@ -366,7 +366,7 @@ public class ExerciseScreen {
         }
     }
 
-    // Estrae il tipo di esercizio (DRY principle)
+    // Estrae il tipo di esercizio 
     private static String getExerciseType(Exercise exercise) {
         if (exercise instanceof FindErrorExercise) {
             return "FindError";
@@ -390,7 +390,7 @@ public class ExerciseScreen {
             numberedSteps.add((i + 1) + ". " + steps.get(i));
         }
 
-        // Assicurati di svuotare la lista prima di aggiungere i nuovi passi
+        
         stepsListView.getItems().clear();
         stepsListView.getItems().addAll(numberedSteps);
 
@@ -413,7 +413,7 @@ public class ExerciseScreen {
                 }
             };
 
-            // Gestione del drag & drop
+            
             cell.setOnDragDetected(event -> {
                 if (!cell.isEmpty()) {
                     Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
