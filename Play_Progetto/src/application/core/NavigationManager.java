@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Gestisce la navigazione tra le diverse schermate dell'applicazione.
  * Implementa il pattern Singleton per garantire un'unica istanza.
- * PULITO - Conforme alle specifiche: nessuna selezione manuale difficoltà.
+ * 
  */
 public class NavigationManager {
     private static NavigationManager instance;
@@ -41,7 +41,7 @@ public class NavigationManager {
         return primaryStage;
     }
 
-    // === METODI DI NAVIGAZIONE PRINCIPALI ===
+    
 
     public void goToHome() {
         Scene homeScene = Home.getScene(primaryStage, getLoginScene());
@@ -69,19 +69,14 @@ public class NavigationManager {
         primaryStage.setScene(profileScene);
     }
 
-    /**
-     * Mostra le regole di un esercizio con livello AUTOMATICO
-     * (conforme alle specifiche - nessuna scelta manuale difficoltà)
-     */
+    
     public void showExerciseRules(Exercise exercise, String returnTo) {
         Scene rulesScene = application.screens.exercises.ExerciseRulesScreen.createScene(
                 primaryStage, exercise, returnTo);
         primaryStage.setScene(rulesScene);
     }
 
-    /**
-     * Avvia un esercizio del livello AUTOMATICO determinato dal sistema
-     */
+    
     public void startExercise(Exercise exercise, String returnTo) {
         Scene exerciseScene = createExerciseScene(exercise);
         primaryStage.setScene(exerciseScene);
@@ -92,7 +87,7 @@ public class NavigationManager {
         goToLogin();
     }
 
-    // === METODI DI SUPPORTO ===
+    
 
     private Scene getLoginScene() {
         String key = "login";
@@ -102,9 +97,7 @@ public class NavigationManager {
         return cachedScenes.get(key);
     }
 
-    /**
-     * Crea la scene per eseguire un esercizio del livello appropriato
-     */
+    
     private Scene createExerciseScene(Exercise exercise) {
         if (exercise instanceof application.exercises.QuizEP) {
             return ScreenQuizEP.getScene(primaryStage, getGridScene(), exercise);
@@ -121,15 +114,12 @@ public class NavigationManager {
         throw new IllegalArgumentException("Tipo di esercizio non supportato: " + exercise.getClass().getSimpleName());
     }
 
-    /**
-     * Helper per ottenere la scene della griglia (per return navigation)
-     */
+    
     private Scene getGridScene() {
         return ExerciseGridScreen.createScene(primaryStage);
     }
 
-    // === METODI DI UTILITÀ PER LA CACHE ===
-
+    
     public void clearCache() {
         cachedScenes.clear();
     }

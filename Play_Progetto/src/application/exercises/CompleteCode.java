@@ -17,9 +17,8 @@ public class CompleteCode extends AbstractExercise {
     private List<String> Answers;
     private List<TextArea> userInputs;
 
-    // NUOVI CAMPI per navigazione una domanda alla volta
     private int currentQuestionIndex = 0;
-    private List<String> userAnswers; // Salva le risposte utente per ogni domanda
+    private List<String> userAnswers; 
 
     public CompleteCode(int difficulty) {
         this.difficulty = difficulty;
@@ -43,10 +42,10 @@ public class CompleteCode extends AbstractExercise {
                 throw new IllegalArgumentException("Livello di difficoltà non valido");
         }
 
-        // Inizializza le domande
+        
         initializeQuestions();
 
-        // Inizializza array risposte utente
+       
         for (int i = 0; i < questionList.size(); i++) {
             userAnswers.add("");
         }
@@ -77,9 +76,7 @@ public class CompleteCode extends AbstractExercise {
         }
     }
 
-    /**
-     * NUOVO: Ottiene l'UI per la domanda corrente (una alla volta)
-     */
+    
     public VBox getCurrentQuestionUI() {
         if (currentQuestionIndex >= questionList.size()) {
             return createNoMoreQuestionsUI();
@@ -89,19 +86,19 @@ public class CompleteCode extends AbstractExercise {
         questionContainer.setPadding(new Insets(20));
         questionContainer.setAlignment(Pos.TOP_LEFT);
 
-        // Titolo con contatore
+        
         Label titleLabel = new Label(String.format("%s (%d/%d)",
                 title, currentQuestionIndex + 1, questionList.size()));
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // Codice da completare
+        
         String currentCode = questionList.get(currentQuestionIndex);
         Label codeLabel = new Label(currentCode);
         codeLabel.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 13; -fx-border-color: gray; -fx-border-radius: 5; -fx-padding: 10;");
         codeLabel.setWrapText(true);
         codeLabel.setPrefWidth(600);
 
-        // Area input per la risposta
+        
         VBox inputBox = new VBox(10);
         Label inputLabel = new Label("Inserisci il codice mancante:");
 
@@ -110,10 +107,10 @@ public class CompleteCode extends AbstractExercise {
         inputArea.setPrefRowCount(3);
         inputArea.setPrefWidth(600);
 
-        // Ripristina la risposta precedente se esiste
+        
         inputArea.setText(userAnswers.get(currentQuestionIndex));
 
-        // Salva la risposta quando l'utente scrive
+        
         inputArea.textProperty().addListener((obs, oldText, newText) -> {
             userAnswers.set(currentQuestionIndex, newText);
         });
@@ -124,9 +121,7 @@ public class CompleteCode extends AbstractExercise {
         return questionContainer;
     }
 
-    /**
-     * UI quando non ci sono più domande
-     */
+    
     private VBox createNoMoreQuestionsUI() {
         VBox container = new VBox(20);
         container.setAlignment(Pos.CENTER);
@@ -139,9 +134,7 @@ public class CompleteCode extends AbstractExercise {
         return container;
     }
 
-    /**
-     * NUOVO: Naviga alla domanda successiva
-     */
+    
     public boolean goToNextQuestion() {
         if (currentQuestionIndex < questionList.size() - 1) {
             currentQuestionIndex++;
@@ -150,9 +143,7 @@ public class CompleteCode extends AbstractExercise {
         return false;
     }
 
-    /**
-     * NUOVO: Naviga alla domanda precedente
-     */
+    
     public boolean goToPreviousQuestion() {
         if (currentQuestionIndex > 0) {
             currentQuestionIndex--;
@@ -161,30 +152,22 @@ public class CompleteCode extends AbstractExercise {
         return false;
     }
 
-    /**
-     * NUOVO: Verifica se ci sono altre domande
-     */
+    
     public boolean hasNextQuestion() {
         return currentQuestionIndex < questionList.size() - 1;
     }
 
-    /**
-     * NUOVO: Verifica se ci sono domande precedenti
-     */
+    
     public boolean hasPreviousQuestion() {
         return currentQuestionIndex > 0;
     }
 
-    /**
-     * NUOVO: Ottiene il numero della domanda corrente (1-based)
-     */
+    
     public int getCurrentQuestionNumber() {
         return currentQuestionIndex + 1;
     }
 
-    /**
-     * NUOVO: Verifica se tutte le domande sono state tentate
-     */
+    
     public boolean allQuestionsAttempted() {
         for (String answer : userAnswers) {
             if (answer == null || answer.trim().isEmpty()) {
@@ -194,9 +177,7 @@ public class CompleteCode extends AbstractExercise {
         return true;
     }
 
-    /**
-     * NUOVO: Calcola il punteggio finale
-     */
+    
     public int calculateScore() {
         int correctCount = 0;
         for (int i = 0; i < userAnswers.size(); i++) {
@@ -207,16 +188,12 @@ public class CompleteCode extends AbstractExercise {
         return correctCount;
     }
 
-    /**
-     * NUOVO: Ottiene le risposte dell'utente
-     */
+    
     public List<String> getUserAnswers() {
         return new ArrayList<>(userAnswers);
     }
 
-    /**
-     * NUOVO: Reset del quiz per ricominciare
-     */
+    
     public void resetQuiz() {
         currentQuestionIndex = 0;
         for (int i = 0; i < userAnswers.size(); i++) {
@@ -224,10 +201,9 @@ public class CompleteCode extends AbstractExercise {
         }
     }
 
-    // === METODI ORIGINALI MANTENUTI PER COMPATIBILITÀ ===
+   
 
-    // Modifica il metodo getExerciseUI() per mostrare TUTTI gli esercizi:
-
+    
     public VBox getExerciseUI() {
         VBox container = new VBox(30);
         container.setPadding(new Insets(20));
@@ -248,13 +224,13 @@ public class CompleteCode extends AbstractExercise {
                 throw new IllegalArgumentException("Livello di difficoltà non valido");
         }
 
-        // MOSTRA TUTTI GLI ESERCIZI, NON SOLO IL PRIMO
+        
         for (int i = 0; i < exercises.size(); i++) {
             CodeSnippet snippet = exercises.get(i);
             VBox block = new VBox(10);
             block.setStyle("-fx-border-color: gray; -fx-border-radius: 5; -fx-padding: 15; -fx-margin: 10;");
 
-            // TITOLO CHIARO
+            
             Label exerciseTitle = new Label("ESERCIZIO " + (i + 1) + " di " + exercises.size());
             exerciseTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2563eb; -fx-padding: 0 0 10 0;");
 
@@ -283,7 +259,7 @@ public class CompleteCode extends AbstractExercise {
     }
 
     public List<TextArea> getUserInputs() {
-        // Convertire le risposte salvate in TextArea per compatibilità
+        
         List<TextArea> inputs = new ArrayList<>();
         for (String answer : userAnswers) {
             TextArea area = new TextArea(answer);
@@ -311,12 +287,12 @@ public boolean checkAnswer(int questionIndex, String userAnswer) {
     String expectedNorm = normalize(expected);
     String actualNorm = normalize(actual);
 
-    // Match esatto
+    
     if (expectedNorm.equals(actualNorm)) {
         return true;
     }
 
-    // Match linea per linea, ignorando spazi e capitalizzazione
+    
     String[] expectedLines = expected.trim().split("\\n+");
     String[] actualLines = actual.trim().split("\\n+");
 
@@ -333,14 +309,12 @@ public boolean checkAnswer(int questionIndex, String userAnswer) {
     return true;
 }
 
-/**
- * Normalizza una stringa per il confronto semantico.
- */
+
 private String normalize(String s) {
     return s.toLowerCase()
-            .replaceAll("\\\\n", "\n")         // Interpreta \n testuali
-            .replaceAll("\\s+", " ")           // Rimuove spazi multipli
-            .replaceAll("[;{}]", "")           // Ignora ; e graffe per confronto semantico
+            .replaceAll("\\\\n", "\n")         
+            .replaceAll("\\s+", " ")           
+            .replaceAll("[;{}]", "")           
             .trim();
 }
 
@@ -350,9 +324,7 @@ private String normalize(String s) {
         return questionList.size();
     }
 
-    /**
-     * Metodo per compatibilità con ScreenCompleteCode.
-     */
+    
     public List<ToggleGroup> getToggleGroups() {
         List<ToggleGroup> toggleGroups = new ArrayList<>();
         for (String answer : userAnswers) {
@@ -365,9 +337,7 @@ private String normalize(String s) {
         return toggleGroups;
     }
 
-    /**
-     * Restituisce le risposte utente come lista di stringhe
-     */
+    
     public List<String> getUserResponses() {
         return getUserAnswers();
     }
@@ -386,7 +356,7 @@ private String normalize(String s) {
         return results;
     }
 
-    // === METODI PRIVATI PER CREARE LE DOMANDE ===
+    
 
     private List<CodeSnippet> getBeginnerSnippets() {
         List<CodeSnippet> list = new ArrayList<>();
@@ -495,7 +465,7 @@ private String normalize(String s) {
         return list;
     }
 
-    // Classe interna per rappresentare uno snippet
+    
     private static class CodeSnippet {
         String code;
         String solution;

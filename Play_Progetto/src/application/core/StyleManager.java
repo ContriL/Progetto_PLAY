@@ -4,16 +4,16 @@ import javafx.scene.Scene;
 
 /**
  * Gestisce l'applicazione centralizzata degli stili CSS.
- * Elimina la duplicazione della logica di caricamento CSS.
+ * 
  */
 public class StyleManager {
     private static final String CSS_PATH = "/application/application.css";
     private static String cachedCssUrl = null;
 
     /**
-     * Applica il foglio di stile principale alla scene fornita.
-     * @param scene La scene a cui applicare gli stili
-     * @return true se l'applicazione è riuscita, false altrimenti
+     * 
+     * @param scene 
+     * @return 
      */
     public static boolean applyMainStyles(Scene scene) {
         if (scene == null) {
@@ -65,9 +65,7 @@ public class StyleManager {
         }
     }
 
-    /**
-     * Resetta la cache CSS (utile per testing o ricaricamento dinamico).
-     */
+    
     public static void clearCache() {
         cachedCssUrl = null;
     }

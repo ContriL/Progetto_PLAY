@@ -31,7 +31,7 @@ public abstract class BaseScreen extends BorderPane {
         initialize();
     }
 
-    // AGGIUNGI QUESTO COSTRUTTORE:
+    
     public BaseScreen(Stage stage, int width, int height) {
         this.stage = stage;
         this.width = width;
@@ -47,10 +47,7 @@ public abstract class BaseScreen extends BorderPane {
     }
 
 
-    /**
-     * Inizializza la barra di navigazione.
-     * Le sottoclassi possono sovrascrivere questo metodo per personalizzare la navbar.
-     */
+    
     protected void initializeNavigation() {
         navbar = createNavigationBar();
 
@@ -58,15 +55,10 @@ public abstract class BaseScreen extends BorderPane {
         topContainer.getChildren().add(navbar);
     }
 
-    /**
-     * Crea la barra di navigazione specifica per questa schermata.
-     * Le sottoclassi devono implementare questo metodo.
-     */
+   
     protected abstract NavigationBar createNavigationBar();
 
-    /**
-     * Inizializza l'header della schermata.
-     */
+    
     protected void initializeHeader() {
         headerText = new Text(getScreenTitle());
         headerText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
@@ -89,21 +81,15 @@ public abstract class BaseScreen extends BorderPane {
         topContainer.getChildren().add(headerBox);
     }
 
-    /**
-     * Metodo astratto per inizializzare il contenuto specifico della schermata.
-     */
+    
     protected abstract void initializeContent();
 
-    /**
-     * Imposta il layout finale della schermata.
-     */
+    
     protected void setupLayout() {
         setTop(topContainer);
     }
 
-    /**
-     * Crea e configura la Scene per questa schermata.
-     */
+    
     public Scene createScene() {
         Scene scene = new Scene(this, width, height);
         StyleManager.applyMainStyles(scene);
@@ -111,26 +97,19 @@ public abstract class BaseScreen extends BorderPane {
         return scene;
     }
 
-    /**
-     * Permette alle sottoclassi di configurare ulteriormente la Scene.
-     */
+    
     protected void configureScene(Scene scene) {
-        // Implementazione di default vuota
-        // Le sottoclassi possono sovrascrivere per aggiungere configurazioni specifiche
+        
     }
 
-    /**
-     * Metodi astratti che le sottoclassi devono implementare.
-     */
+    
     protected abstract String getScreenTitle();
 
     protected String getScreenDescription() {
-        return null; // Di default nessuna descrizione
+        return null; 
     }
 
-    /**
-     * Metodi di utilità per le sottoclassi.
-     */
+   
     protected void setHeaderStyle(String style) {
         if (headerText != null) {
             headerText.setStyle(style);
@@ -153,7 +132,7 @@ public abstract class BaseScreen extends BorderPane {
         if (descriptionText != null) {
             descriptionText.setText(newDescription);
         } else if (newDescription != null && !newDescription.isEmpty()) {
-            // Crea la descrizione se non esisteva
+            
             descriptionText = new Text(newDescription);
             descriptionText.setFont(Font.font("Arial", 16));
             headerBox.getChildren().add(descriptionText);
@@ -164,18 +143,14 @@ public abstract class BaseScreen extends BorderPane {
      * Metodi per gestire il lifecycle della schermata.
      */
     public void onShow() {
-        // Chiamato quando la schermata viene mostrata
-        // Le sottoclassi possono sovrascrivere per inizializzazioni specifiche
+        
     }
 
     public void onHide() {
-        // Chiamato quando la schermata viene nascosta
-        // Le sottoclassi possono sovrascrivere per cleanup
+        
     }
 
-    /**
-     * Mostra questa schermata sul stage.
-     */
+    
     public void show() {
         Scene scene = createScene();
         stage.setScene(scene);
