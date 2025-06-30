@@ -10,6 +10,8 @@ public class ExerciseFactory {
                 return new OrderStepsExercise(difficulty);
             case "WhatPrints":
                 return new WhatPrintsExercise(difficulty);
+            case "CompareCode":
+                return new CompareCode(difficulty);
             default:
                 throw new IllegalArgumentException("Tipo di esercizio non supportato: " + type);
         }

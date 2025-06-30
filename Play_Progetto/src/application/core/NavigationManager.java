@@ -4,6 +4,8 @@ import application.exercises.Exercise;
 import application.screens.auth.Main;
 import application.screens.exercises.ExerciseScreen;
 import application.screens.exercises.ScreenCompleteCode;
+import application.screens.exercises.ScreenCompareCode;
+
 import application.screens.exercises.ScreenQuizEP;
 import application.screens.home.ExerciseGridScreen;
 import application.screens.home.Home;
@@ -97,12 +99,14 @@ public class NavigationManager {
         return cachedScenes.get(key);
     }
 
-    
+
     private Scene createExerciseScene(Exercise exercise) {
         if (exercise instanceof application.exercises.QuizEP) {
             return ScreenQuizEP.getScene(primaryStage, getGridScene(), exercise);
         } else if (exercise instanceof application.exercises.CompleteCode) {
             return ScreenCompleteCode.getScene(primaryStage, getGridScene(), exercise);
+        } else if (exercise instanceof application.exercises.CompareCode) {
+            return ScreenCompareCode.getScene(primaryStage, getGridScene(), exercise);
         } else if (exercise instanceof application.exercises.FindErrorExercise) {
             return ExerciseScreen.getScene(primaryStage, getGridScene(), exercise);
         } else if (exercise instanceof application.exercises.OrderStepsExercise) {

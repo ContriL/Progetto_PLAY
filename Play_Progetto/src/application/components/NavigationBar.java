@@ -12,12 +12,12 @@ public class NavigationBar extends HBox {
     private NavigationManager navigationManager;
     private Button homeButton;
     private Button progressButton;
-    private Button profileButton;  
+    private Button profileButton;
     private Button logoutButton;
     private Button backButton;
 
     public NavigationBar() {
-        this(true); 
+        this(true);
     }
 
     public NavigationBar(boolean showBackButton) {
@@ -28,21 +28,21 @@ public class NavigationBar extends HBox {
 
     private void initializeNavBar(boolean showBackButton) {
         // Configurazione del layout
-        setSpacing(20);  
+        setSpacing(20);
         setId("navBar");
-        setPadding(new Insets(15, 25, 15, 25));  
+        setPadding(new Insets(15, 25, 15, 25));
         setAlignment(Pos.CENTER_RIGHT);
 
-        // Creazione dei pulsanti 
+        // Creazione dei pulsanti
         homeButton = new Button("🏠 Home");
         progressButton = new Button("📊 I miei Progressi");
         profileButton = new Button("👤 Profilo");
         logoutButton = new Button("👋 Logout");
 
-        
+
         getChildren().addAll(homeButton, progressButton, profileButton, logoutButton);
 
-        
+
         if (showBackButton) {
             backButton = new Button("⬅️ Indietro");
             getChildren().add(backButton);
@@ -52,12 +52,12 @@ public class NavigationBar extends HBox {
     private void setupEventHandlers() {
         homeButton.setOnAction(e -> navigationManager.goToHome());
         progressButton.setOnAction(e -> navigationManager.goToUserProgress());
-        profileButton.setOnAction(e -> navigationManager.goToProfile());  
+        profileButton.setOnAction(e -> navigationManager.goToProfile());
         logoutButton.setOnAction(e -> navigationManager.logout());
     }
 
     /**
-     * 
+     *
      * @param action
      */
     public void setBackAction(Runnable action) {
@@ -67,7 +67,7 @@ public class NavigationBar extends HBox {
     }
 
     /**
-     * 
+     *
      * @param destination
      */
     public void setBackAction(String destination) {
@@ -91,7 +91,7 @@ public class NavigationBar extends HBox {
         }
     }
 
-    
+
     public void setButtonEnabled(String buttonName, boolean enabled) {
         switch (buttonName.toLowerCase()) {
             case "home":
@@ -100,7 +100,7 @@ public class NavigationBar extends HBox {
             case "progress":
                 progressButton.setDisable(!enabled);
                 break;
-            case "profile":  
+            case "profile":
                 profileButton.setDisable(!enabled);
                 break;
             case "logout":
@@ -114,7 +114,7 @@ public class NavigationBar extends HBox {
         }
     }
 
-    
+
     public void setButtonVisible(String buttonName, boolean visible) {
         switch (buttonName.toLowerCase()) {
             case "home":
@@ -137,12 +137,12 @@ public class NavigationBar extends HBox {
         }
     }
 
-    
+
     public static NavigationBar forLoginScreen() {
         NavigationBar navbar = new NavigationBar(false);
         navbar.setButtonVisible("home", false);
         navbar.setButtonVisible("progress", false);
-        navbar.setButtonVisible("profile", false);  
+        navbar.setButtonVisible("profile", false);
         return navbar;
     }
 

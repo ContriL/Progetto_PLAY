@@ -16,26 +16,28 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.text.TextAlignment;
 
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Schermata Home dell'applicazione PLAY
+ * Schermata Home dell'applicazione PLAY - BELLISSIMA! 🌟
+ * Completamente ridisegnata con statistiche, emoji e glassmorphism
  */
 public class Home extends BaseScreen {
 
 	public Home(Stage stage) {
-		super(stage, 1200, 800); 
+		super(stage, 1200, 800); // Dimensioni aumentate per la nuova grafica
 	}
 
 	@Override
 	protected NavigationBar createNavigationBar() {
-		
-		NavigationBar navbar = new NavigationBar(false); 
+		// Navbar personalizzata per Home
+		NavigationBar navbar = new NavigationBar(false); // Senza pulsante indietro
 
-		
+		// Personalizza i pulsanti con emoji
 		Button homeButton = new Button("🏠 Home");
 		Button progressButton = new Button("📊 I miei Progressi");
 		Button logoutButton = new Button("👋 Logout");
@@ -45,7 +47,7 @@ public class Home extends BaseScreen {
 				"-fx-background-radius: 25; -fx-effect: dropshadow(gaussian, rgba(155, 89, 182, 0.4), 8, 0, 0, 4);");
 		logoutButton.getStyleClass().add("secondary");
 
-		
+		// Event handlers
 		progressButton.setOnAction(e -> NavigationManager.getInstance().goToUserProgress());
 		logoutButton.setOnAction(e -> NavigationManager.getInstance().logout());
 
@@ -66,7 +68,7 @@ public class Home extends BaseScreen {
 	protected void initializeContent() {
 		VBox mainContent = createBeautifulHomeContent();
 
-		
+		// Container con glassmorphism
 		VBox contentContainer = new VBox();
 		contentContainer.getStyleClass().add("content-container");
 		contentContainer.getChildren().add(mainContent);
@@ -75,28 +77,34 @@ public class Home extends BaseScreen {
 	}
 
 	/**
-	 * Crea il contenuto principale della Home
+	 * Crea il contenuto principale della Home BELLISSIMO
 	 */
 	private VBox createBeautifulHomeContent() {
 		VBox centerBox = new VBox(40);
 		centerBox.setAlignment(Pos.CENTER);
 		centerBox.setPadding(new Insets(30));
 
+		// === STATISTICHE RAPIDE ===
 		HBox statsBox = createStatsSection();
-		
+
+		// === PULSANTE PRINCIPALE FIGISSIMO ===
 		Button startButton = createMainActionButton();
 
+		// === CITAZIONE MOTIVAZIONALE ===
 		Text motivationText = createMotivationalQuote();
 
 		centerBox.getChildren().addAll(statsBox, startButton, motivationText);
 		return centerBox;
 	}
 
-	
+	/**
+	 * Crea le statistiche cards colorate
+	 */
 	private HBox createStatsSection() {
 		HBox statsBox = new HBox(25);
 		statsBox.setAlignment(Pos.CENTER);
 
+		// Calcola statistiche reali dell'utente
 		Map<String, String> userStats = calculateUserStats();
 
 		VBox exercisesCard = createStatCard("🎯", "Esercizi", "Completati", userStats.get("total"), "#e74c3c");
@@ -108,7 +116,9 @@ public class Home extends BaseScreen {
 		return statsBox;
 	}
 
-	
+	/**
+	 * Crea una singola stat card colorata
+	 */
 	private VBox createStatCard(String icon, String title, String subtitle, String value, String borderColor) {
 		VBox card = new VBox(12);
 		card.getStyleClass().add("stats-container");
@@ -116,7 +126,7 @@ public class Home extends BaseScreen {
 		card.setPrefWidth(180);
 		card.setPrefHeight(140);
 
-		
+		// Bordo colorato in basso
 		card.setStyle(card.getStyle() + "-fx-border-color: " + borderColor + "; -fx-border-width: 0 0 4 0;");
 
 		Text iconText = new Text(icon);
@@ -136,7 +146,9 @@ public class Home extends BaseScreen {
 		return card;
 	}
 
-	
+	/**
+	 * Crea il pulsante principale stilizzato
+	 */
 	private Button createMainActionButton() {
 		Button startButton = new Button("🚀 Inizia gli Esercizi");
 		startButton.setPrefWidth(320);
@@ -149,6 +161,9 @@ public class Home extends BaseScreen {
 		return startButton;
 	}
 
+	/**
+	 * Crea la citazione motivazionale
+	 */
 	private Text createMotivationalQuote() {
 		String[] quotes = {
 				"\"Il successo è la somma di piccoli sforzi ripetuti giorno dopo giorno\" 💪",
@@ -169,14 +184,16 @@ public class Home extends BaseScreen {
 		return motivationText;
 	}
 
-	
+	/**
+	 * Calcola le statistiche reali dell'utente
+	 */
 	private Map<String, String> calculateUserStats() {
 		Map<String, String> stats = new HashMap<>();
 
 		try {
 			List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
 
-			
+			// Calcoli reali
 			int totalExercises = progressData.size();
 			int totalCorrect = 0;
 			int totalQuestions = 0;
@@ -191,18 +208,18 @@ public class Home extends BaseScreen {
 					totalCorrect += Integer.parseInt(parts[3]);
 					totalQuestions += Integer.parseInt(parts[4]);
 
-				
+					// Conta per tipo di esercizio
 					String type = parts[1];
 					exerciseCount.put(type, exerciseCount.getOrDefault(type, 0) + 1);
 
-					
+					// Sessioni di oggi
 					if (parts.length >= 7 && parts[6].startsWith(today)) {
 						todaySessions++;
 					}
 				}
 			}
 
-			
+			// Trova esercizio preferito
 			String favoriteExercise = exerciseCount.entrySet().stream()
 					.max(Map.Entry.comparingByValue())
 					.map(entry -> getFriendlyExerciseName(entry.getKey()))
@@ -216,7 +233,7 @@ public class Home extends BaseScreen {
 			stats.put("today", String.valueOf(todaySessions));
 
 		} catch (Exception e) {
-			
+			// Valori di fallback se ci sono errori
 			stats.put("total", "0");
 			stats.put("percentage", "0");
 			stats.put("favorite", "Quiz");
@@ -226,6 +243,9 @@ public class Home extends BaseScreen {
 		return stats;
 	}
 
+	/**
+	 * Converte i nomi interni in nomi user-friendly
+	 */
 	private String getFriendlyExerciseName(String internalName) {
 		switch (internalName) {
 			case "FindError": return "Debug";
@@ -245,7 +265,7 @@ public class Home extends BaseScreen {
 		}
 	}
 
-	
+	// === METODO STATICO PER COMPATIBILITÀ ===
 	public static Scene getScene(Stage stage, Scene loginScene) {
 		Home homeScreen = new Home(stage);
 		return homeScreen.createScene();

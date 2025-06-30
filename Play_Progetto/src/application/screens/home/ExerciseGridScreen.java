@@ -15,7 +15,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
- * Schermata griglia esercizi
+ * Schermata griglia esercizi pulita e funzionale.
+ * Mantiene le barre di progresso visibili e un design sobrio.
+ * DUPLICAZIONE HEADER RIMOSSA - BaseScreen gestisce automaticamente l'header.
  */
 public class ExerciseGridScreen extends BaseScreen {
 
@@ -45,17 +47,21 @@ public class ExerciseGridScreen extends BaseScreen {
         contentBox.setPadding(new Insets(40));
         contentBox.getStyleClass().add("content-container");
 
-      
+        // RIMOSSO: VBox headerSection = createSimpleHeader();
+        // BaseScreen gestisce automaticamente l'header tramite getScreenTitle() e getScreenDescription()
+
         // Griglia degli esercizi
         GridPane exerciseGrid = createCleanExerciseGrid();
 
-        
-        contentBox.getChildren().add(exerciseGrid); 
+        // RIMOSSO: contentBox.getChildren().addAll(headerSection, exerciseGrid);
+        contentBox.getChildren().add(exerciseGrid); // Solo la griglia, header automatico
 
         setCenter(contentBox);
     }
 
-    
+    // RIMOSSO: metodo createSimpleHeader() non più necessario
+    // BaseScreen crea automaticamente l'header con getScreenTitle() e getScreenDescription()
+
     /**
      * Crea la griglia pulita degli esercizi
      */
@@ -77,11 +83,15 @@ public class ExerciseGridScreen extends BaseScreen {
 
         // Riga 3
         exerciseGrid.add(createCleanExerciseCard("💻", "Completa il Codice", "CompleteCode", username), 0, 2);
+        exerciseGrid.add(createCleanExerciseCard("🤔", "Confronta il codice", "CompareCode", username),1, 2); ;
+
 
         return exerciseGrid;
     }
 
-   
+    /**
+     * Crea una card pulita per un esercizio
+     */
     private VBox createCleanExerciseCard(String icon, String title, String exerciseType, String username) {
         VBox card = new VBox(15);
         card.getStyleClass().add("exercise-card");
@@ -89,7 +99,7 @@ public class ExerciseGridScreen extends BaseScreen {
         card.setPrefWidth(280);
         card.setPrefHeight(180);
 
-        
+        // Colore iniziale della card
         String baseColor = "#a385cf";
         String hoverColor = "#d1b3ff";
 
@@ -125,7 +135,7 @@ public class ExerciseGridScreen extends BaseScreen {
     }
 
     /**
-     * Crea una barra di progresso 
+     * Crea una barra di progresso CHIARAMENTE VISIBILE
      */
     private HBox createVisibleProgressBar(String username, String exerciseType) {
         HBox progressBar = new HBox(4);
@@ -140,24 +150,24 @@ public class ExerciseGridScreen extends BaseScreen {
             Region segment = new Region();
             segment.getStyleClass().add("progress-segment");
             segment.setPrefWidth(50);
-            segment.setPrefHeight(6);
+            segment.setPrefHeight(6); // Più spesso per essere visibile
 
             if (i <= maxLevel) {
                 // Livello completato - colore in base al livello
                 segment.getStyleClass().add("level-" + i);
                 switch (i) {
                     case 1:
-                        segment.setStyle("-fx-background-color: #fbbf24;"); 
+                        segment.setStyle("-fx-background-color: #fbbf24;"); // Giallo
                         break;
                     case 2:
-                        segment.setStyle("-fx-background-color: #3b82f6;");
+                        segment.setStyle("-fx-background-color: #3b82f6;"); // Blu
                         break;
                     case 3:
-                        segment.setStyle("-fx-background-color: #10b981;"); 
+                        segment.setStyle("-fx-background-color: #10b981;"); // Verde
                         break;
                 }
             } else {
-                
+                // Livello non completato - grigio chiaro
                 segment.getStyleClass().add("level-0");
                 segment.setStyle("-fx-background-color: #e2e8f0;");
             }
@@ -181,21 +191,22 @@ public class ExerciseGridScreen extends BaseScreen {
     }
 
     private int getMaxLevelReached(String username, String exerciseType) {
+        // Controlla quale è il livello massimo superato
         for (int level = 3; level >= 1; level--) {
             if (UserProgress.hasPassedLevel(username, exerciseType, level)) {
                 return level;
             }
         }
-        return 0; 
+        return 0; // Nessun livello completato
     }
 
     private void goToExerciseRules(String exerciseType, String username) {
         System.out.println("🎯 Cliccato su esercizio: " + exerciseType);
 
-        
+        // Determina quale livello proporre
         int nextLevel = getNextLevel(username, exerciseType);
 
-        
+        // Crea l'esercizio del livello appropriato
         Exercise exercise = createExercise(exerciseType, nextLevel);
 
         if (exercise != null) {
@@ -207,13 +218,13 @@ public class ExerciseGridScreen extends BaseScreen {
     }
 
     private int getNextLevel(String username, String exerciseType) {
-        
+        // Trova il prossimo livello da fare
         for (int level = 1; level <= 3; level++) {
             if (!UserProgress.hasPassedLevel(username, exerciseType, level)) {
-                return level; 
+                return level; // Primo livello non completato
             }
         }
-        return 3;
+        return 3; // Se ha completato tutto, rigioca l'ultimo livello
     }
 
     private Exercise createExercise(String exerciseType, int level) {
@@ -229,6 +240,8 @@ public class ExerciseGridScreen extends BaseScreen {
                     return new QuizEP(level);
                 case "CompleteCode":
                     return new CompleteCode(level);
+                case "CompareCode":
+                    return ExerciseFactory.createExercise("CompareCode", level);
                 default:
                     return null;
             }
@@ -238,7 +251,7 @@ public class ExerciseGridScreen extends BaseScreen {
         }
     }
 
-    
+    // Metodo statico per compatibilità
     public static Scene createScene(Stage stage) {
         ExerciseGridScreen screen = new ExerciseGridScreen(stage);
         return screen.createScene();
