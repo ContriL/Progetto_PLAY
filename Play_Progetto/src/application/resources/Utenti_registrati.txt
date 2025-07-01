@@ -4,5 +4,5 @@ lorenzo,Contri,lollo,pas
 Dalia,Barone,daliaxx,Daliaf
 dada,ria,dalia,123
 Lorenzo,Contri,Lollo5,Lorenzo10
-Lorenzo,Contri,Contri,Lorenzo100mattia,veroni,pak,123Prova
+Lorenzo,Contri,Contri,Lorenzo100
 mattia,veroni,pakmatti,123Prova
