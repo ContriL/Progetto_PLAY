@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * 
+ * Videata Regole (3)
  * Mostra le regole e spiegazioni di un esercizio prima di iniziare.
  */
 public class ExerciseRulesScreen extends BaseScreen {
@@ -32,7 +32,7 @@ public class ExerciseRulesScreen extends BaseScreen {
         this.exercise = exercise;
         this.returnDestination = returnDestination;
 
-        
+        // AGGIUNGI QUESTO: Aggiorna il contenuto dopo che exercise è assegnato
         updateRulesContent();
     }
 
@@ -52,7 +52,7 @@ public class ExerciseRulesScreen extends BaseScreen {
 
     @Override
     protected String getScreenTitle() {
-        
+        // Protezione contro null - evita il crash
         if (exercise == null) {
             return "Regole Esercizio";
         }
@@ -70,19 +70,19 @@ public class ExerciseRulesScreen extends BaseScreen {
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(30));
 
-        
+        // Aspetta che exercise sia disponibile
         if (exercise == null) {
             Label waitingLabel = new Label("Caricamento regole...");
             contentBox.getChildren().add(waitingLabel);
 
-            
+            // Controlla periodicamente se exercise è disponibile
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
                 if (exercise != null) {
-                    
+                    // Richiama initializeContent quando exercise è pronto
                     Platform.runLater(this::recreateContent);
                 }
             }));
-            timeline.setCycleCount(50); 
+            timeline.setCycleCount(50); // Prova per 5 secondi
             timeline.play();
         } else {
             createRulesContent(contentBox);
@@ -100,14 +100,14 @@ public class ExerciseRulesScreen extends BaseScreen {
     }
 
     private void createRulesContent(VBox contentBox) {
-        
+        // Spiegazione delle regole
         Label rulesLabel = new Label(getRulesText());
         rulesLabel.setWrapText(true);
         rulesLabel.setFont(Font.font("Arial", 16));
         rulesLabel.setMaxWidth(600);
         rulesLabel.setStyle("-fx-text-alignment: justify;");
 
-        
+        // Pulsanti
         VBox buttonBox = new VBox(15);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -129,7 +129,7 @@ public class ExerciseRulesScreen extends BaseScreen {
     }
 
     private String getRulesText() {
-        
+        // Protezione contro null
         if (exercise == null) {
             return "Caricamento delle regole dell'esercizio in corso...\n\n" +
                     "Le regole verranno visualizzate a breve.";
@@ -182,6 +182,18 @@ public class ExerciseRulesScreen extends BaseScreen {
                         "• Una riga per ogni println, rispetta l'ordine di output\n\n" +
                         "Questo esercizio ti aiuterà a migliorare la capacità di " +
                         "tracciare l'esecuzione del codice mentalmente.";
+            case "CompareCode":
+                return "In questo esercizio dovrai confrontare due versioni di codice Java e valutarne le differenze.\n\n" +
+                        "• Ti verranno mostrate due versioni di codice affiancate (Versione A e Versione B)\n" +
+                        "• Dovrai analizzare entrambe le versioni per correttezza, efficienza e leggibilità\n" +
+                        "• Rispondi alle 3 domande per ogni confronto:\n" +
+                        "  - Quale versione è funzionalmente corretta?\n" +
+                        "  - Quale versione è più efficiente?\n" +
+                        "  - Quale versione è più leggibile e segue le best practice?\n" +
+                        "• Spiega le tue valutazioni nel campo motivazione\n" +
+                        "• Completa almeno 2 confronti su 3 correttamente per passare al livello successivo\n\n" +
+                        "Questo esercizio ti aiuterà a sviluppare il pensiero critico per valutare " +
+                        "la qualità del codice e riconoscere le best practice di programmazione.";
 
             default:
                 return "In questo esercizio metterai alla prova le tue conoscenze di programmazione Java.\n\n" +
@@ -206,7 +218,7 @@ public class ExerciseRulesScreen extends BaseScreen {
         }
     }
 
-    
+    // Metodi statici per compatibilità
     public static Scene createScene(Stage stage, Exercise exercise, String returnDestination) {
         System.out.println("🏗️ ExerciseRulesScreen.createScene chiamato");
         System.out.println("📦 Exercise ricevuto: " + (exercise != null ? exercise.getClass().getSimpleName() : "NULL"));
@@ -225,10 +237,11 @@ public class ExerciseRulesScreen extends BaseScreen {
 
     private void updateRulesContent() {
         if (exercise != null) {
-            
+            // Aggiorna il titolo
             updateTitle(exercise.getTitle());
 
-            
+            // Per ora lasciamo così - il testo delle regole dovrebbe aggiornarsi automaticamente
+            // perché ora exercise non è più null quando getRulesText() viene chiamato
         }
     }
 

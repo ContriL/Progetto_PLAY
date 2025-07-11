@@ -288,6 +288,9 @@ public class ScreenCompareCode extends BaseScreen {
     /**
      * Configura il bottone per il prossimo livello
      */
+    /**
+     * Configura il bottone per il prossimo livello
+     */
     private void setupNextLevelButton() {
         passToNextLevel.setOnAction(e -> {
             int nextLevel = exercise.getDifficulty() + 1;
@@ -296,8 +299,8 @@ public class ScreenCompareCode extends BaseScreen {
                 Scene nextScene = ScreenCompareCode.getScene(stage, returnScene, nextExercise);
                 stage.setScene(nextScene);
             } else {
-                saveMessage.setText("🎊 Complimenti! Hai completato tutti i livelli del confronto codice!");
-                saveMessage.setTextFill(Color.BLUE);
+                // Ha completato tutti i 3 livelli - mostra riepilogo finale
+                showFinalSummary();
             }
         });
     }
@@ -384,5 +387,62 @@ public class ScreenCompareCode extends BaseScreen {
      */
     public int getCorrectCount(int difficulty) {
         return correctCountMap.getOrDefault(difficulty, 0);
+    }
+    /**
+     * Mostra il riepilogo finale quando tutti i livelli sono completati
+     */
+    /**
+     * Mostra il riepilogo finale quando tutti i livelli sono completati
+     */
+    private void showFinalSummary() {
+        // Calcola statistiche totali da UserProgress
+        String username = Main.getCurrentUser();
+        int level1Score = UserProgress.getCorrectAnswers(username, "CompareCode", 1);
+        int level2Score = UserProgress.getCorrectAnswers(username, "CompareCode", 2);
+        int level3Score = UserProgress.getCorrectAnswers(username, "CompareCode", 3);
+        int totalScore = level1Score + level2Score + level3Score;
+        int maxPossible = 9; // 3 livelli x 3 confronti = 9
+
+        double percentage = (double) totalScore / maxPossible * 100;
+
+        String summaryText = String.format(
+                "🎊 COMPLIMENTI! Hai completato tutti i livelli di Confronta il Codice!\n\n" +
+                        "📊 RIEPILOGO FINALE:\n" +
+                        "• Livello 1 (Principiante): %d/3 confronti corretti\n" +
+                        "• Livello 2 (Intermedio): %d/3 confronti corretti\n" +
+                        "• Livello 3 (Avanzato): %d/3 confronti corretti\n\n" +
+                        "🎯 PUNTEGGIO TOTALE: %d/%d (%.1f%%)\n\n" +
+                        "%s",
+                level1Score, level2Score, level3Score, totalScore, maxPossible, percentage,
+                getPerformanceMessage(percentage)
+        );
+
+        // Mostra alert con riepilogo e poi esce automaticamente
+        Alert summaryAlert = new Alert(Alert.AlertType.INFORMATION);
+        summaryAlert.setTitle("Esercizio Completato!");
+        summaryAlert.setHeaderText("🎊 Tutti i livelli completati!");
+        summaryAlert.setContentText(summaryText);
+
+        ButtonType okButton = new ButtonType("🏠 Torna alla Griglia", ButtonBar.ButtonData.OK_DONE);
+        summaryAlert.getButtonTypes().setAll(okButton);
+
+        summaryAlert.showAndWait().ifPresent(response -> {
+            // Esce automaticamente quando clicca OK
+            NavigationManager.getInstance().goToExerciseGrid();
+        });
+    }
+    /**
+     * Messaggio di valutazione in base alla performance
+     */
+    private String getPerformanceMessage(double percentage) {
+        if (percentage >= 90) {
+            return "🌟 ECCELLENTE! Hai dimostrato ottime capacità di analisi del codice!";
+        } else if (percentage >= 80) {
+            return "👍 MOLTO BENE! Hai una buona comprensione delle best practice!";
+        } else if (percentage >= 70) {
+            return "✅ BUONO! Continua a praticare per migliorare!";
+        } else {
+            return "📚 Rivedi i concetti e riprova! La pratica rende perfetti!";
+        }
     }
 }
