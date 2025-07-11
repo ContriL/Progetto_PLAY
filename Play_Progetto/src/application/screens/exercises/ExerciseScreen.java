@@ -5,6 +5,7 @@ import application.screens.auth.Main;
 import application.UserProgress;
 import application.screens.user.UserProgressScreen;
 import application.core.StyleManager;
+import application.core.NavigationManager;
 import application.exercises.Exercise;
 import application.exercises.FindErrorExercise;
 import application.exercises.OrderStepsExercise;
@@ -23,33 +24,53 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
+import application.core.DialogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExerciseScreen {
 
-    private static int currentQuestionIndex = 0;
-    private static int correctAnswers = 0;
-
     public static Scene getScene(Stage stage, Scene selectionScene, Exercise exercise) {
-        
-        currentQuestionIndex = 0;
-        correctAnswers = 0;
+        // Utilizzo di variabili locali array per evitare problemi di concorrenza con variabili statiche
+        final int[] currentQuestionIndex = {0};
+        final int[] correctAnswers = {0};
 
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 1200, 800);
 
-        
         StyleManager.applyMainStyles(scene);
 
-        
-        NavigationBar navBar = NavigationBar.forSubScreens("grid");
+        // Configurazione navbar con intercettazione della navigazione durante l'esercizio
+        NavigationBar navBar = new NavigationBar(true);
+
+        // Imposta azione back button con conferma di uscita
+        navBar.setBackAction(() -> {
+            handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () -> {
+                NavigationManager.getInstance().goToExerciseGrid();
+            });
+        });
+
+        // Intercettazione di tutti i bottoni della navbar per gestire uscita dall'esercizio
+        navBar.setButtonAction("home", () ->
+                handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () ->
+                        NavigationManager.getInstance().goToHome()));
+
+        navBar.setButtonAction("progress", () ->
+                handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () ->
+                        NavigationManager.getInstance().goToUserProgress()));
+
+        navBar.setButtonAction("profile", () ->
+                handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () ->
+                        NavigationManager.getInstance().goToProfile()));
+
+        navBar.setButtonAction("logout", () ->
+                handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () ->
+                        NavigationManager.getInstance().logout()));
 
         VBox topContainer = new VBox();
         topContainer.getChildren().add(navBar);
 
-        
         Text headerText = new Text(exercise.getTitle() + " - Livello " + exercise.getDifficulty());
         headerText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         Text descriptionText = new Text(exercise.getDescription());
@@ -62,35 +83,28 @@ public class ExerciseScreen {
         topContainer.getChildren().add(headerBox);
         root.setTop(topContainer);
 
-        
         VBox contentBox = new VBox(15);
         contentBox.setPadding(new Insets(15));
 
-        
-        Label questionCountLabel = new Label("Domanda " + (currentQuestionIndex + 1) + " di " + exercise.getTotalQuestions());
+        Label questionCountLabel = new Label("Domanda " + (currentQuestionIndex[0] + 1) + " di " + exercise.getTotalQuestions());
         questionCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        
         TextArea codeSnippetArea = new TextArea();
         codeSnippetArea.setEditable(false);
         codeSnippetArea.setPrefRowCount(12);
         codeSnippetArea.setFont(Font.font("Monospaced", 13));
         codeSnippetArea.setWrapText(true);
 
-        
         List<String> questions = exercise.getQuestions();
         if (!questions.isEmpty()) {
-            codeSnippetArea.setText(questions.get(currentQuestionIndex));
+            codeSnippetArea.setText(questions.get(currentQuestionIndex[0]));
         }
 
-        
         VBox answerBox = new VBox(10);
         Label answerLabel = new Label("La tua risposta:");
 
-        
         final Control[] answerControlRef = new Control[1];
 
-        
         if (exercise instanceof WhatPrintsExercise) {
             TextArea answerArea = new TextArea();
             answerArea.setPromptText("Scrivi l'output atteso, una riga per ogni println");
@@ -98,8 +112,7 @@ public class ExerciseScreen {
             answerArea.setPrefRowCount(4);
             answerControlRef[0] = answerArea;
         } else if (exercise instanceof OrderStepsExercise) {
-            
-            answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
+            answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex[0]);
         } else {
             TextField answerField = new TextField();
             answerField.setPromptText("Inserisci la tua risposta qui");
@@ -108,15 +121,12 @@ public class ExerciseScreen {
 
         answerBox.getChildren().addAll(answerLabel, answerControlRef[0]);
 
-        
         Text resultText = new Text();
         resultText.setFill(Color.GREEN);
 
-        
         contentBox.getChildren().addAll(questionCountLabel, codeSnippetArea, answerBox, resultText);
         root.setCenter(contentBox);
 
-        
         HBox buttonBar = new HBox(10);
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.setPadding(new Insets(15));
@@ -129,7 +139,6 @@ public class ExerciseScreen {
         nextButton.setDisable(true);
         retryButton.setDisable(true);
 
-        
         if (answerControlRef[0] instanceof TextField) {
             TextField textField = (TextField) answerControlRef[0];
             textField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -153,24 +162,24 @@ public class ExerciseScreen {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < listView.getItems().size(); i++) {
                     if (i > 0) sb.append(",");
-                    
+
                     String item = listView.getItems().get(i);
                     int dotIndex = item.indexOf('.');
                     if (dotIndex > 0) {
                         sb.append(item.substring(0, dotIndex));
                     } else {
-                        sb.append(item); 
+                        sb.append(item);
                     }
                 }
                 userAnswer = sb.toString();
             }
 
-            boolean isCorrect = exercise.checkAnswer(currentQuestionIndex, userAnswer);
+            boolean isCorrect = exercise.checkAnswer(currentQuestionIndex[0], userAnswer);
 
             if (isCorrect) {
                 resultText.setText("Corretto!");
                 resultText.setFill(Color.GREEN);
-                correctAnswers++;
+                correctAnswers[0]++;
                 retryButton.setDisable(true);
             } else {
                 resultText.setText("Sbagliato. Riprova o passa alla prossima domanda.");
@@ -192,7 +201,7 @@ public class ExerciseScreen {
                 int controlIndex = parent.getChildren().indexOf(answerControlRef[0]);
                 parent.getChildren().remove(answerControlRef[0]);
 
-                answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
+                answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex[0]);
                 parent.getChildren().add(controlIndex, answerControlRef[0]);
             }
 
@@ -202,18 +211,15 @@ public class ExerciseScreen {
         });
 
         nextButton.setOnAction(e -> {
-            currentQuestionIndex++;
+            currentQuestionIndex[0]++;
 
-            if (currentQuestionIndex < exercise.getTotalQuestions()) {
-                
-                codeSnippetArea.setText(questions.get(currentQuestionIndex));
-                questionCountLabel.setText("Domanda " + (currentQuestionIndex + 1) + " di " + exercise.getTotalQuestions());
+            if (currentQuestionIndex[0] < exercise.getTotalQuestions()) {
+                codeSnippetArea.setText(questions.get(currentQuestionIndex[0]));
+                questionCountLabel.setText("Domanda " + (currentQuestionIndex[0] + 1) + " di " + exercise.getTotalQuestions());
 
-                
                 if (answerControlRef[0] instanceof TextField) {
                     ((TextField) answerControlRef[0]).clear();
 
-                    
                     TextField textField = (TextField) answerControlRef[0];
                     textField.textProperty().addListener((observable, oldValue, newValue) -> {
                         if (submitButton.isDisabled() && !textField.getText().isEmpty()) {
@@ -225,12 +231,11 @@ public class ExerciseScreen {
                     ((TextArea) answerControlRef[0]).clear();
 
                 } else if (answerControlRef[0] instanceof ListView) {
-                    
                     VBox parent = (VBox) answerControlRef[0].getParent();
                     int controlIndex = parent.getChildren().indexOf(answerControlRef[0]);
                     parent.getChildren().remove(answerControlRef[0]);
 
-                    answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex);
+                    answerControlRef[0] = createOrderStepsControl((OrderStepsExercise) exercise, currentQuestionIndex[0]);
                     parent.getChildren().add(controlIndex, answerControlRef[0]);
                 }
 
@@ -240,26 +245,23 @@ public class ExerciseScreen {
                 retryButton.setDisable(true);
 
             } else {
-                
+                // Esercizio completato: salvataggio del risultato finale
                 contentBox.getChildren().clear();
 
-                
                 String exerciseType = getExerciseType(exercise);
-
-                // Salva il progresso dell'utente (usando il nickname dell'utente corrente)
                 String currentUser = Main.getCurrentUser();
                 boolean saved = UserProgress.saveProgress(
                         currentUser,
                         exerciseType,
                         exercise.getDifficulty(),
-                        correctAnswers,
+                        correctAnswers[0],
                         exercise.getTotalQuestions()
                 );
 
                 Text completionText = new Text("Esercizio completato!");
                 completionText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
-                Text scoreText = new Text("Hai risposto correttamente a " + correctAnswers +
+                Text scoreText = new Text("Hai risposto correttamente a " + correctAnswers[0] +
                         " domande su " + exercise.getTotalQuestions() + ".");
                 scoreText.setFill(Color.GREEN);
 
@@ -268,11 +270,9 @@ public class ExerciseScreen {
                         "Non è stato possibile salvare i progressi.");
                 progressText.setFill(saved ? Color.GREEN : Color.RED);
 
-                // Calcola la percentuale di successo
-                double percentage = (double) correctAnswers / exercise.getTotalQuestions() * 100;
+                double percentage = (double) correctAnswers[0] / exercise.getTotalQuestions() * 100;
                 Text percentageText = new Text(String.format("Percentuale di successo: %.1f%%", percentage));
 
-                // Messaggio sul risultato del livello
                 Text resultLevelText = new Text();
                 if (percentage >= 60) {
                     resultLevelText.setText("Congratulazioni! Hai superato questo livello.");
@@ -294,79 +294,76 @@ public class ExerciseScreen {
                         newExerciseButton
                 );
 
-                
                 submitButton.setDisable(true);
                 nextButton.setDisable(true);
                 retryButton.setDisable(true);
             }
         });
 
-        
+        // Configurazione back button con gestione conferma uscita
         backButton.setOnAction(e -> {
-            showExitConfirmation(() -> {
-                
-                if (currentQuestionIndex > 0 || correctAnswers > 0) {
-                    savePartialProgress(exercise, correctAnswers, currentQuestionIndex + 1);
-                }
+            handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () -> {
                 stage.setScene(selectionScene);
             });
         });
 
-        
         buttonBar.getChildren().addAll(submitButton, retryButton, nextButton, backButton);
         root.setBottom(buttonBar);
 
         return scene;
     }
 
-    
-    private static void showExitConfirmation(Runnable onConfirm) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Conferma Uscita");
-        alert.setHeaderText("⚠️ Attenzione: stai per uscire dall'esercizio");
-        alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
-                "Vuoi continuare e uscire dall'esercizio?");
+    /**
+     * Gestisce la conferma di uscita dall'esercizio secondo le specifiche del progetto.
+     * Se l'esercizio è completato permette uscita libera, altrimenti richiede conferma.
+     *
+     * @param exercise l'esercizio corrente
+     * @param currentQuestionIndex indice della domanda corrente
+     * @param correctAnswers numero di risposte corrette
+     * @param onConfirm azione da eseguire se confermata l'uscita
+     */
+    private static void showExitConfirmation(Exercise exercise, int currentQuestionIndex,
+                                             int correctAnswers, Runnable onConfirm) {
+        // Determina se l'esercizio è stato completato interamente
+        boolean isCompleted = (currentQuestionIndex >= exercise.getTotalQuestions());
 
-        
-        ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
-        ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(confirmButton, cancelButton);
-
-        
-        alert.getDialogPane().getStylesheets().add(
-                ExerciseScreen.class.getResource("/application/application.css").toExternalForm()
+        // Utilizza DialogUtils per gestire la conferma secondo le specifiche
+        DialogUtils.showExerciseExitConfirmation(
+                exercise,
+                isCompleted,
+                correctAnswers,
+                onConfirm
         );
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == confirmButton) {
-                onConfirm.run();
-            }
-            
-        });
     }
 
-    // Salva progresso parziale con percentuale
-    private static void savePartialProgress(Exercise exercise, int correctAnswers, int questionsAttempted) {
-        String exerciseType = getExerciseType(exercise);
-        String currentUser = Main.getCurrentUser();
+    /**
+     * Gestisce la navigazione durante lo svolgimento dell'esercizio.
+     * Implementa la logica di controllo per l'uscita dall'esercizio.
+     *
+     * @param exercise l'esercizio corrente
+     * @param currentQuestionIndex indice della domanda corrente
+     * @param correctAnswers numero di risposte corrette
+     * @param navigationAction azione di navigazione da eseguire
+     */
+    private static void handleNavigation(Exercise exercise, int currentQuestionIndex,
+                                         int correctAnswers, Runnable navigationAction) {
+        boolean isCompleted = (currentQuestionIndex >= exercise.getTotalQuestions());
 
-        
-        boolean saved = UserProgress.saveProgress(
-                currentUser,
-                exerciseType,
-                exercise.getDifficulty(),
-                correctAnswers,                    
-                exercise.getTotalQuestions()      
-        );
-
-        if (saved) {
-            System.out.println("✅ Progresso parziale salvato: " + correctAnswers + "/" + exercise.getTotalQuestions() +
-                    " (fatto " + questionsAttempted + " domande)");
+        if (isCompleted) {
+            // Esercizio completato: navigazione libera senza conferma
+            navigationAction.run();
+        } else {
+            // Esercizio in corso: richiede conferma per l'uscita
+            showExitConfirmation(exercise, currentQuestionIndex, correctAnswers, navigationAction);
         }
     }
 
-    // Estrae il tipo di esercizio 
+    /**
+     * Determina il tipo di esercizio per il sistema di salvataggio progressi.
+     *
+     * @param exercise l'istanza dell'esercizio
+     * @return stringa identificativa del tipo di esercizio
+     */
     private static String getExerciseType(Exercise exercise) {
         if (exercise instanceof FindErrorExercise) {
             return "FindError";
@@ -378,7 +375,13 @@ public class ExerciseScreen {
         return "Unknown";
     }
 
-    // Crea un controllo per l'esercizio "Ordina i Passi"
+    /**
+     * Crea il controllo UI per l'esercizio "Ordina i Passi" con funzionalità drag & drop.
+     *
+     * @param exercise l'istanza dell'esercizio OrderStepsExercise
+     * @param questionIndex indice della domanda corrente
+     * @return ListView configurata per il riordinamento tramite trascinamento
+     */
     private static ListView<String> createOrderStepsControl(OrderStepsExercise exercise, int questionIndex) {
         ListView<String> stepsListView = new ListView<>();
         stepsListView.setPrefHeight(200);
@@ -390,7 +393,6 @@ public class ExerciseScreen {
             numberedSteps.add((i + 1) + ". " + steps.get(i));
         }
 
-        
         stepsListView.getItems().clear();
         stepsListView.getItems().addAll(numberedSteps);
 
@@ -413,7 +415,6 @@ public class ExerciseScreen {
                 }
             };
 
-            
             cell.setOnDragDetected(event -> {
                 if (!cell.isEmpty()) {
                     Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);

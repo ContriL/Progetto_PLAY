@@ -16,12 +16,10 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.*;
 
-/**
- * Schermata Profilo 
- */
+// Schermata Profilo Utente: visualizza bio, avatar, statistiche e obiettivi
 public class ProfileScreen extends BaseScreen {
 
-    private static final String PROFILE_FILE = System.getProperty("user.dir") + "/Play_Progetto/src/application/resources/profiles.properties";
+    private static final String PROFILE_FILE = System.getProperty("user.dir") + "/src/application/resources/profiles.properties";
 
     private TextArea bioField;
 
@@ -50,8 +48,8 @@ public class ProfileScreen extends BaseScreen {
         mainContent.setPadding(new Insets(30));
         mainContent.setAlignment(Pos.TOP_CENTER);
 
-        VBox profileSection = createProfileSection();
-        HBox statsAchievements = new HBox(40, createRealStatsSection(), createSimpleAchievementsSection());
+        VBox profileSection = createProfileSection(); // avatar + bio
+        HBox statsAchievements = new HBox(40, createRealStatsSection(), createSimpleAchievementsSection()); // stats + obiettivi
         statsAchievements.setAlignment(Pos.CENTER);
 
         mainContent.getChildren().addAll(profileSection, statsAchievements);
@@ -61,6 +59,7 @@ public class ProfileScreen extends BaseScreen {
         setCenter(container);
     }
 
+    // Sezione avatar, username, bio e pulsante salvataggio
     private VBox createProfileSection() {
         VBox section = new VBox(20);
         section.setAlignment(Pos.CENTER);
@@ -92,6 +91,7 @@ public class ProfileScreen extends BaseScreen {
         return section;
     }
 
+    // Sezione avatar: selezione emoji tra opzioni predefinite
     private VBox createSimpleAvatarSection() {
         VBox box = new VBox(10);
         box.setAlignment(Pos.CENTER);
@@ -123,6 +123,7 @@ public class ProfileScreen extends BaseScreen {
         return box;
     }
 
+    // Statistiche reali basate sui progressi utente
     private VBox createRealStatsSection() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
@@ -137,6 +138,7 @@ public class ProfileScreen extends BaseScreen {
 
         stats.getChildren().add(createStatRow("🎯", "Esercizi fatti", String.valueOf(progress.size())));
 
+        // Conteggio esercizi superati
         long passed = progress.stream().filter(p -> {
             String[] parts = p.split(",");
             return parts.length >= 6 && Double.parseDouble(parts[5]) >= 60.0;
@@ -153,6 +155,7 @@ public class ProfileScreen extends BaseScreen {
         return box;
     }
 
+    // Sezione con obiettivi sbloccati o meno
     private VBox createSimpleAchievementsSection() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
@@ -169,6 +172,7 @@ public class ProfileScreen extends BaseScreen {
         return box;
     }
 
+    // Riga singola per una statistica (es: esercizi completati)
     private HBox createStatRow(String icon, String label, String value) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
@@ -187,6 +191,7 @@ public class ProfileScreen extends BaseScreen {
         return row;
     }
 
+    // Riga per un singolo obiettivo (con stato sbloccato)
     private HBox createSimpleAchievementRow(SimpleAchievement a) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
@@ -197,6 +202,7 @@ public class ProfileScreen extends BaseScreen {
         return row;
     }
 
+    // Crea e restituisce lista di obiettivi sbloccabili
     private List<SimpleAchievement> calculateSimpleAchievements() {
         List<String> progress = UserProgress.getUserProgress(Main.getCurrentUser());
         List<SimpleAchievement> list = new ArrayList<>();
@@ -207,6 +213,7 @@ public class ProfileScreen extends BaseScreen {
         list.add(new SimpleAchievement("Quiz EP - Principiante", UserProgress.hasPassedLevel(Main.getCurrentUser(), "quizEP", 1)));
         list.add(new SimpleAchievement("5 esercizi completati", progress.size() >= 5));
 
+        // Verifica se ha provato almeno 3 tipi diversi
         Set<String> types = new HashSet<>();
         progress.forEach(p -> {
             String[] parts = p.split(",");
@@ -217,6 +224,7 @@ public class ProfileScreen extends BaseScreen {
         return list;
     }
 
+    // Trova il tipo di esercizio svolto più volte
     private String findFavoriteExercise(List<String> progress) {
         Map<String, Integer> map = new HashMap<>();
         for (String p : progress) {
@@ -238,6 +246,7 @@ public class ProfileScreen extends BaseScreen {
         }
     }
 
+    // Mostra un semplice alert informativo
     private void showSimpleAlert(String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle("PLAY");
@@ -246,6 +255,7 @@ public class ProfileScreen extends BaseScreen {
         a.showAndWait();
     }
 
+    // Carica la bio utente, con valore predefinito
     private String loadUserBio() {
         return loadUserProperty(".bio", "🚀 Studente di programmazione appassionato!");
     }
@@ -262,38 +272,54 @@ public class ProfileScreen extends BaseScreen {
         saveUserProperty(".avatar", avatar);
     }
 
+    // Carica una proprietà dal file utente
     private String loadUserProperty(String suffix, String defaultVal) {
         try {
             Properties props = new Properties();
             File f = new File(PROFILE_FILE);
-            if (f.exists()) {
-                props.load(new FileInputStream(f));
-                return props.getProperty(Main.getCurrentUser() + suffix, defaultVal);
+
+            if (!f.exists()) {
+                return defaultVal;
             }
+
+            try (FileInputStream fis = new FileInputStream(f)) {
+                props.load(fis);
+            }
+
+            String key = Main.getCurrentUser() + suffix;
+            return props.getProperty(key, defaultVal);
+
         } catch (IOException e) {
-            System.err.println("Errore caricamento: " + e.getMessage());
+            return defaultVal;
         }
-        return defaultVal;
     }
 
+    // Salva una proprietà nel file, con debug avanzato
     private void saveUserProperty(String suffix, String value) {
         try {
             Properties props = new Properties();
             File file = new File(PROFILE_FILE);
-            if (file.exists()) props.load(new FileInputStream(file));
-            else {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-            props.setProperty(Main.getCurrentUser() + suffix, value);
-            props.store(new FileOutputStream(file), "User Profiles");
-        } catch (IOException e) {
-            System.err.println("Errore salvataggio: " + e.getMessage());
-        }
-    }
 
-    public static Scene createScene(Stage stage) {
-        return new ProfileScreen(stage).createScene();
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            if (file.exists()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    props.load(fis);
+                }
+            }
+
+            String key = Main.getCurrentUser() + suffix;
+            props.setProperty(key, value);
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                props.store(fos, "User Profiles - Updated");
+            }
+
+        } catch (IOException e) {
+        }
     }
 
     @Override
@@ -302,6 +328,7 @@ public class ProfileScreen extends BaseScreen {
         if (stage != null) stage.setTitle("PLAY - Il tuo Profilo");
     }
 
+    // Modello dati per un obiettivo semplice (nome + stato sblocco)
     private static class SimpleAchievement {
         String name;
         boolean unlocked;
@@ -311,4 +338,5 @@ public class ProfileScreen extends BaseScreen {
             this.unlocked = unlocked;
         }
     }
+
 }

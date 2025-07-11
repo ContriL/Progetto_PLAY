@@ -155,4 +155,43 @@ public class NavigationBar extends HBox {
         navbar.setBackAction(backDestination);
         return navbar;
     }
+
+    /**
+     * Imposta azione personalizzata per un bottone specifico.
+     * Utile per intercettare la navigazione negli esercizi.
+     */
+    public void setButtonAction(String buttonName, Runnable action) {
+        switch (buttonName.toLowerCase()) {
+            case "home":
+                if (homeButton != null) {
+                    homeButton.setOnAction(e -> action.run());
+                }
+                break;
+            case "progress":
+                if (progressButton != null) {
+                    progressButton.setOnAction(e -> action.run());
+                }
+                break;
+            case "profile":
+                if (profileButton != null) {
+                    profileButton.setOnAction(e -> action.run());
+                }
+                break;
+            case "logout":
+                if (logoutButton != null) {
+                    logoutButton.setOnAction(e -> action.run());
+                }
+                break;
+            default:
+                System.err.println("⚠️ Bottone non riconosciuto: " + buttonName);
+                break;
+        }
+    }
+
+    /**
+     * Ripristina le azioni di default dei bottoni
+     */
+    public void resetDefaultActions() {
+        setupEventHandlers(); // Richiama il metodo esistente
+    }
 }

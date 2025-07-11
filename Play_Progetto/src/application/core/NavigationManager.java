@@ -67,11 +67,15 @@ public class NavigationManager {
     }
 
     public void goToProfile() {
-        Scene profileScene = ProfileScreen.createScene(primaryStage);
+        // Crea lo screen passando stage nel costruttore
+        ProfileScreen profileScreen = new ProfileScreen(primaryStage);
+        // Chiama createScene() senza parametri
+        Scene profileScene = profileScreen.createScene();
         primaryStage.setScene(profileScene);
     }
 
-    
+
+
     public void showExerciseRules(Exercise exercise, String returnTo) {
         Scene rulesScene = application.screens.exercises.ExerciseRulesScreen.createScene(
                 primaryStage, exercise, returnTo);

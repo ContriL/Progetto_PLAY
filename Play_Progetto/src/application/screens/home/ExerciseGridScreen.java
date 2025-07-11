@@ -15,9 +15,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
- * Schermata griglia esercizi pulita e funzionale.
- * Mantiene le barre di progresso visibili e un design sobrio.
- * DUPLICAZIONE HEADER RIMOSSA - BaseScreen gestisce automaticamente l'header.
+ * Schermata griglia esercizi con barra di avanzamento e stile pulito.
  */
 public class ExerciseGridScreen extends BaseScreen {
 
@@ -47,221 +45,142 @@ public class ExerciseGridScreen extends BaseScreen {
         contentBox.setPadding(new Insets(40));
         contentBox.getStyleClass().add("content-container");
 
-        // RIMOSSO: VBox headerSection = createSimpleHeader();
-        // BaseScreen gestisce automaticamente l'header tramite getScreenTitle() e getScreenDescription()
-
-        // Griglia degli esercizi
-        GridPane exerciseGrid = createCleanExerciseGrid();
-
-        // RIMOSSO: contentBox.getChildren().addAll(headerSection, exerciseGrid);
-        contentBox.getChildren().add(exerciseGrid); // Solo la griglia, header automatico
-
+        GridPane exerciseGrid = createExerciseGrid();
+        contentBox.getChildren().add(exerciseGrid);
         setCenter(contentBox);
     }
 
-    // RIMOSSO: metodo createSimpleHeader() non più necessario
-    // BaseScreen crea automaticamente l'header con getScreenTitle() e getScreenDescription()
+    // Crea la griglia degli esercizi
+    private GridPane createExerciseGrid() {
+        GridPane grid = new GridPane();
+        grid.setHgap(25);
+        grid.setVgap(25);
+        grid.setAlignment(Pos.CENTER);
 
-    /**
-     * Crea la griglia pulita degli esercizi
-     */
-    private GridPane createCleanExerciseGrid() {
-        GridPane exerciseGrid = new GridPane();
-        exerciseGrid.setHgap(25);
-        exerciseGrid.setVgap(25);
-        exerciseGrid.setAlignment(Pos.CENTER);
+        String user = Main.getCurrentUser();
 
-        String username = Main.getCurrentUser();
+        grid.add(createExerciseCard("🎯", "Trova l'errore", "FindError", user), 0, 0);
+        grid.add(createExerciseCard("🔄", "Ordina i passi", "OrderSteps", user), 1, 0);
+        grid.add(createExerciseCard("👁️", "Cosa stampa?", "WhatPrints", user), 0, 1);
+        grid.add(createExerciseCard("📝", "Quiz EP", "quizEP", user), 1, 1);
+        grid.add(createExerciseCard("💻", "Completa il Codice", "CompleteCode", user), 0, 2);
+        grid.add(createExerciseCard("🤔", "Confronta il codice", "CompareCode", user), 1, 2);
 
-        // Riga 1
-        exerciseGrid.add(createCleanExerciseCard("🎯", "Trova l'errore", "FindError", username), 0, 0);
-        exerciseGrid.add(createCleanExerciseCard("🔄", "Ordina i passi", "OrderSteps", username), 1, 0);
-
-        // Riga 2
-        exerciseGrid.add(createCleanExerciseCard("👁️", "Cosa stampa?", "WhatPrints", username), 0, 1);
-        exerciseGrid.add(createCleanExerciseCard("📝", "Quiz EP", "quizEP", username), 1, 1);
-
-        // Riga 3
-        exerciseGrid.add(createCleanExerciseCard("💻", "Completa il Codice", "CompleteCode", username), 0, 2);
-        exerciseGrid.add(createCleanExerciseCard("🤔", "Confronta il codice", "CompareCode", username),1, 2); ;
-
-
-        return exerciseGrid;
+        return grid;
     }
 
-    /**
-     * Crea una card pulita per un esercizio
-     */
-    private VBox createCleanExerciseCard(String icon, String title, String exerciseType, String username) {
+    // Crea una singola card esercizio
+    private VBox createExerciseCard(String icon, String title, String type, String user) {
         VBox card = new VBox(15);
-        card.getStyleClass().add("exercise-card");
         card.setAlignment(Pos.CENTER);
-        card.setPrefWidth(280);
-        card.setPrefHeight(180);
+        card.setPrefSize(280, 180);
+        card.getStyleClass().add("exercise-card");
 
-        // Colore iniziale della card
-        String baseColor = "#a385cf";
-        String hoverColor = "#d1b3ff";
+        String base = "#a385cf", hover = "#d1b3ff";
+        card.setStyle("-fx-background-color: " + base + "; -fx-background-radius: 15px; -fx-padding: 20px;");
 
-        card.setStyle("-fx-background-color: " + baseColor + "; -fx-background-radius: 15px; -fx-padding: 20px;");
-
-        // Icona
         Label iconLabel = new Label(icon);
         iconLabel.setFont(Font.font(32));
         iconLabel.setStyle("-fx-text-fill: #475569;");
 
-        // Titolo
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("card-title");
 
-        // Livello raggiunto
-        String levelText = getLevelText(username, exerciseType);
-        Label levelLabel = new Label(levelText);
+        Label levelLabel = new Label(getLevelLabel(user, type));
         levelLabel.getStyleClass().add("card-subtitle");
 
-        // Barra di progresso
-        HBox progressBar = createVisibleProgressBar(username, exerciseType);
+        HBox progressBar = createProgressBar(user, type);
 
         card.getChildren().addAll(iconLabel, titleLabel, levelLabel, progressBar);
 
-        // Effetto hover corretto
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: " + hoverColor + "; -fx-background-radius: 15px; -fx-padding: 20px;"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: " + baseColor + "; -fx-background-radius: 15px; -fx-padding: 20px;"));
-
-        // Click
-        card.setOnMouseClicked(e -> goToExerciseRules(exerciseType, username));
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: " + hover + "; -fx-background-radius: 15px; -fx-padding: 20px;"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: " + base + "; -fx-background-radius: 15px; -fx-padding: 20px;"));
+        card.setOnMouseClicked(e -> openExercise(type, user));
 
         return card;
     }
 
-    /**
-     * Crea una barra di progresso CHIARAMENTE VISIBILE
-     */
-    private HBox createVisibleProgressBar(String username, String exerciseType) {
-        HBox progressBar = new HBox(4);
-        progressBar.getStyleClass().add("progress-bar-container");
-        progressBar.setAlignment(Pos.CENTER);
-        progressBar.setPrefWidth(180);
+    // Crea barra di avanzamento livelli (3 livelli)
+    private HBox createProgressBar(String user, String type) {
+        HBox bar = new HBox(4);
+        bar.setAlignment(Pos.CENTER);
+        bar.setPrefWidth(180);
 
-        int maxLevel = getMaxLevelReached(username, exerciseType);
+        int level = getMaxLevel(user, type);
 
-        // 3 segmenti per i 3 livelli
         for (int i = 1; i <= 3; i++) {
             Region segment = new Region();
-            segment.getStyleClass().add("progress-segment");
-            segment.setPrefWidth(50);
-            segment.setPrefHeight(6); // Più spesso per essere visibile
+            segment.setPrefSize(50, 6);
 
-            if (i <= maxLevel) {
-                // Livello completato - colore in base al livello
-                segment.getStyleClass().add("level-" + i);
+            if (i <= level) {
                 switch (i) {
-                    case 1:
-                        segment.setStyle("-fx-background-color: #fbbf24;"); // Giallo
-                        break;
-                    case 2:
-                        segment.setStyle("-fx-background-color: #3b82f6;"); // Blu
-                        break;
-                    case 3:
-                        segment.setStyle("-fx-background-color: #10b981;"); // Verde
-                        break;
+                    case 1 -> segment.setStyle("-fx-background-color: #fbbf24;");
+                    case 2 -> segment.setStyle("-fx-background-color: #3b82f6;");
+                    case 3 -> segment.setStyle("-fx-background-color: #10b981;");
                 }
             } else {
-                // Livello non completato - grigio chiaro
-                segment.getStyleClass().add("level-0");
                 segment.setStyle("-fx-background-color: #e2e8f0;");
             }
 
-            progressBar.getChildren().add(segment);
+            bar.getChildren().add(segment);
         }
 
-        return progressBar;
+        return bar;
     }
 
-    private String getLevelText(String username, String exerciseType) {
-        int maxLevel = getMaxLevelReached(username, exerciseType);
+    // Testo del livello raggiunto
+    private String getLevelLabel(String user, String type) {
+        return switch (getMaxLevel(user, type)) {
+            case 1 -> "(Livello Principiante)";
+            case 2 -> "(Livello Intermedio)";
+            case 3 -> "(Livello Avanzato)";
+            default -> "(Nessun livello completato)";
+        };
+    }
 
-        switch (maxLevel) {
-            case 0: return "(Nessun livello completato)";
-            case 1: return "(Livello Principiante)";
-            case 2: return "(Livello Intermedio)";
-            case 3: return "(Livello Avanzato)";
-            default: return "(Principiante)";
+    // Calcola il livello massimo superato
+    private int getMaxLevel(String user, String type) {
+        for (int i = 3; i >= 1; i--) {
+            if (UserProgress.hasPassedLevel(user, type, i)) return i;
         }
+        return 0;
     }
 
-    private int getMaxLevelReached(String username, String exerciseType) {
-        // Controlla quale è il livello massimo superato
-        for (int level = 3; level >= 1; level--) {
-            if (UserProgress.hasPassedLevel(username, exerciseType, level)) {
-                return level;
-            }
+    // Apre l'esercizio corretto in base al livello
+    private void openExercise(String type, String user) {
+        int nextLevel = getNextLevel(user, type);
+        Exercise ex = createExercise(type, nextLevel);
+        if (ex != null)
+            NavigationManager.getInstance().showExerciseRules(ex, "grid");
+    }
+
+    // Trova il prossimo livello non completato
+    private int getNextLevel(String user, String type) {
+        for (int i = 1; i <= 3; i++) {
+            if (!UserProgress.hasPassedLevel(user, type, i)) return i;
         }
-        return 0; // Nessun livello completato
+        return 3;
     }
 
-    private void goToExerciseRules(String exerciseType, String username) {
-        System.out.println("🎯 Cliccato su esercizio: " + exerciseType);
-
-        // Determina quale livello proporre
-        int nextLevel = getNextLevel(username, exerciseType);
-
-        // Crea l'esercizio del livello appropriato
-        Exercise exercise = createExercise(exerciseType, nextLevel);
-
-        if (exercise != null) {
-            NavigationManager navManager = NavigationManager.getInstance();
-            navManager.showExerciseRules(exercise, "grid");
-        } else {
-            System.err.println("❌ Errore: impossibile creare esercizio " + exerciseType + " livello " + nextLevel);
-        }
+    // Crea istanza dell’esercizio corretto
+    private Exercise createExercise(String type, int level) {
+        return switch (type) {
+            case "FindError", "OrderSteps", "WhatPrints", "CompareCode" ->
+                    ExerciseFactory.createExercise(type, level);
+            case "quizEP" -> new QuizEP(level);
+            case "CompleteCode" -> new CompleteCode(level);
+            default -> null;
+        };
     }
 
-    private int getNextLevel(String username, String exerciseType) {
-        // Trova il prossimo livello da fare
-        for (int level = 1; level <= 3; level++) {
-            if (!UserProgress.hasPassedLevel(username, exerciseType, level)) {
-                return level; // Primo livello non completato
-            }
-        }
-        return 3; // Se ha completato tutto, rigioca l'ultimo livello
-    }
-
-    private Exercise createExercise(String exerciseType, int level) {
-        try {
-            switch (exerciseType) {
-                case "FindError":
-                    return ExerciseFactory.createExercise("FindError", level);
-                case "OrderSteps":
-                    return ExerciseFactory.createExercise("OrderSteps", level);
-                case "WhatPrints":
-                    return ExerciseFactory.createExercise("WhatPrints", level);
-                case "quizEP":
-                    return new QuizEP(level);
-                case "CompleteCode":
-                    return new CompleteCode(level);
-                case "CompareCode":
-                    return ExerciseFactory.createExercise("CompareCode", level);
-                default:
-                    return null;
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Errore creazione esercizio: " + e.getMessage());
-            return null;
-        }
-    }
-
-    // Metodo statico per compatibilità
+    // Metodo statico per compatibilità con NavigationManager
     public static Scene createScene(Stage stage) {
-        ExerciseGridScreen screen = new ExerciseGridScreen(stage);
-        return screen.createScene();
+        return new ExerciseGridScreen(stage).createScene();
     }
 
     @Override
     protected void configureScene(Scene scene) {
         super.configureScene(scene);
-        if (stage != null) {
-            stage.setTitle("PLAY - Scegli un Esercizio");
-        }
+        if (stage != null) stage.setTitle("PLAY - Scegli un Esercizio");
     }
 }

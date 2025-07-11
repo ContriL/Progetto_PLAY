@@ -17,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import application.core.DialogUtils;
 
 /**
  * Schermata Quiz sull'ereditarietà e il polimorfismo
@@ -75,8 +76,32 @@ public class ScreenQuizEP extends BaseScreen {
     protected NavigationBar createNavigationBar() {
         NavigationBar navbar = new NavigationBar(false);
 
-       
+        navbar.setButtonAction("home", () ->
+                handleNavigation(() -> NavigationManager.getInstance().goToHome()));
+
+        navbar.setButtonAction("progress", () ->
+                handleNavigation(() -> NavigationManager.getInstance().goToUserProgress()));
+
+        navbar.setButtonAction("profile", () ->
+                handleNavigation(() -> NavigationManager.getInstance().goToProfile()));
+
+        navbar.setButtonAction("logout", () ->
+                handleNavigation(() -> NavigationManager.getInstance().logout()));
+
         return navbar;
+    }
+
+    /**
+     * Helper per determinare se mostrare conferma uscita
+     */
+    private void handleNavigation(Runnable navigationAction) {
+        if (quizCompleted) {
+            // Quiz completato - navigazione libera
+            navigationAction.run();
+        } else {
+            // Quiz in corso - chiedi conferma
+            confirmExit(navigationAction);
+        }
     }
 
     @Override
@@ -231,8 +256,19 @@ public class ScreenQuizEP extends BaseScreen {
         resultText.setFill(percentage >= 60 ? Color.GREEN : Color.ORANGE);
         resultText.setVisible(true);
 
-        
-        saveProgress(correctAnswers, totalQuestions);
+
+        String currentUser = Main.getCurrentUser();
+        boolean saved = UserProgress.saveProgress(
+                currentUser,
+                "quizEP",
+                currentQuiz.getDifficulty(),
+                correctAnswers,
+                totalQuestions
+        );
+
+        if (!saved) {
+            System.err.println("Errore durante il salvataggio dei progressi del quiz");
+        }
 
         questionCounterLabel.setText("Quiz completato - Progressi salvati!");
         questionCounterLabel.setStyle("-fx-text-fill: green;");
@@ -248,7 +284,8 @@ public class ScreenQuizEP extends BaseScreen {
 
         Button newQuizButton = new Button("Nuovo Esercizio");
         Button nextLevelButton = new Button("Livello Successivo");
-        exitButton.setText("Esci dall'esercizio"); 
+        exitButton.setText("Esci dall'esercizio");
+        exitButton.setOnAction(e -> confirmExit(() -> NavigationManager.getInstance().goToExerciseGrid()));
 
         newQuizButton.setPrefWidth(150);
         nextLevelButton.setPrefWidth(150);
@@ -280,71 +317,27 @@ public class ScreenQuizEP extends BaseScreen {
         setBottom(finalButtons);
     }
 
-   
-    private void saveProgress(int correctAnswers, int totalQuestions) {
-        String currentUser = Main.getCurrentUser();
-        boolean saved = UserProgress.saveProgress(
-                currentUser, "quizEP", currentQuiz.getDifficulty(),
-                correctAnswers, totalQuestions
-        );
 
-        if (!saved) {
-            System.err.println("Errore durante il salvataggio dei progressi del quiz");
-        }
-    }
 
-   
+    /**
+     * Gestisce conferma uscita secondo specifiche Prof
+     */
     private static void confirmExit(Runnable exitAction) {
-        
-        if (!quizCompleted && currentQuiz.getUserAnswers().stream().anyMatch(answer -> answer != null && !answer.trim().isEmpty())) {
+        // Determina se il quiz è completato
+        boolean isCompleted = quizCompleted;
 
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Conferma Uscita");
-            alert.setHeaderText("⚠️ Attenzione: stai per uscire dal quiz");
-            alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
-                    "Vuoi continuare e uscire dal quiz?");
+        // Calcola risposte corrette attuali
+        int correctAnswers = currentQuiz.calculateScore();
 
-            
-            ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
-            ButtonType cancelButton = new ButtonType("❌ No, continua quiz", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-            alert.getButtonTypes().setAll(confirmButton, cancelButton);
-
-            alert.showAndWait().ifPresent(response -> {
-                if (response == confirmButton) {
-                    
-                    int answeredQuestions = 0;
-                    for (String answer : currentQuiz.getUserAnswers()) {
-                        if (answer != null && !answer.trim().isEmpty()) {
-                            answeredQuestions++;
-                        }
-                    }
-
-                    if (answeredQuestions > 0) {
-                       
-                        String currentUser = Main.getCurrentUser();
-                        boolean saved = UserProgress.saveProgress(
-                                currentUser,
-                                "quizEP",
-                                currentQuiz.getDifficulty(),
-                                currentQuiz.calculateScore(),
-                                currentQuiz.getTotalQuestions()
-                        );
-
-                        if (saved) {
-                            System.out.println("✅ Progresso parziale salvato prima dell'uscita");
-                        }
-                           }
-
-                    exitAction.run();
-                }
-                
-            });
-        } else {
-            
-            exitAction.run();
-        }
+        // Usa DialogUtils con specifiche Prof
+        DialogUtils.showExerciseExitConfirmation(
+                currentQuiz,           // Exercise
+                isCompleted,           // È completato?
+                correctAnswers,        // Risposte corrette attuali
+                exitAction            // Azione se conferma
+        );
     }
+
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

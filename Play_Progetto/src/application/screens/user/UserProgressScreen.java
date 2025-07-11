@@ -13,14 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,11 +26,11 @@ public class UserProgressScreen {
         Scene scene = new Scene(root, 1200, 800);
         StyleManager.applyMainStyles(scene);
 
-        
+        // Barra di navigazione in alto
         NavigationBar navBar = NavigationBar.forMainScreens();
         root.setTop(navBar);
 
-        
+        // Scroll centrale con i contenuti
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -43,39 +38,32 @@ public class UserProgressScreen {
 
         VBox mainContent = createMainContent();
         scrollPane.setContent(mainContent);
-
         root.setCenter(scrollPane);
 
         stage.setTitle("PLAY - I tuoi Progressi");
         return scene;
     }
 
-
     protected NavigationBar createNavigationBar() {
-        return NavigationBar.forMainScreens(); 
+        return NavigationBar.forMainScreens();
     }
 
+    // Sezione centrale con header, statistiche, grafici, tabella
     private static VBox createMainContent() {
         VBox mainContent = new VBox(30);
         mainContent.setPadding(new Insets(30));
         mainContent.setAlignment(Pos.TOP_CENTER);
 
-        
         VBox header = createHeader();
-
-        
         HBox statsOverview = createStatsOverview();
-
-       
         HBox chartsSection = createChartsSection();
-
-        
         VBox tableSection = createTableSection();
 
         mainContent.getChildren().addAll(header, statsOverview, chartsSection, tableSection);
         return mainContent;
     }
 
+    // Titolo della pagina e messaggio di benvenuto
     private static VBox createHeader() {
         VBox header = new VBox(15);
         header.setAlignment(Pos.CENTER);
@@ -91,11 +79,11 @@ public class UserProgressScreen {
         return header;
     }
 
+    // Sezione con 4 schede: esercizi, corrette, % successo, livello medio
     private static HBox createStatsOverview() {
         HBox statsBox = new HBox(25);
         statsBox.setAlignment(Pos.CENTER);
 
-        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, Integer> stats = calculateStats(progressData);
 
@@ -108,6 +96,7 @@ public class UserProgressScreen {
         return statsBox;
     }
 
+    // Crea una singola card con valore, titolo e icona
     private static VBox createStatCard(String icon, String title, String subtitle, String value, String color) {
         VBox card = new VBox(12);
         card.getStyleClass().add("stats-container");
@@ -119,8 +108,7 @@ public class UserProgressScreen {
         iconText.setStyle("-fx-font-size: 36px;");
 
         Text valueText = new Text(value);
-        valueText.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 3, 0, 0, 1);");
+        valueText.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 3, 0, 0, 1);");
 
         Text titleText = new Text(title);
         titleText.setStyle("-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;");
@@ -128,22 +116,20 @@ public class UserProgressScreen {
         Text subtitleText = new Text(subtitle);
         subtitleText.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.8);");
 
-        
+        // Bordo colorato in basso
         card.setStyle(card.getStyle() + "-fx-border-color: " + color + "; -fx-border-width: 0 0 4 0;");
-
         card.getChildren().addAll(iconText, valueText, titleText, subtitleText);
         return card;
     }
 
+    // Sezione con due grafici (tipo esercizi + prestazioni per livello)
     private static HBox createChartsSection() {
         HBox chartsBox = new HBox(30);
         chartsBox.setAlignment(Pos.CENTER);
 
-        
         PieChart exerciseChart = createExerciseTypeChart();
         VBox pieChartContainer = createChartContainer("📈 Esercizi per Tipo", exerciseChart);
 
-        
         BarChart<String, Number> levelChart = createLevelChart();
         VBox barChartContainer = createChartContainer("📊 Prestazioni per Livello", levelChart);
 
@@ -165,11 +151,11 @@ public class UserProgressScreen {
         return container;
     }
 
+    // Grafico a torta: distribuzione tipi di esercizi
     private static PieChart createExerciseTypeChart() {
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, Integer> exerciseCount = new HashMap<>();
 
-        
         for (String progress : progressData) {
             String[] parts = progress.split(",");
             if (parts.length >= 2) {
@@ -191,6 +177,7 @@ public class UserProgressScreen {
         return chart;
     }
 
+    // Grafico a barre: prestazioni medie per livello
     private static BarChart<String, Number> createLevelChart() {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -204,7 +191,6 @@ public class UserProgressScreen {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Percentuale Successo");
 
-        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         Map<String, List<Double>> levelPerformance = new HashMap<>();
 
@@ -226,13 +212,13 @@ public class UserProgressScreen {
         return chart;
     }
 
+    // Sezione con la tabella completa degli esercizi svolti
     private static VBox createTableSection() {
         VBox tableSection = new VBox(20);
         tableSection.setAlignment(Pos.CENTER);
 
         Text tableTitle = new Text("📋 Cronologia Dettagliata");
-        tableTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);");
+        tableTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);");
 
         TableView<ProgressEntry> table = createModernTable();
 
@@ -245,12 +231,11 @@ public class UserProgressScreen {
         return tableSection;
     }
 
-    @SuppressWarnings("unchecked")
+    // Crea la tabella con le colonne personalizzate e dati ordinati
     private static TableView<ProgressEntry> createModernTable() {
         TableView<ProgressEntry> table = new TableView<>();
         table.setPrefHeight(300);
 
-        // Colonne stilizzate
         TableColumn<ProgressEntry, String> exerciseCol = new TableColumn<>("🎯 Esercizio");
         exerciseCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getExerciseType()));
         exerciseCol.setPrefWidth(150);
@@ -260,8 +245,7 @@ public class UserProgressScreen {
         levelCol.setPrefWidth(100);
 
         TableColumn<ProgressEntry, String> scoreCol = new TableColumn<>("📊 Punteggio");
-        scoreCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
-                data.getValue().getCorrectAnswers() + "/" + data.getValue().getTotalQuestions()));
+        scoreCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getCorrectAnswers() + "/" + data.getValue().getTotalQuestions()));
         scoreCol.setPrefWidth(100);
 
         TableColumn<ProgressEntry, String> percentageCol = new TableColumn<>("📈 Percentuale");
@@ -278,7 +262,6 @@ public class UserProgressScreen {
 
         table.getColumns().addAll(exerciseCol, levelCol, scoreCol, percentageCol, statusCol, dateCol);
 
-        
         List<String> progressData = UserProgress.getUserProgress(Main.getCurrentUser());
         ObservableList<ProgressEntry> entries = FXCollections.observableArrayList();
 
@@ -292,15 +275,14 @@ public class UserProgressScreen {
             }
         }
 
-        
+        // Ordina per data decrescente
         entries.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
         table.setItems(entries);
 
         return table;
     }
 
-    
-
+    // Calcolo delle statistiche aggregate per le card
     private static Map<String, Integer> calculateStats(List<String> progressData) {
         Map<String, Integer> stats = new HashMap<>();
         int totalExercises = progressData.size();
@@ -328,6 +310,7 @@ public class UserProgressScreen {
         return stats;
     }
 
+    // Restituisce nome leggibile per tipo esercizio
     private static String getExerciseDisplayName(String exerciseType) {
         switch (exerciseType) {
             case "FindError": return "🔍 Trova Errore";
@@ -339,6 +322,7 @@ public class UserProgressScreen {
         }
     }
 
+    // Restituisce nome leggibile per livello medio
     private static String getLevelName(int level) {
         switch (level) {
             case 1: return "Principiante";
@@ -348,7 +332,7 @@ public class UserProgressScreen {
         }
     }
 
-    
+    // Modello per una riga della tabella
     public static class ProgressEntry {
         private final String exerciseType;
         private final int difficulty;
