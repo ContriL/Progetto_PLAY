@@ -250,7 +250,7 @@ public class ScreenCompareCode extends BaseScreen {
                     String.format("\n\nPunteggio finale: %d/%d confronti corretti", totalScore, totalQuestions));
                 
                 // Abilita il prossimo livello se il punteggio è sufficiente (almeno 70%)
-                if (totalScore >= Math.ceil(totalQuestions * 0.7)) {
+                if ((totalScore * 100.0 / totalQuestions) >= 66.0)  {
                     passToNextLevel.setDisable(false);
                     resultLabel.setText(resultLabel.getText() + "\n🎉 Livello completato con successo!");
                 }

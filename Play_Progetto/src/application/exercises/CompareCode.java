@@ -77,31 +77,12 @@ public class CompareCode extends AbstractExercise {
         // Container per i due codici affiancati
         HBox codesContainer = new HBox(20);
         codesContainer.setAlignment(Pos.TOP_CENTER);
+        codesContainer.setPrefWidth(1300); // Usa quasi tutta la larghezza
 
-        /*// Codice A
-        VBox codeABox = new VBox(10);
-        Label codeATitle = new Label("VERSIONE A:");
-        codeATitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #dc2626;");
-        Label codeALabel = new Label(current.codeA);
-        codeALabel.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 12px; -fx-background-color: #f8f9fa; -fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 5; -fx-padding: 15;");
-        codeALabel.setWrapText(true);
-        codeALabel.setPrefWidth(350);
-        codeABox.getChildren().addAll(codeATitle, codeALabel);
 
-        // Codice B
-        VBox codeBBox = new VBox(10);
-        Label codeBTitle = new Label("VERSIONE B:");
-        codeBTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #16a34a;");
-        Label codeBLabel = new Label(current.codeB);
-        codeBLabel.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 12px; -fx-background-color: #f8f9fa; -fx-border-color: #16a34a; -fx-border-width: 2; -fx-border-radius: 5; -fx-padding: 15;");
-        codeBLabel.setWrapText(true);
-        codeBLabel.setPrefWidth(350);
-        codeBBox.getChildren().addAll(codeBTitle, codeBLabel);
-
-        codesContainer.getChildren().addAll(codeABox, codeBBox);*/
 
         // --- Codice A ---
-        VBox codeABox = new VBox(10);
+      /*  VBox codeABox = new VBox(10);
         Label codeATitle = new Label("VERSIONE A:");
         codeATitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #dc2626;");
 
@@ -113,8 +94,8 @@ public class CompareCode extends AbstractExercise {
                         + " -fx-background-color: #f8f9fa; -fx-border-color: #dc2626;"
                         + " -fx-border-width: 2; -fx-border-radius: 5;"
         );
-        codeAText.setPrefWidth(350);
-        codeAText.setPrefHeight(200);
+        codeAText.setPrefWidth(600);
+        codeAText.setPrefHeight(400);
         codeAText.setPadding(new Insets(10));
 
         codeABox.getChildren().addAll(codeATitle, codeAText);
@@ -132,9 +113,56 @@ public class CompareCode extends AbstractExercise {
                         + " -fx-background-color: #f8f9fa; -fx-border-color: #16a34a;"
                         + " -fx-border-width: 2; -fx-border-radius: 5;"
         );
-        codeBText.setPrefWidth(350);
-        codeBText.setPrefHeight(200);
+        codeBText.setPrefWidth(600);
+        codeBText.setPrefHeight(400);
         codeBText.setPadding(new Insets(10));
+
+        codeBBox.getChildren().addAll(codeBTitle, codeBText);*/
+
+        // --- Codice A ---
+        VBox codeABox = new VBox(10);
+        Label codeATitle = new Label("VERSIONE A:");
+        codeATitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #dc2626;");
+
+        TextArea codeAText = new TextArea(current.codeA);
+        codeAText.setEditable(false);
+        codeAText.setWrapText(false);
+        codeAText.setStyle(
+                "-fx-font-family: 'Consolas', monospace; -fx-font-size: 14px;"
+                        + " -fx-background-color: #f8f9fa; -fx-border-color: #dc2626;"
+                        + " -fx-border-width: 2; -fx-border-radius: 5;"
+        );
+        codeAText.setPrefWidth(600);
+        codeAText.setPrefHeight(400);
+        codeAText.setMinWidth(600);
+        codeAText.setMinHeight(400);
+        codeAText.setPrefRowCount(20);
+        codeAText.setPrefColumnCount(80);
+        codeAText.setPadding(new Insets(15));
+
+        codeABox.getChildren().addAll(codeATitle, codeAText);
+
+
+        // --- Codice B ---
+        VBox codeBBox = new VBox(10);
+        Label codeBTitle = new Label("VERSIONE B:");
+        codeBTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #16a34a;");
+
+        TextArea codeBText = new TextArea(current.codeB);
+        codeBText.setEditable(false);
+        codeBText.setWrapText(false);
+        codeBText.setStyle(
+                "-fx-font-family: 'Consolas', monospace; -fx-font-size: 14px;"
+                        + " -fx-background-color: #f8f9fa; -fx-border-color: #16a34a;"
+                        + " -fx-border-width: 2; -fx-border-radius: 5;"
+        );
+        codeBText.setPrefWidth(600);
+        codeBText.setPrefHeight(400);
+        codeBText.setMinWidth(600);
+        codeBText.setMinHeight(400);
+        codeBText.setPrefRowCount(20);
+        codeBText.setPrefColumnCount(80);
+        codeBText.setPadding(new Insets(15));
 
         codeBBox.getChildren().addAll(codeBTitle, codeBText);
 
