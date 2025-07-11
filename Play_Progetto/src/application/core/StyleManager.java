@@ -3,18 +3,15 @@ package application.core;
 import javafx.scene.Scene;
 
 /**
- * Gestisce l'applicazione centralizzata degli stili CSS.
- * 
+ * Gestisce l'applicazione centralizzata degli stili CSS per l'applicazione PLAY.
+ * Fornisce metodi per applicare fogli di stile e gestire la cache delle risorse CSS.
  */
 public class StyleManager {
     private static final String CSS_PATH = "/application/application.css";
     private static String cachedCssUrl = null;
 
-    /**
-     * 
-     * @param scene 
-     * @return 
-     */
+    //Applica il foglio di stile principale alla scena specificata.
+
     public static boolean applyMainStyles(Scene scene) {
         if (scene == null) {
             System.err.println("Impossibile applicare stili: scene is null");
@@ -54,25 +51,21 @@ public class StyleManager {
         return cachedCssUrl;
     }
 
-    /**
-     * Applica stili personalizzati inline a un nodo.
-     * @param styleableNode Il nodo a cui applicare lo stile
-     * @param styles Gli stili CSS da applicare
-     */
     public static void applyInlineStyles(javafx.scene.Node styleableNode, String styles) {
         if (styleableNode != null && styles != null && !styles.trim().isEmpty()) {
             styleableNode.setStyle(styles);
         }
     }
 
-    
+    // Pulisce la cache degli URL CSS, forzando il ricaricamento al prossimo utilizzo.
+
     public static void clearCache() {
         cachedCssUrl = null;
     }
 
     /**
-     * Verifica se il file CSS è disponibile.
-     * @return true se il file CSS è accessibile
+     * Verifica se il file CSS è disponibile e accessibile.
+     * true se il file CSS è accessibile
      */
     public static boolean isCssAvailable() {
         return getCssUrl() != null;

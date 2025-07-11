@@ -102,7 +102,7 @@ public class ProfileScreen extends BaseScreen {
 
         HBox selection = new HBox(10);
         selection.setAlignment(Pos.CENTER);
-        String[] avatars = {"👤", "👨‍💻", "👩‍💻", "🚀"};
+        String[] avatars = {"🎮", "👨‍💻", "👩‍💻", "🚀"};
 
         for (String av : avatars) {
             Button btn = new Button(av);

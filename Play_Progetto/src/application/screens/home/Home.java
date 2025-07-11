@@ -83,7 +83,7 @@ public class Home extends BaseScreen {
 
 		VBox ex = createStatCard("🎯", "Esercizi", "Completati", stats.get("total"), "#e74c3c");
 		VBox pct = createStatCard("🔥", "Percentuale", "Successo", stats.get("percentage") + "%", "#f39c12");
-		VBox fav = createStatCard("⭐", "Livello", "Preferito", stats.get("favorite"), "#9b59b6");
+		VBox fav = createStatCard("💡", "Esercizio", "Preferito", stats.get("favorite"), "#9b59b6");
 		VBox today = createStatCard("📅", "Oggi", "Sessioni", stats.get("today"), "#2ecc71");
 
 		statsBox.getChildren().addAll(ex, pct, fav, today);
@@ -132,20 +132,24 @@ public class Home extends BaseScreen {
 				"\"Programmare è come risolvere puzzle infiniti\" 🧩",
 				"\"L'errore di oggi è la conoscenza di domani\" 🔮"
 		};
-		Text t = new Text(quotes[(int)(Math.random() * quotes.length)]);
+		Text t = new Text(quotes[(int) (Math.random() * quotes.length)]);
 		t.setStyle("-fx-font-size: 16px; -fx-font-style: italic; -fx-text-fill: rgba(255,255,255,0.8);");
 		t.setWrappingWidth(600);
 		t.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 		return t;
 	}
 
-	// Statistiche calcolate da UserProgress
+
+	// Calcola le statistiche dell'utente dai dati di progresso salvati.
+
 	private Map<String, String> calculateUserStats() {
 		Map<String, String> stats = new HashMap<>();
+
 		try {
 			List<String> data = UserProgress.getUserProgress(Main.getCurrentUser());
 			int total = data.size(), correct = 0, totalQ = 0, today = 0;
 			Map<String, Integer> types = new HashMap<>();
+			Map<Integer, Integer> levels = new HashMap<>(); // Per contare i livelli
 			String todayDate = java.time.LocalDate.now().toString();
 
 			for (String row : data) {
@@ -154,36 +158,66 @@ public class Home extends BaseScreen {
 					correct += Integer.parseInt(p[3]);
 					totalQ += Integer.parseInt(p[4]);
 					types.put(p[1], types.getOrDefault(p[1], 0) + 1);
-					if (p.length >= 7 && p[6].startsWith(todayDate)) today++;
+
+					// Conta anche i livelli di difficoltà
+					int level = Integer.parseInt(p[2]);
+					levels.put(level, levels.getOrDefault(level, 0) + 1);
+
+					// Controlla sessioni di oggi
+					if (p.length >= 8 && p[7].startsWith(todayDate)) {
+						today++;
+					}
 				}
 			}
 
-			String fav = types.entrySet().stream()
+			// Trova esercizio preferito
+			String favExercise = types.entrySet().stream()
 					.max(Map.Entry.comparingByValue())
 					.map(e -> getFriendlyExerciseName(e.getKey())).orElse("Nessuno");
+
+			// Trova livello preferito
+			String favLevel = levels.entrySet().stream()
+					.max(Map.Entry.comparingByValue())
+					.map(e -> getLevelName(e.getKey())).orElse("Principiante");
+
 			int pct = totalQ > 0 ? (correct * 100 / totalQ) : 0;
 
 			stats.put("total", String.valueOf(total));
 			stats.put("percentage", String.valueOf(pct));
-			stats.put("favorite", fav);
+			stats.put("favorite", favExercise);
 			stats.put("today", String.valueOf(today));
+
 		} catch (Exception e) {
 			stats.put("total", "0");
 			stats.put("percentage", "0");
-			stats.put("favorite", "Quiz");
+			stats.put("favorite", "Principiante");
 			stats.put("today", "0");
 		}
+
 		return stats;
 	}
 
-	// Nome leggibile per tipo esercizio
+	// Converte i numeri di livello in nomi leggibili.
+
+	private String getLevelName(int level) {
+		switch (level) {
+			case 1: return "Principiante";
+			case 2: return "Intermedio";
+			case 3: return "Avanzato";
+			default: return "Principiante";
+		}
+	}
+
+	// Converte i nomi interni degli esercizi in nomi user-friendly.
+
 	private String getFriendlyExerciseName(String name) {
 		switch (name) {
-			case "FindError": return "Debug";
-			case "OrderSteps": return "Logica";
-			case "WhatPrints": return "Output";
-			case "quizEP": return "Quiz";
-			case "CompleteCode": return "Coding";
+			case "FindError": return "Trova Errori";
+			case "OrderSteps": return "Ordina Passi";
+			case "WhatPrints": return "Cosa Stampa";
+			case "quizEP": return "Quiz EP";
+			case "CompleteCode": return "Completa Codice";
+			case "CompareCode": return "Confronta Codice";
 			default: return "Misto";
 		}
 	}
@@ -194,7 +228,8 @@ public class Home extends BaseScreen {
 		if (stage != null) stage.setTitle("PLAY - Home");
 	}
 
-	// Metodo statico per mostrare la schermata Home
+	// Metodo factory per creare la schermata Home.
+
 	public static Scene getScene(Stage stage, Scene loginScene) {
 		return new Home(stage).createScene();
 	}

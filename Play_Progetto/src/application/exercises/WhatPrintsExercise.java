@@ -248,7 +248,7 @@ public class WhatPrintsExercise extends AbstractExercise {
                         "    }\n" +
                         "}"
         );
-        // Nota: usiamo un valore approssimato per l'area del cerchio
+        // valore approssimato per l'area del cerchio
         correctOutputs.add("Circle, Area: 12.566370614359172\nRectangle, Area: 12.0\nCircle, Area: 3.141592653589793");
 
         // Esercizio 3: Eccezioni e gestione degli errori

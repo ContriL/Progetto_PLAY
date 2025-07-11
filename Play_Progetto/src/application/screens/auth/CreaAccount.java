@@ -24,17 +24,21 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
+/**
+ * Schermata di registrazione per nuovi utenti dell'applicazione PLAY.
+ * Gestisce la creazione di account con validazione dei dati e persistenza su file.
+ */
 public class CreaAccount extends Main {
 
-    
-    public static File Utenti_registrati = new File("Play_Progetto/src/application/resources/Utenti_registrati.txt");
+    public static File Utenti_registrati = new File(System.getProperty("user.dir") + "/src/application/resources/Utenti_registrati.txt");
+
+    // Crea la schermata di registrazione con form di input e validazione.
 
     public static Scene getScene(Stage stage, Scene s1, Text loginMsg) {
-        VBox root = new VBox(10); // Aggiunto spacing
-        root.setPadding(new Insets(20)); // Aggiunto padding
-        Scene crea = new Scene(root, 1200, 800); // Aumentata l'altezza
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(20));
+        Scene crea = new Scene(root, 1200, 800);
 
-        
         StyleManager.applyMainStyles(crea);
 
         Text title = new Text("Registrazione Nuovo Utente");
@@ -51,36 +55,34 @@ public class CreaAccount extends Main {
         final PasswordField p = new PasswordField();
 
         Button r = new Button("Registrati");
-        Button backButton = new Button("Indietro"); 
+        Button backButton = new Button("Indietro");
 
-        // Contenitore per i pulsanti
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(r, backButton);
 
-        Text errorMsg = new Text(); 
+        Text errorMsg = new Text();
         errorMsg.setFill(Color.RED);
 
         EventHandler<ActionEvent> pressed = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
-                
                 errorMsg.setText("");
 
-                // Controllo per campi vuoti
+                // Validazione campi obbligatori
                 if (n.getText().trim().isEmpty() || c.getText().trim().isEmpty() ||
                         nick.getText().trim().isEmpty() || p.getText().trim().isEmpty()) {
                     errorMsg.setText("Tutti i campi sono obbligatori!");
                     return;
                 }
 
-                // Controllo per nickname duplicato
+                // Controllo unicità nickname
                 if (isNicknameDuplicated(nick.getText(), loginMsg)) {
                     errorMsg.setText("Nickname già in uso!");
                     return;
                 }
 
                 try {
-                    // Creazione dell'utente con validazione
+                    // Creazione e validazione utente
                     User u = new User();
                     u.setNome(n.getText());
                     u.setCognome(c.getText());
@@ -96,18 +98,12 @@ public class CreaAccount extends Main {
                     stage.setScene(homeScreen);
 
                 } catch (IllegalArgumentException e) {
-                    
                     errorMsg.setText(e.getMessage());
                 }
             }
         };
 
-        
-        backButton.setOnAction(e -> {
-            
-            stage.setScene(s1);
-        });
-
+        backButton.setOnAction(e -> stage.setScene(s1));
         r.setOnAction(pressed);
 
         stage.setTitle("Registrati");
@@ -118,17 +114,16 @@ public class CreaAccount extends Main {
                 cognome, c,
                 nickname, nick,
                 pswd, p,
-                buttonBox,  
+                buttonBox,
                 errorMsg
         );
 
-        
         root.setAlignment(Pos.CENTER);
-
         return crea;
     }
 
-    
+    // Verifica se un nickname è già presente nel sistema.
+
     public static boolean isNicknameDuplicated(String nickname, Text loginMsg) {
         try (BufferedReader br = new BufferedReader(new FileReader(Utenti_registrati))) {
             String line;
@@ -145,17 +140,14 @@ public class CreaAccount extends Main {
         return false;
     }
 
+    // Scrive i dati utente nel file di registrazione.
+
     public static void scriviFile(File file, String contenuto) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            System.out.println("🐛 DEBUG: Tentativo scrittura file: " + file.getAbsolutePath());
-            System.out.println("🐛 DEBUG: Contenuto da scrivere: " + contenuto);
-
             writer.write(contenuto);
             writer.newLine();
-
-            System.out.println("✅ DEBUG: Scrittura completata!");
         } catch (IOException e) {
-            System.err.println("❌ DEBUG: Errore nella scrittura: " + e.getMessage());
+            System.err.println("Errore nella scrittura: " + e.getMessage());
             e.printStackTrace();
         }
     }

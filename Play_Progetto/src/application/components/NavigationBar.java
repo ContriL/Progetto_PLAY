@@ -56,20 +56,14 @@ public class NavigationBar extends HBox {
         logoutButton.setOnAction(e -> navigationManager.logout());
     }
 
-    /**
-     *
-     * @param action
-     */
+
     public void setBackAction(Runnable action) {
         if (backButton != null) {
             backButton.setOnAction(e -> action.run());
         }
     }
 
-    /**
-     *
-     * @param destination
-     */
+
     public void setBackAction(String destination) {
         if (backButton != null) {
             backButton.setOnAction(e -> {
@@ -183,14 +177,13 @@ public class NavigationBar extends HBox {
                 }
                 break;
             default:
-                System.err.println("⚠️ Bottone non riconosciuto: " + buttonName);
+                System.err.println(" Bottone non riconosciuto: " + buttonName);
                 break;
         }
     }
 
-    /**
-     * Ripristina le azioni di default dei bottoni
-     */
+    //Ripristina le azioni di default dei bottoni
+
     public void resetDefaultActions() {
         setupEventHandlers(); // Richiama il metodo esistente
     }

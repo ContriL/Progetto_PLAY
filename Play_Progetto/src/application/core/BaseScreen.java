@@ -139,9 +139,8 @@ public abstract class BaseScreen extends BorderPane {
         }
     }
 
-    /**
-     * Metodi per gestire il lifecycle della schermata.
-     */
+    // Metodi per gestire il lifecycle della schermata.
+
     public void onShow() {
         
     }

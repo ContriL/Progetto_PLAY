@@ -19,22 +19,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import application.core.DialogUtils;
 
-/**
- * Schermata Quiz sull'ereditarietà e il polimorfismo
- */
 public class ScreenQuizEP extends BaseScreen {
 
     private static QuizEP currentQuiz;
     private static VBox questionContainer;
-    private static Button previousButton;
-    private static Button nextButton;
-    private static Button submitButton;
-    private static Button exitButton;
+    private static Button previousButton, nextButton, submitButton, exitButton;
     private static Label questionCounterLabel;
     private static Text resultText;
     private static boolean quizCompleted = false;
     private static Scene returnScene;
-
     private Exercise exercise;
 
     public ScreenQuizEP(Stage stage, Exercise exercise, Scene returnScene) {
@@ -49,24 +42,14 @@ public class ScreenQuizEP extends BaseScreen {
         ScreenQuizEP.returnScene = returnScene;
         quizCompleted = false;
 
-        
         loadRealContent();
     }
 
     private void loadRealContent() {
         if (exercise != null && currentQuiz != null) {
-            
-            VBox centerContent = createCenterContent();
-            setCenter(centerContent);
-
-            
-            HBox bottomNav = createBottomNavigation();
-            setBottom(bottomNav);
-
-            
+            setCenter(createCenterContent());
+            setBottom(createBottomNavigation());
             updateCurrentQuestionDisplay();
-
-            
             updateTitle(exercise.getTitle());
             updateDescription(exercise.getDescription());
         }
@@ -75,33 +58,16 @@ public class ScreenQuizEP extends BaseScreen {
     @Override
     protected NavigationBar createNavigationBar() {
         NavigationBar navbar = new NavigationBar(false);
-
-        navbar.setButtonAction("home", () ->
-                handleNavigation(() -> NavigationManager.getInstance().goToHome()));
-
-        navbar.setButtonAction("progress", () ->
-                handleNavigation(() -> NavigationManager.getInstance().goToUserProgress()));
-
-        navbar.setButtonAction("profile", () ->
-                handleNavigation(() -> NavigationManager.getInstance().goToProfile()));
-
-        navbar.setButtonAction("logout", () ->
-                handleNavigation(() -> NavigationManager.getInstance().logout()));
-
+        navbar.setButtonAction("home", () -> handleNavigation(() -> NavigationManager.getInstance().goToHome()));
+        navbar.setButtonAction("progress", () -> handleNavigation(() -> NavigationManager.getInstance().goToUserProgress()));
+        navbar.setButtonAction("profile", () -> handleNavigation(() -> NavigationManager.getInstance().goToProfile()));
+        navbar.setButtonAction("logout", () -> handleNavigation(() -> NavigationManager.getInstance().logout()));
         return navbar;
     }
 
-    /**
-     * Helper per determinare se mostrare conferma uscita
-     */
     private void handleNavigation(Runnable navigationAction) {
-        if (quizCompleted) {
-            // Quiz completato - navigazione libera
-            navigationAction.run();
-        } else {
-            // Quiz in corso - chiedi conferma
-            confirmExit(navigationAction);
-        }
+        if (quizCompleted) navigationAction.run(); // Naviga subito se quiz già finito
+        else confirmExit(navigationAction);        // Altrimenti chiedi conferma uscita
     }
 
     @Override
@@ -121,45 +87,41 @@ public class ScreenQuizEP extends BaseScreen {
         setCenter(placeholderBox);
     }
 
-  
     private VBox createCenterContent() {
-        VBox centerContent = new VBox(20);
-        centerContent.setPadding(new Insets(20));
-        centerContent.setAlignment(Pos.TOP_CENTER);
-
+        VBox box = new VBox(20);
+        box.setPadding(new Insets(20));
+        box.setAlignment(Pos.TOP_CENTER);
 
         questionCounterLabel = new Label();
         questionCounterLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         questionCounterLabel.setStyle("-fx-text-fill: #2563eb;");
 
-
         questionContainer = new VBox(15);
         questionContainer.setAlignment(Pos.TOP_LEFT);
         questionContainer.setPadding(new Insets(20));
-        questionContainer.setStyle("-fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-color: #ffffff; -fx-background-radius: 8;");
-
+        questionContainer.setStyle(
+                "-fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 8; " +
+                        "-fx-background-color: #ffffff; -fx-background-radius: 8;"
+        );
 
         resultText = new Text();
         resultText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         resultText.setVisible(false);
 
-        centerContent.getChildren().addAll(questionCounterLabel, questionContainer, resultText);
-        return centerContent;
+        box.getChildren().addAll(questionCounterLabel, questionContainer, resultText);
+        return box;
     }
 
-   
     private HBox createBottomNavigation() {
-        HBox bottomNav = new HBox(15);
-        bottomNav.setAlignment(Pos.CENTER);
-        bottomNav.setPadding(new Insets(20));
+        HBox box = new HBox(15);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20));
 
-        
         previousButton = new Button("Domanda Precedente");
         nextButton = new Button("Prossima domanda");
         submitButton = new Button("Termina Quiz");
         exitButton = new Button("Esci dall'esercizio");
 
-        
         previousButton.setPrefWidth(160);
         nextButton.setPrefWidth(160);
         submitButton.setPrefWidth(120);
@@ -170,105 +132,66 @@ public class ScreenQuizEP extends BaseScreen {
         submitButton.setOnAction(e -> finishQuiz());
         exitButton.setOnAction(e -> confirmExit(() -> NavigationManager.getInstance().goToExerciseGrid()));
 
-        bottomNav.getChildren().addAll(previousButton, nextButton, submitButton, exitButton);
-        return bottomNav;
+        box.getChildren().addAll(previousButton, nextButton, submitButton, exitButton);
+        return box;
     }
 
-    
     private void updateCurrentQuestionDisplay() {
         if (quizCompleted) return;
 
-        
         questionCounterLabel.setText(String.format("Quiz (%d/%d)",
                 currentQuiz.getCurrentQuestionNumber(), currentQuiz.getTotalQuestions()));
 
-        
-        VBox currentQuestionUI = currentQuiz.getCurrentQuestionUI();
-        questionContainer.getChildren().clear();
-        questionContainer.getChildren().add(currentQuestionUI);
+        VBox questionUI = currentQuiz.getCurrentQuestionUI();
+        questionContainer.getChildren().setAll(questionUI);
 
-        
         updateButtonStates();
     }
 
- 
     private void updateButtonStates() {
-        
         previousButton.setDisable(!currentQuiz.hasPreviousQuestion());
-
-        
         nextButton.setDisable(!currentQuiz.hasNextQuestion());
 
- 
-        boolean canSubmit = currentQuiz.getCurrentQuestionNumber() >= currentQuiz.getTotalQuestions() &&
-                hasAnsweredAtLeastOne();
+        boolean canSubmit = currentQuiz.getCurrentQuestionNumber() >= currentQuiz.getTotalQuestions()
+                && hasAnsweredAtLeastOne();
         submitButton.setVisible(canSubmit);
     }
 
- 
     private boolean hasAnsweredAtLeastOne() {
-        for (String answer : currentQuiz.getUserAnswers()) {
-            if (answer != null && !answer.trim().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return currentQuiz.getUserAnswers().stream()
+                .anyMatch(ans -> ans != null && !ans.trim().isEmpty());
     }
 
-   
     private void goToPreviousQuestion() {
-        if (currentQuiz.goToPreviousQuestion()) {
-            updateCurrentQuestionDisplay();
-        }
+        if (currentQuiz.goToPreviousQuestion()) updateCurrentQuestionDisplay();
     }
 
- 
     private void goToNextQuestion() {
-        if (currentQuiz.goToNextQuestion()) {
-            updateCurrentQuestionDisplay();
-        }
+        if (currentQuiz.goToNextQuestion()) updateCurrentQuestionDisplay();
     }
-
 
     private void finishQuiz() {
         quizCompleted = true;
 
-        
-        int correctAnswers = currentQuiz.calculateScore();
-        int totalQuestions = currentQuiz.getTotalQuestions();
-        double percentage = (double) correctAnswers / totalQuestions * 100;
+        int correct = currentQuiz.calculateScore();
+        int total = currentQuiz.getTotalQuestions();
+        double percentage = (double) correct / total * 100;
 
-        
         questionContainer.setVisible(false);
 
-        
-        String resultMessage = String.format(
+        String message = String.format(
                 "Bene hai superato l'esercizio e hai risposto correttamente a %d domande su %d.\n\n" +
-                        "Percentuale di successo: %.1f%%\n\n" +
-                        "%s\n\n" +
-                        "Prova con un nuovo esercizio.",
-                correctAnswers, totalQuestions, percentage,
+                        "Percentuale di successo: %.1f%%\n\n%s\n\nProva con un nuovo esercizio.",
+                correct, total, percentage,
                 percentage >= 60 ? "Congratulazioni! Hai superato il quiz." :
                         "Continua a studiare per migliorare."
         );
 
-        resultText.setText(resultMessage);
+        resultText.setText(message);
         resultText.setFill(percentage >= 60 ? Color.GREEN : Color.ORANGE);
         resultText.setVisible(true);
 
-
-        String currentUser = Main.getCurrentUser();
-        boolean saved = UserProgress.saveProgress(
-                currentUser,
-                "quizEP",
-                currentQuiz.getDifficulty(),
-                correctAnswers,
-                totalQuestions
-        );
-
-        if (!saved) {
-            System.err.println("Errore durante il salvataggio dei progressi del quiz");
-        }
+        UserProgress.saveProgress(Main.getCurrentUser(), "quizEP", currentQuiz.getDifficulty(), correct, total);
 
         questionCounterLabel.setText("Quiz completato - Progressi salvati!");
         questionCounterLabel.setStyle("-fx-text-fill: green;");
@@ -276,74 +199,56 @@ public class ScreenQuizEP extends BaseScreen {
         replaceWithFinalButtons();
     }
 
-    
     private void replaceWithFinalButtons() {
-        HBox finalButtons = new HBox(15);
-        finalButtons.setAlignment(Pos.CENTER);
-        finalButtons.setPadding(new Insets(20));
+        HBox box = new HBox(15);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20));
 
-        Button newQuizButton = new Button("Nuovo Esercizio");
-        Button nextLevelButton = new Button("Livello Successivo");
-        exitButton.setText("Esci dall'esercizio");
-        exitButton.setOnAction(e -> confirmExit(() -> NavigationManager.getInstance().goToExerciseGrid()));
+        Button newQuiz = new Button("Nuovo Esercizio");
+        Button nextLevel = new Button("Livello Successivo");
 
-        newQuizButton.setPrefWidth(150);
-        nextLevelButton.setPrefWidth(150);
-
-        
-        newQuizButton.setOnAction(e -> {
-            QuizEP newQuiz = new QuizEP(currentQuiz.getDifficulty());
-            Scene newScene = ScreenQuizEP.getScene(stage, returnScene, newQuiz);
-            stage.setScene(newScene);
+        // Ricomincia stesso livello
+        newQuiz.setOnAction(e -> {
+            QuizEP q = new QuizEP(currentQuiz.getDifficulty());
+            stage.setScene(ScreenQuizEP.getScene(stage, returnScene, q));
         });
 
-        // Livello successivo (se esiste e se ha superato)
-        nextLevelButton.setOnAction(e -> {
-            int nextLevel = currentQuiz.getDifficulty() + 1;
-            if (nextLevel <= 3) {
-                QuizEP nextQuiz = new QuizEP(nextLevel);
-                Scene nextScene = ScreenQuizEP.getScene(stage, returnScene, nextQuiz);
-                stage.setScene(nextScene);
+        // Prossimo livello se superato
+        nextLevel.setOnAction(e -> {
+            int level = currentQuiz.getDifficulty() + 1;
+            if (level <= 3) {
+                QuizEP q = new QuizEP(level);
+                stage.setScene(ScreenQuizEP.getScene(stage, returnScene, q));
             } else {
                 showAlert("Hai già completato tutti i livelli disponibili!");
             }
         });
 
-        
+        // Blocca il bottone se non ha superato il livello
         double percentage = (double) currentQuiz.calculateScore() / currentQuiz.getTotalQuestions() * 100;
-        nextLevelButton.setDisable(percentage < 60 || currentQuiz.getDifficulty() >= 3);
+        nextLevel.setDisable(percentage < 60 || currentQuiz.getDifficulty() >= 3);
 
-        finalButtons.getChildren().addAll(newQuizButton, nextLevelButton, exitButton);
-        setBottom(finalButtons);
+        exitButton.setText("Esci dall'esercizio");
+        exitButton.setOnAction(e -> confirmExit(() -> NavigationManager.getInstance().goToExerciseGrid()));
+
+        box.getChildren().addAll(newQuiz, nextLevel, exitButton);
+        setBottom(box);
     }
 
-
-
-    /**
-     * Gestisce conferma uscita secondo specifiche Prof
-     */
     private static void confirmExit(Runnable exitAction) {
-        // Determina se il quiz è completato
-        boolean isCompleted = quizCompleted;
-
-        // Calcola risposte corrette attuali
-        int correctAnswers = currentQuiz.calculateScore();
-
-        // Usa DialogUtils con specifiche Prof
         DialogUtils.showExerciseExitConfirmation(
-                currentQuiz,           // Exercise
-                isCompleted,           // È completato?
-                correctAnswers,        // Risposte corrette attuali
-                exitAction            // Azione se conferma
+                currentQuiz,
+                quizCompleted,
+                currentQuiz.calculateScore(),
+                exitAction
         );
     }
 
-
-    private void showAlert(String message) {
+    private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Informazione");
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 
@@ -355,9 +260,7 @@ public class ScreenQuizEP extends BaseScreen {
         }
     }
 
-    
     public static Scene getScene(Stage stage, Scene returnScene, Exercise exercise) {
-        ScreenQuizEP screen = new ScreenQuizEP(stage, exercise, returnScene);
-        return screen.createScene();
+        return new ScreenQuizEP(stage, exercise, returnScene).createScene();
     }
 }

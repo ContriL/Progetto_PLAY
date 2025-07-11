@@ -18,10 +18,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-/**
- * 
- * Mostra le regole e spiegazioni di un esercizio prima di iniziare.
- */
+// Mostra le regole e spiegazioni di un esercizio prima di iniziare.
+
 public class ExerciseRulesScreen extends BaseScreen {
 
     private Exercise exercise;
@@ -208,9 +206,6 @@ public class ExerciseRulesScreen extends BaseScreen {
 
     
     public static Scene createScene(Stage stage, Exercise exercise, String returnDestination) {
-        System.out.println("🏗️ ExerciseRulesScreen.createScene chiamato");
-        System.out.println("📦 Exercise ricevuto: " + (exercise != null ? exercise.getClass().getSimpleName() : "NULL"));
-
         ExerciseRulesScreen screen = new ExerciseRulesScreen(stage, exercise, returnDestination);
         return screen.createScene();
     }
