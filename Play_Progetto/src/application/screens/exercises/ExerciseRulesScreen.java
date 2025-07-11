@@ -172,6 +172,19 @@ public class ExerciseRulesScreen extends BaseScreen {
                         "Questo esercizio ti aiuterà a comprendere meglio la logica " +
                         "e la sequenza degli algoritmi.";
 
+            case "CompareCode":
+                return "In questo esercizio dovrai confrontare due versioni di codice Java e valutarne le differenze.\n\n" +
+                        "• Ti verranno mostrate due versioni di codice affiancate (Versione A e Versione B)\n" +
+                        "• Dovrai analizzare entrambe le versioni per correttezza, efficienza e leggibilità\n" +
+                        "• Rispondi alle 3 domande per ogni confronto:\n" +
+                        "  - Quale versione è funzionalmente corretta?\n" +
+                        "  - Quale versione è più efficiente?\n" +
+                        "  - Quale versione è più leggibile e segue le best practice?\n" +
+                        "• Spiega le tue valutazioni nel campo motivazione\n" +
+                        "• Completa almeno 2 confronti su 3 correttamente per passare al livello successivo\n\n" +
+                        "Questo esercizio ti aiuterà a sviluppare il pensiero critico per valutare " +
+                        "la qualità del codice e riconoscere le best practice di programmazione.";
+
             case "WhatPrintsExercise":
                 return "In questo esercizio dovrai prevedere l'output di un programma Java.\n\n" +
                         "• Ti verrà mostrato del codice Java completo\n" +
