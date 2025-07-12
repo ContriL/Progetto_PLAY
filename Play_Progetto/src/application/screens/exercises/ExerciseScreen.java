@@ -1,6 +1,7 @@
 package application.screens.exercises;
 
 import application.components.NavigationBar;
+import application.components.FinalResultScreen;
 import application.screens.auth.Main;
 import application.UserProgress;
 import application.core.StyleManager;
@@ -27,14 +28,12 @@ import application.core.DialogUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe per gestire la schermata degli esercizi di base (trova errore, ordina passi, cosa stampa).
- * Fornisce l'interfaccia per svolgere gli esercizi con navigazione e salvataggio.
- */
+// Schermata per i tre esercizi base del progetto
+// Gestisce trova errore, ordina passi e cosa stampa
 public class ExerciseScreen {
 
     public static Scene getScene(Stage stage, Scene selectionScene, Exercise exercise) {
-        // Uso variabili array per evitare problemi con variabili statiche
+        // Evito problemi con le variabili statiche usando array
         final int[] currentQuestionIndex = {0};
         final int[] correctAnswers = {0};
 
@@ -43,17 +42,17 @@ public class ExerciseScreen {
 
         StyleManager.applyMainStyles(scene);
 
-        // Crea navbar con controllo navigazione durante esercizio
+        // Navbar personalizzata con gestione uscita durante esercizio
         NavigationBar navBar = new NavigationBar(true);
 
-        // Configura pulsante indietro con conferma
+        // Se prova ad uscire durante l'esercizio chiedo conferma
         navBar.setBackAction(() -> {
             handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () -> {
                 NavigationManager.getInstance().goToExerciseGrid();
             });
         });
 
-        // Intercetta tutti i pulsanti della navbar per gestire uscita
+        // Tutti i pulsanti della navbar devono chiedere conferma se esercizio in corso
         navBar.setButtonAction("home", () ->
                 handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () ->
                         NavigationManager.getInstance().goToHome()));
@@ -73,7 +72,7 @@ public class ExerciseScreen {
         VBox topContainer = new VBox();
         topContainer.getChildren().add(navBar);
 
-        // Crea header con titolo e descrizione
+        // Header dell'esercizio
         Text headerText = new Text(exercise.getTitle() + " - Livello " + exercise.getDifficulty());
         headerText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         Text descriptionText = new Text(exercise.getDescription());
@@ -89,11 +88,11 @@ public class ExerciseScreen {
         VBox contentBox = new VBox(15);
         contentBox.setPadding(new Insets(15));
 
-        // Etichetta contatore domande
+        // Contatore domande
         Label questionCountLabel = new Label("Domanda " + (currentQuestionIndex[0] + 1) + " di " + exercise.getTotalQuestions());
         questionCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        // Area per mostrare il codice dell'esercizio
+        // Qui mostro il codice dell'esercizio
         TextArea codeSnippetArea = new TextArea();
         codeSnippetArea.setEditable(false);
         codeSnippetArea.setPrefRowCount(12);
@@ -110,7 +109,7 @@ public class ExerciseScreen {
 
         final Control[] answerControlRef = new Control[1];
 
-        // Crea controllo risposta diverso in base al tipo di esercizio
+        // Creo controlli diversi per ogni tipo di esercizio
         if (exercise instanceof WhatPrintsExercise) {
             TextArea answerArea = new TextArea();
             answerArea.setPromptText("Scrivi l'output atteso, una riga per ogni println");
@@ -146,7 +145,7 @@ public class ExerciseScreen {
         nextButton.setDisable(true);
         retryButton.setDisable(true);
 
-        // Abilita pulsante verifica quando l'utente scrive
+        // Attivo verifica solo quando ha scritto qualcosa
         if (answerControlRef[0] instanceof TextField) {
             TextField textField = (TextField) answerControlRef[0];
             textField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -156,7 +155,7 @@ public class ExerciseScreen {
             });
         }
 
-        // Gestisce verifica della risposta
+        // Quando clicca verifica controllo la risposta
         submitButton.setOnAction(e -> {
             String userAnswer = "";
 
@@ -200,7 +199,7 @@ public class ExerciseScreen {
             nextButton.setDisable(false);
         });
 
-        // Gestisce pulsante riprova
+        // Reset per riprovare la domanda
         retryButton.setOnAction(e -> {
             if (answerControlRef[0] instanceof TextField) {
                 ((TextField) answerControlRef[0]).clear();
@@ -220,16 +219,16 @@ public class ExerciseScreen {
             retryButton.setDisable(true);
         });
 
-        // Gestisce passaggio alla domanda successiva
+        // Passo alla prossima domanda o mostro risultati finali
         nextButton.setOnAction(e -> {
             currentQuestionIndex[0]++;
 
             if (currentQuestionIndex[0] < exercise.getTotalQuestions()) {
-                // Carica prossima domanda
+                // Carico la prossima domanda
                 codeSnippetArea.setText(questions.get(currentQuestionIndex[0]));
                 questionCountLabel.setText("Domanda " + (currentQuestionIndex[0] + 1) + " di " + exercise.getTotalQuestions());
 
-                // Reset controlli risposta
+                // Pulisco i controlli per la prossima domanda
                 if (answerControlRef[0] instanceof TextField) {
                     ((TextField) answerControlRef[0]).clear();
 
@@ -258,9 +257,7 @@ public class ExerciseScreen {
                 retryButton.setDisable(true);
 
             } else {
-                // Esercizio completato - mostra risultati finali
-                contentBox.getChildren().clear();
-
+                // Finito! Uso la nuova classe per la schermata finale
                 String exerciseType = getExerciseType(exercise);
                 String currentUser = Main.getCurrentUser();
                 boolean saved = UserProgress.saveProgress(
@@ -271,49 +268,19 @@ public class ExerciseScreen {
                         exercise.getTotalQuestions()
                 );
 
-                Text completionText = new Text("Esercizio completato!");
-                completionText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+                // Sostituisco tutto con la schermata finale
+                root.getChildren().clear();
+                root.setTop(topContainer); // Tengo solo la navbar
 
-                Text scoreText = new Text("Hai risposto correttamente a " + correctAnswers[0] +
-                        " domande su " + exercise.getTotalQuestions() + ".");
-                scoreText.setFill(Color.GREEN);
+                ScrollPane finalScreen = FinalResultScreen.createFinalScreen(exercise, correctAnswers[0], exercise.getTotalQuestions(), saved);
+                FinalResultScreen.setupActions(finalScreen, exercise, stage, selectionScene);
 
-                Text progressText = new Text(saved ?
-                        "I tuoi progressi sono stati salvati." :
-                        "Non è stato possibile salvare i progressi.");
-                progressText.setFill(saved ? Color.GREEN : Color.RED);
-
-                double percentage = (double) correctAnswers[0] / exercise.getTotalQuestions() * 100;
-                Text percentageText = new Text(String.format("Percentuale di successo: %.1f%%", percentage));
-
-                Text resultLevelText = new Text();
-                if (percentage >= 60) {
-                    resultLevelText.setText("Congratulazioni! Hai superato questo livello.");
-                    resultLevelText.setFill(Color.GREEN);
-                } else {
-                    resultLevelText.setText("Continua a esercitarti per migliorare il tuo punteggio.");
-                    resultLevelText.setFill(Color.ORANGE);
-                }
-
-                Button newExerciseButton = new Button("Scegli un nuovo esercizio");
-                newExerciseButton.setOnAction(event -> stage.setScene(selectionScene));
-
-                contentBox.getChildren().addAll(
-                        completionText,
-                        scoreText,
-                        percentageText,
-                        resultLevelText,
-                        progressText,
-                        newExerciseButton
-                );
-
-                submitButton.setDisable(true);
-                nextButton.setDisable(true);
-                retryButton.setDisable(true);
+                root.setCenter(finalScreen);
+                // NON aggiungo più buttonBar in basso!
             }
         });
 
-        // Gestisce pulsante torna indietro con conferma
+        // Pulsante indietro con conferma se esercizio in corso
         backButton.setOnAction(e -> {
             handleNavigation(exercise, currentQuestionIndex[0], correctAnswers[0], () -> {
                 stage.setScene(selectionScene);
@@ -326,7 +293,9 @@ public class ExerciseScreen {
         return scene;
     }
 
-    // Mostra conferma di uscita dall'esercizio
+    // Roba originale che c'era già
+
+    // Popup di conferma quando esce durante esercizio
     private static void showExitConfirmation(Exercise exercise, int currentQuestionIndex,
                                              int correctAnswers, Runnable onConfirm) {
         boolean isCompleted = (currentQuestionIndex >= exercise.getTotalQuestions());
@@ -339,21 +308,21 @@ public class ExerciseScreen {
         );
     }
 
-    // Gestisce la navigazione durante l'esercizio
+    // Controllo se deve chiedere conferma prima di navigare
     private static void handleNavigation(Exercise exercise, int currentQuestionIndex,
                                          int correctAnswers, Runnable navigationAction) {
         boolean isCompleted = (currentQuestionIndex >= exercise.getTotalQuestions());
 
         if (isCompleted) {
-            // Esercizio completato - navigazione libera
+            // Se ha finito può navigare liberamente
             navigationAction.run();
         } else {
-            // Esercizio in corso - chiede conferma
+            // Altrimenti chiedo conferma
             showExitConfirmation(exercise, currentQuestionIndex, correctAnswers, navigationAction);
         }
     }
 
-    // Restituisce il tipo di esercizio come stringa per il salvataggio
+    // Converto l'esercizio in stringa per salvarlo
     private static String getExerciseType(Exercise exercise) {
         if (exercise instanceof FindErrorExercise) {
             return "FindError";
@@ -365,7 +334,7 @@ public class ExerciseScreen {
         return "Unknown";
     }
 
-    // Crea il controllo drag & drop per l'esercizio "Ordina i Passi"
+    // Lista con drag and drop per l'esercizio ordina passi
     private static ListView<String> createOrderStepsControl(OrderStepsExercise exercise, int questionIndex) {
         ListView<String> stepsListView = new ListView<>();
         stepsListView.setPrefHeight(200);
@@ -373,7 +342,7 @@ public class ExerciseScreen {
         List<String> steps = exercise.getStepsForQuestion(questionIndex);
         List<String> numberedSteps = new ArrayList<>();
 
-        // Aggiunge numerazione ai passi
+        // Metto i numeri davanti ai passi
         for (int i = 0; i < steps.size(); i++) {
             numberedSteps.add((i + 1) + ". " + steps.get(i));
         }
@@ -381,7 +350,7 @@ public class ExerciseScreen {
         stepsListView.getItems().clear();
         stepsListView.getItems().addAll(numberedSteps);
 
-        // Configura drag & drop per riordinare i passi
+        // Imposto drag and drop per riordinare
         stepsListView.setCellFactory(lv -> {
             ListCell<String> cell = new ListCell<>() {
                 @Override
@@ -401,7 +370,7 @@ public class ExerciseScreen {
                 }
             };
 
-            // Gestione drag & drop
+            // Tutto il casino per il drag and drop
             cell.setOnDragDetected(event -> {
                 if (!cell.isEmpty()) {
                     Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
