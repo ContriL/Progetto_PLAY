@@ -24,6 +24,7 @@ public class ExerciseRulesScreen extends BaseScreen {
 
     private Exercise exercise;
     private String returnDestination;
+    private Timeline loadingTimeline;
 
     public ExerciseRulesScreen(Stage stage, Exercise exercise, String returnDestination) {
         super(stage, 1200, 800);
@@ -62,26 +63,25 @@ public class ExerciseRulesScreen extends BaseScreen {
         return "COSA DEVI FARE";
     }
 
+ 
     @Override
     protected void initializeContent() {
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(30));
 
-        
         if (exercise == null) {
             Label waitingLabel = new Label("Caricamento regole...");
             contentBox.getChildren().add(waitingLabel);
 
-            
-            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
+            loadingTimeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
                 if (exercise != null) {
-                    
+                    loadingTimeline.stop(); // FERMA il timeline
                     Platform.runLater(this::recreateContent);
                 }
             }));
-            timeline.setCycleCount(50); 
-            timeline.play();
+            loadingTimeline.setCycleCount(Timeline.INDEFINITE);
+            loadingTimeline.play();
         } else {
             createRulesContent(contentBox);
         }
