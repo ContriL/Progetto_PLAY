@@ -54,8 +54,23 @@ public class ProfileScreen extends BaseScreen {
 
         mainContent.getChildren().addAll(profileSection, statsAchievements);
 
-        VBox container = new VBox(mainContent);
+        // Crea ScrollPane per rendere il contenuto scorrevole
+        ScrollPane scrollPane = new ScrollPane(mainContent);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setPannable(true);
+        scrollPane.setVvalue(0.0); // Inizia dall'alto
+        
+        // Stile per il ScrollPane
+        scrollPane.getStyleClass().add("edge-to-edge");
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        VBox container = new VBox(scrollPane);
         container.getStyleClass().add("content-container");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        
         setCenter(container);
     }
 
