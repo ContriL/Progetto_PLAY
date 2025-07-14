@@ -22,6 +22,10 @@ public class UserProgress {
      */
     public static boolean saveProgress(String username, String exerciseType, int difficulty,
                                        int correctAnswers, int totalQuestions) {
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("❌ Errore: username vuoto, salvataggio annullato");
+            return false;
+        }
         try {
             // Verifica esistenza del file e lo crea se necessario
             if (!progressFile.exists()) {
