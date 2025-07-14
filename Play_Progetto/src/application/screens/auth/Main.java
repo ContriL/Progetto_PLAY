@@ -37,6 +37,11 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) {
 		NavigationManager.getInstance().initialize(stage);
+
+
+		stage.setWidth(1400);
+		stage.setHeight(900);
+
 		Scene loginScene = getLoginScene(stage);
 		stage.setTitle("Pannello di Login");
 		stage.setScene(loginScene);
