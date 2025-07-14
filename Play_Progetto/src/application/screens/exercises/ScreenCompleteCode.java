@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import application.core.DialogUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,17 +65,44 @@ public class ScreenCompleteCode extends BaseScreen {
 
     @Override
     protected NavigationBar createNavigationBar() {
-        NavigationBar navbar = new NavigationBar(true); 
+        NavigationBar navbar = new NavigationBar(true);
 
-        
+        // Pulsante indietro
         navbar.setBackAction(() -> {
-            showExitConfirmation(() -> {
-                saveProgressBeforeExit();
-                NavigationManager.getInstance().goToExerciseGrid();
-            });
+            CompleteCode codeExercise = (CompleteCode) exercise;
+            boolean isCompleted = codeExercise.allQuestionsAttempted();
+            int correctAnswers = codeExercise.calculateScore();
+
+            DialogUtils.showExerciseExitConfirmation(
+                    exercise, isCompleted, correctAnswers,
+                    () -> NavigationManager.getInstance().goToExerciseGrid()
+            );
         });
 
+        // Altri pulsanti navbar
+        navbar.setButtonAction("home", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToHome()));
+
+        navbar.setButtonAction("progress", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToUserProgress()));
+
+        navbar.setButtonAction("profile", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToProfile()));
+
+        navbar.setButtonAction("logout", () -> handleNavigation(() ->
+                NavigationManager.getInstance().logout()));
+
         return navbar;
+    }
+
+    private void handleNavigation(Runnable navigationAction) {
+        CompleteCode codeExercise = (CompleteCode) exercise;
+        boolean isCompleted = codeExercise.allQuestionsAttempted();
+        int correctAnswers = codeExercise.calculateScore();
+
+        DialogUtils.showExerciseExitConfirmation(
+                exercise, isCompleted, correctAnswers, navigationAction
+        );
     }
 
     @Override

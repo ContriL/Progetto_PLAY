@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import application.core.DialogUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,16 +71,44 @@ public class ScreenCompareCode extends BaseScreen {
 
     @Override
     protected NavigationBar createNavigationBar() {
-        NavigationBar navbar = new NavigationBar(true); 
+        NavigationBar navbar = new NavigationBar(true);
 
+        // Pulsante indietro
         navbar.setBackAction(() -> {
-            showExitConfirmation(() -> {
-                saveProgressBeforeExit();
-                NavigationManager.getInstance().goToExerciseGrid();
-            });
+            CompareCode codeExercise = (CompareCode) exercise;
+            boolean isCompleted = codeExercise.allQuestionsAttempted();
+            int correctAnswers = codeExercise.calculateScore();
+
+            DialogUtils.showExerciseExitConfirmation(
+                    exercise, isCompleted, correctAnswers,
+                    () -> NavigationManager.getInstance().goToExerciseGrid()
+            );
         });
 
+        // Altri pulsanti navbar
+        navbar.setButtonAction("home", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToHome()));
+
+        navbar.setButtonAction("progress", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToUserProgress()));
+
+        navbar.setButtonAction("profile", () -> handleNavigation(() ->
+                NavigationManager.getInstance().goToProfile()));
+
+        navbar.setButtonAction("logout", () -> handleNavigation(() ->
+                NavigationManager.getInstance().logout()));
+
         return navbar;
+    }
+
+    private void handleNavigation(Runnable navigationAction) {
+        CompareCode codeExercise = (CompareCode) exercise;
+        boolean isCompleted = codeExercise.allQuestionsAttempted();
+        int correctAnswers = codeExercise.calculateScore();
+
+        DialogUtils.showExerciseExitConfirmation(
+                exercise, isCompleted, correctAnswers, navigationAction
+        );
     }
 
     @Override
@@ -304,28 +333,7 @@ public class ScreenCompareCode extends BaseScreen {
             }
         });
     }
-
-    /**
-     * Mostra dialogo di conferma per l'uscita
-     */
-    private void showExitConfirmation(Runnable onConfirm) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Conferma Uscita");
-        alert.setHeaderText("⚠️ Attenzione: stai per uscire dall'esercizio");
-        alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
-                "Vuoi continuare e uscire dall'esercizio?");
-
-        ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
-        ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(confirmButton, cancelButton);
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == confirmButton) {
-                onConfirm.run();
-            }
-        });
-    }
+    
 
     /**
      * Salva il progresso prima di uscire
