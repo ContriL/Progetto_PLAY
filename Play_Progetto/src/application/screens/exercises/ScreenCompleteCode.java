@@ -256,8 +256,8 @@ public class ScreenCompleteCode extends BaseScreen {
                 Scene nextScene = ScreenCompleteCode.getScene(stage, returnScene, nextExercise);
                 stage.setScene(nextScene);
             } else {
-                saveMessage.setText("Hai completato tutti i livelli disponibili.");
-                saveMessage.setTextFill(Color.BLUE);
+                // Ha completato tutti i livelli - mostra schermata finale
+                showFinalSummary();
             }
         });
     }
@@ -336,5 +336,25 @@ public class ScreenCompleteCode extends BaseScreen {
     
     public int getCorrectCount(int difficulty) {
         return correctCountMap.getOrDefault(difficulty, 0);
+    }
+
+    /**
+     * Mostra la schermata finale quando tutti i livelli sono completati
+     */
+    private void showFinalSummary() {
+        CompleteCode codeExercise = (CompleteCode) exercise;
+        int correctCount = codeExercise.calculateScore();
+        int totalQuestions = codeExercise.getTotalQuestions();
+
+        // Crea la schermata finale
+        ScrollPane finalScreen = application.components.FinalResultScreen.createFinalScreen(
+                exercise, correctCount, totalQuestions, true
+        );
+
+        // Configura le azioni dei pulsanti
+        application.components.FinalResultScreen.setupActions(finalScreen, exercise, stage, returnScene);
+
+        // Sostituisci tutto il contenuto
+        setCenter(finalScreen);
     }
 }
