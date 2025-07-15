@@ -1,0 +1,4 @@
+# Ignora file compilati Java ovunque
+**/*.class
+# Ignora intera cartella out/ ovunque
+**/out/
