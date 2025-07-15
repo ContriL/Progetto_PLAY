@@ -244,42 +244,49 @@ public class ScreenCompareCode extends BaseScreen {
     }
 
     //Configura il bottone di submit per la valutazione//
-  
-    private void setupSubmitButton(CompareCode codeExercise) {
-        submitCurrent.setOnAction(e -> {
-            int currentIndex = codeExercise.getCurrentQuestionNumber() - 1;
-            
-           
-            boolean isCorrect = codeExercise.checkAnswer(currentIndex, "");
-            
-            if (isCorrect) {
-                resultLabel.setText("✔ Valutazione corretta! Buona analisi del codice.");
-                resultLabel.setTextFill(Color.GREEN);
-            } else {
-                resultLabel.setText("✘ Valutazione non completamente corretta. Ricontrolla le differenze tra i codici.");
-                resultLabel.setTextFill(Color.ORANGE);
-            }
 
-            // Controllo confronti completati//
-            if (codeExercise.allQuestionsAttempted()) {
-                int totalScore = codeExercise.calculateScore();
-                int totalQuestions = codeExercise.getTotalQuestions();
-                
-                // Mostra il punteggio finale//
-                resultLabel.setText(resultLabel.getText() + 
-                    String.format("\n\nPunteggio finale: %d/%d confronti corretti", totalScore, totalQuestions));
-                
-                // Abilita il prossimo livello se il punteggio è sufficiente 66%//
-                if ((totalScore * 100.0 / totalQuestions) >= 66.0)  {
-                    passToNextLevel.setDisable(false);
-                    resultLabel.setText(resultLabel.getText() + "\n🎉 Livello completato con successo!");
-                }
-            }
+     private void setupSubmitButton(CompareCode codeExercise) {
+         submitCurrent.setOnAction(e -> {
+             int currentIndex = codeExercise.getCurrentQuestionNumber() - 1;
 
-           
-            saveCurrentProgress(codeExercise);
-        });
-    }
+             boolean isCorrect = codeExercise.checkAnswer(currentIndex, "");
+
+             if (isCorrect) {
+                 resultLabel.setText("✔ Valutazione corretta! Buona analisi del codice.");
+                 resultLabel.setTextFill(Color.GREEN);
+             } else {
+                 resultLabel.setText("✘ Valutazione non completamente corretta. Ricontrolla le differenze tra i codici.");
+                 resultLabel.setTextFill(Color.ORANGE);
+             }
+
+             // Controlla se tutti i confronti sono stati completati
+             if (codeExercise.allQuestionsAttempted()) {
+                 int totalScore = codeExercise.calculateScore();
+                 int totalQuestions = codeExercise.getTotalQuestions();
+
+                 // Salva i progressi
+                 saveCurrentProgress(codeExercise);
+
+                 // Mostra FinalResultScreen invece dei messaggi
+                 showLevelCompleted(totalScore, totalQuestions);
+             } else {
+                 saveCurrentProgress(codeExercise);
+             }
+         });
+     }
+
+     /**
+      * Mostra FinalResultScreen quando un livello è completato
+      */
+     private void showLevelCompleted(int correctAnswers, int totalQuestions) {
+         ScrollPane finalScreen = application.components.FinalResultScreen.createFinalScreen(
+                 exercise, correctAnswers, totalQuestions, true
+         );
+
+         application.components.FinalResultScreen.setupActions(finalScreen, exercise, stage, returnScene);
+
+         setCenter(finalScreen);
+     }
 
     //salva progresso corrente//
     private void saveCurrentProgress(CompareCode codeExercise) {
