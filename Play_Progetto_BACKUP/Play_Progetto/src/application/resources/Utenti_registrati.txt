@@ -1,7 +1,0 @@
-Test,Test,Test,Test
-aldo,baglio,aldo,p1
-lorenzo,Contri,lollo,pas
-Dalia,Barone,daliaxx,Daliaf
-dada,ria,dalia,123
-Lorenzo,Contri,Lollo5,Lorenzo10
-Lorenzo,Contri,Contri,Lorenzo100
