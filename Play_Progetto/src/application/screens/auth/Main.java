@@ -24,7 +24,20 @@ import java.io.*;
 public class Main extends Application {
 
 	private static String currentUser = "";
-	public static File Utenti_registrati = new File("src/application/resources/Utenti_registrati.txt");
+	public static File Utenti_registrati = getDataFile("Utenti_registrati.txt");
+
+	private static File getDataFile(String filename) {
+		// Usa SEMPRE la cartella resources di Play_Progetto
+		File resourcesFile = new File("Play_Progetto/src/application/resources/" + filename);
+
+		// Assicurati che la directory esista
+		File parentDir = resourcesFile.getParentFile();
+		if (parentDir != null && !parentDir.exists()) {
+			parentDir.mkdirs();
+		}
+
+		return resourcesFile;
+	}
 
 	public static String getCurrentUser() {
 		return currentUser;

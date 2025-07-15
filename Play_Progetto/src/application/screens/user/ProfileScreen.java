@@ -19,7 +19,19 @@ import java.util.*;
 // Schermata Profilo Utente: visualizza bio, avatar, statistiche e obiettivi
 public class ProfileScreen extends BaseScreen {
 
-    private static final String PROFILE_FILE = System.getProperty("user.dir") + "/src/application/resources/profiles.properties";
+    private static final String PROFILE_FILE = getProfileFilePath();
+
+    private static String getProfileFilePath() {
+        File resourcesFile = new File("Play_Progetto/src/application/resources/profiles.properties");
+
+        // Assicurati che la directory esista
+        File parentDir = resourcesFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        return resourcesFile.getAbsolutePath();
+    }
 
     private TextArea bioField;
 

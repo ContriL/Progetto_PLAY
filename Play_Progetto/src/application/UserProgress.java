@@ -15,7 +15,19 @@ public class UserProgress {
     /**
      * File di riferimento per il salvataggio dei progressi utente
      */
-    public static File progressFile = new File(System.getProperty("user.dir") + "/src/application/resources/Utenti_Progressi.txt");
+    public static File progressFile = getDataFile("Utenti_Progressi.txt");
+
+    private static File getDataFile(String filename) {
+
+        File resourcesFile = new File("Play_Progetto/src/application/resources/" + filename);
+
+        File parentDir = resourcesFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        return resourcesFile;
+    }
 
     /**
      * Salva il risultato di un esercizio completato da un utente.
@@ -23,7 +35,7 @@ public class UserProgress {
     public static boolean saveProgress(String username, String exerciseType, int difficulty,
                                        int correctAnswers, int totalQuestions) {
         if (username == null || username.trim().isEmpty()) {
-            System.err.println("❌ Errore: username vuoto, salvataggio annullato");
+            System.err.println("Errore: username vuoto, salvataggio annullato");
             return false;
         }
         try {
