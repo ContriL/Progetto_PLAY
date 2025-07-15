@@ -5,8 +5,10 @@ import application.UserProgress;
 import application.core.BaseScreen;
 import application.core.NavigationManager;
 import application.components.NavigationBar;
-import application.exercises.CompareCode;
+import application.exercises.CompleteCode;
 import application.exercises.Exercise;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,10 +19,14 @@ import javafx.stage.Stage;
 import application.core.DialogUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
- //Schermata per l'esercizio Compare Code.//
-public class ScreenCompareCode extends BaseScreen {
+/**
+ * Schermata per l'esercizio Complete Code.
+ * 
+ */
+public class ScreenCompleteCode extends BaseScreen {
 
     private static final Map<Integer, Integer> correctCountMap = new HashMap<>();
 
@@ -30,49 +36,40 @@ public class ScreenCompareCode extends BaseScreen {
     // Componenti UI
     private Label resultLabel;
     private Label saveMessage;
-    private Button submitCurrent;
+    private Button submitAll;
     private Button passToNextLevel;
-    private Button nextQuestion; 
-    private Button previousQuestion; 
+    private Button nextExercise; 
+    private Button previousExercise; 
     private VBox codeContainer; 
 
-    public ScreenCompareCode(Stage stage, Exercise exercise, Scene returnScene) {
-        super(stage, 1400, 900); 
+    public ScreenCompleteCode(Stage stage, Exercise exercise, Scene returnScene) {
+        super(stage, 1200, 800);
         this.exercise = exercise;
         this.returnScene = returnScene;
 
+        
         loadRealContent();
     }
 
+    
     private void loadRealContent() {
-        if (exercise != null && exercise instanceof CompareCode) {
-            codeContainer = createCompareCodeContent((CompareCode) exercise);
-            setCenter(createScrollableContent(codeContainer));
+        if (exercise != null && exercise instanceof CompleteCode) {
+            codeContainer = createCompleteCodeContent((CompleteCode) exercise);
+            setCenter(codeContainer);
 
-            
+            // Aggiorna anche l'header
             updateTitle(exercise.getTitle() + " - Livello " + exercise.getDifficulty());
             updateDescription(exercise.getDescription());
         }
-    }
-
-     //Crea un contenuto scrollabile per gestire contenuti lunghi//
-     
-    private ScrollPane createScrollableContent(VBox content) {
-        ScrollPane scrollPane = new ScrollPane(content);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        return scrollPane;
     }
 
     @Override
     protected NavigationBar createNavigationBar() {
         NavigationBar navbar = new NavigationBar(true);
 
-        // Pulsante indietro//
+        // Pulsante indietro
         navbar.setBackAction(() -> {
-            CompareCode codeExercise = (CompareCode) exercise;
+            CompleteCode codeExercise = (CompleteCode) exercise;
             boolean isCompleted = codeExercise.allQuestionsAttempted();
             int correctAnswers = codeExercise.calculateScore();
 
@@ -82,7 +79,7 @@ public class ScreenCompareCode extends BaseScreen {
             );
         });
 
-        // Altri pulsanti navbar//
+        // Altri pulsanti navbar
         navbar.setButtonAction("home", () -> handleNavigation(() ->
                 NavigationManager.getInstance().goToHome()));
 
@@ -99,7 +96,7 @@ public class ScreenCompareCode extends BaseScreen {
     }
 
     private void handleNavigation(Runnable navigationAction) {
-        CompareCode codeExercise = (CompareCode) exercise;
+        CompleteCode codeExercise = (CompleteCode) exercise;
         boolean isCompleted = codeExercise.allQuestionsAttempted();
         int correctAnswers = codeExercise.calculateScore();
 
@@ -110,7 +107,7 @@ public class ScreenCompareCode extends BaseScreen {
 
     @Override
     protected String getScreenTitle() {
-        return exercise != null ? exercise.getTitle() + " - Livello " + exercise.getDifficulty() : "Confronta il Codice";
+        return exercise != null ? exercise.getTitle() + " - Livello " + exercise.getDifficulty() : "Completa il Codice";
     }
 
     @Override
@@ -130,159 +127,134 @@ public class ScreenCompareCode extends BaseScreen {
         super.onShow();
     }
 
-    
-    // Crea il contenuto per l'esercizio Compare Code//
-     
-    private VBox createCompareCodeContent(CompareCode codeExercise) {
-        codeContainer = new VBox(20);
-        codeContainer.setPadding(new Insets(20));
+    /**
+     * Crea il contenuto per l'esercizio Complete Code
+     */
+    private VBox createCompleteCodeContent(CompleteCode codeExercise) {
+        codeContainer = new VBox(15);
+        codeContainer.setPadding(new Insets(15));
 
-        // Inizializza componenti UI//
+        
         resultLabel = new Label();
         saveMessage = new Label();
-        submitCurrent = new Button("Valuta Confronto");
+        submitAll = new Button("Verifica Codice");
         passToNextLevel = new Button("Prossimo Livello");
         passToNextLevel.setDisable(true);
 
-        // Bottoni di navigazione tra domande//
-        nextQuestion = new Button("Prossima Domanda →");
-        previousQuestion = new Button("← Domanda Precedente");
+        
+        nextExercise = new Button("Prossimo Esercizio →");
+        previousExercise = new Button("← Esercizio Precedente");
 
-        // Ottieni l'UI della domanda corrente//
-        VBox questionUI = codeExercise.getCurrentQuestionUI();
+        
+        VBox codeUI = codeExercise.getCurrentQuestionUI();
 
         setupSubmitButton(codeExercise);
         setupNextLevelButton();
         setupNavigationButtons(codeExercise); 
 
-        // Riga di navigazione tra domande//
-        HBox navigationRow = new HBox(15, previousQuestion, nextQuestion);
+        HBox navigationRow = new HBox(15, previousExercise, nextExercise);
         navigationRow.setAlignment(Pos.CENTER);
 
-        // Riga delle azioni principali//
-        HBox actionRow = new HBox(15, submitCurrent, passToNextLevel);
+        HBox actionRow = new HBox(15, submitAll, passToNextLevel);
         actionRow.setAlignment(Pos.CENTER);
 
         updateNavigationButtons(codeExercise);
 
-        // Separatori visivi//
-        Separator sep1 = new Separator();
-        Separator sep2 = new Separator();
-
-        codeContainer.getChildren().addAll(
-            questionUI, 
-            sep1,
-            navigationRow, 
-            actionRow, 
-            sep2,
-            resultLabel, 
-            saveMessage
-        );
-        
+        codeContainer.getChildren().addAll(codeUI, navigationRow, actionRow, resultLabel, saveMessage);
         return codeContainer;
     }
 
-   //configurazione bottono di navigazione tra domande//
-   
-    private void setupNavigationButtons(CompareCode codeExercise) {
-        nextQuestion.setOnAction(e -> {
+    
+    private void setupNavigationButtons(CompleteCode codeExercise) {
+        nextExercise.setOnAction(e -> {
             if (codeExercise.goToNextQuestion()) {
-                refreshQuestionUI(codeExercise);
+                refreshCodeUI(codeExercise);
                 updateNavigationButtons(codeExercise);
                 clearMessages(); 
             }
         });
 
-        previousQuestion.setOnAction(e -> {
+        previousExercise.setOnAction(e -> {
             if (codeExercise.goToPreviousQuestion()) {
-                refreshQuestionUI(codeExercise);
+                refreshCodeUI(codeExercise);
                 updateNavigationButtons(codeExercise);
                 clearMessages();
             }
         });
     }
 
-  // Aggiorna lo stato dei bottoni di navigazione//
-    
-    private void updateNavigationButtons(CompareCode codeExercise) {
-        nextQuestion.setDisable(!codeExercise.hasNextQuestion());
-        previousQuestion.setDisable(!codeExercise.hasPreviousQuestion());
+
+    private void updateNavigationButtons(CompleteCode codeExercise) {
+        nextExercise.setDisable(!codeExercise.hasNextQuestion());
+        previousExercise.setDisable(!codeExercise.hasPreviousQuestion());
 
         int current = codeExercise.getCurrentQuestionNumber();
         int total = codeExercise.getTotalQuestions();
         
-        nextQuestion.setText(String.format("Prossima Domanda → (%d/%d)", 
+        nextExercise.setText(String.format("Prossimo Esercizio → (%d/%d)", 
             Math.min(current + 1, total), total));
-        previousQuestion.setText(String.format("← Domanda Precedente (%d/%d)", 
+        previousExercise.setText(String.format("← Esercizio Precedente (%d/%d)", 
             Math.max(current - 1, 1), total));
     }
 
-   //Aggiorna l'UI con la nuova domanda//
-     
-    private void refreshQuestionUI(CompareCode codeExercise) {
+ 
+    private void refreshCodeUI(CompleteCode codeExercise) {
         if (codeContainer.getChildren().size() > 0) {
             codeContainer.getChildren().remove(0);
         }
 
         
-        VBox newQuestionUI = codeExercise.getCurrentQuestionUI();
-        codeContainer.getChildren().add(0, newQuestionUI);
+        VBox newCodeUI = codeExercise.getCurrentQuestionUI();
+        codeContainer.getChildren().add(0, newCodeUI);
 
         
         int current = codeExercise.getCurrentQuestionNumber();
         int total = codeExercise.getTotalQuestions();
-        updateTitle(String.format("%s - Livello %d - Confronto %d/%d", 
+        updateTitle(String.format("%s - Livello %d - Esercizio %d/%d", 
             exercise.getTitle(), exercise.getDifficulty(), current, total));
     }
 
-   //pulizia messaggi di stato//
-   
+ 
     private void clearMessages() {
         resultLabel.setText("");
         saveMessage.setText("");
-        
+        passToNextLevel.setDisable(true);
     }
 
-    //Configura il bottone di submit per la valutazione//
-  
-    private void setupSubmitButton(CompareCode codeExercise) {
-        submitCurrent.setOnAction(e -> {
-            int currentIndex = codeExercise.getCurrentQuestionNumber() - 1;
+ 
+    private void setupSubmitButton(CompleteCode codeExercise) {
+        submitAll.setOnAction(e -> {
+            int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
+            List<String> userAnswers = codeExercise.getUserAnswers();
             
-           
-            boolean isCorrect = codeExercise.checkAnswer(currentIndex, "");
-            
-            if (isCorrect) {
-                resultLabel.setText("✔ Valutazione corretta! Buona analisi del codice.");
-                resultLabel.setTextFill(Color.GREEN);
-            } else {
-                resultLabel.setText("✘ Valutazione non completamente corretta. Ricontrolla le differenze tra i codici.");
-                resultLabel.setTextFill(Color.ORANGE);
-            }
-
-            // Controllo confronti completati//
-            if (codeExercise.allQuestionsAttempted()) {
-                int totalScore = codeExercise.calculateScore();
-                int totalQuestions = codeExercise.getTotalQuestions();
+            if (currentIndex < userAnswers.size()) {
+                String userAnswer = userAnswers.get(currentIndex); 
+                boolean isCorrect = codeExercise.checkAnswer(currentIndex, userAnswer);
                 
-                // Mostra il punteggio finale//
-                resultLabel.setText(resultLabel.getText() + 
-                    String.format("\n\nPunteggio finale: %d/%d confronti corretti", totalScore, totalQuestions));
-                
-                // Abilita il prossimo livello se il punteggio è sufficiente 66%//
-                if ((totalScore * 100.0 / totalQuestions) >= 66.0)  {
-                    passToNextLevel.setDisable(false);
-                    resultLabel.setText(resultLabel.getText() + "\n🎉 Livello completato con successo!");
+                if (isCorrect) {
+                    resultLabel.setText("✔ Esercizio corretto!");
+                    resultLabel.setTextFill(Color.GREEN);
+                    
+                    
+                    if (!codeExercise.hasNextQuestion() && codeExercise.allQuestionsAttempted()) {
+                        int totalScore = codeExercise.calculateScore();
+                        if (totalScore == codeExercise.getTotalQuestions()) {
+                            passToNextLevel.setDisable(false);
+                        }
+                    }
+                } else {
+                    resultLabel.setText("✘ Esercizio non corretto. Riprova!");
+                    resultLabel.setTextFill(Color.RED);
                 }
-            }
 
-           
-            saveCurrentProgress(codeExercise);
+                
+                saveCurrentProgress(codeExercise);
+            }
         });
     }
 
-    //salva progresso corrente//
-    private void saveCurrentProgress(CompareCode codeExercise) {
+   
+    private void saveCurrentProgress(CompleteCode codeExercise) {
         int correctCount = codeExercise.calculateScore();
         int totalQuestions = codeExercise.getTotalQuestions();
         int difficulty = exercise.getDifficulty();
@@ -290,11 +262,11 @@ public class ScreenCompareCode extends BaseScreen {
         correctCountMap.put(difficulty, correctCount);
 
         String currentUser = Main.getCurrentUser();
-        String type = "CompareCode";
+        String type = "CompleteCode";
         boolean saved = UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
 
         if (saved) {
-            saveMessage.setText(String.format("Progresso salvato: %d/%d confronti corretti.", 
+            saveMessage.setText(String.format("Progresso salvato: %d/%d esercizi corretti.", 
                 correctCount, totalQuestions));
             saveMessage.setTextFill(Color.GREEN);
         } else {
@@ -303,28 +275,47 @@ public class ScreenCompareCode extends BaseScreen {
         }
     }
 
-    
-     //Configura il bottone per il prossimo livello//
-    
+
     private void setupNextLevelButton() {
         passToNextLevel.setOnAction(e -> {
             int nextLevel = exercise.getDifficulty() + 1;
             if (nextLevel <= 3) {
-                Exercise nextExercise = new CompareCode(nextLevel);
-                Scene nextScene = ScreenCompareCode.getScene(stage, returnScene, nextExercise);
+                Exercise nextExercise = new CompleteCode(nextLevel);
+                Scene nextScene = ScreenCompleteCode.getScene(stage, returnScene, nextExercise);
                 stage.setScene(nextScene);
             } else {
-                
-                showFinalSummary();    //per mostrare dopoa aver completato tutti e 3 i livelli il resoconto finale//
+                // Ha completato tutti i livelli - mostra schermata finale
+                showFinalSummary();
             }
         });
     }
-    
 
-   //salva il progresso prima di uscire//
+  
+    private void showExitConfirmation(Runnable onConfirm) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conferma Uscita");
+        alert.setHeaderText("⚠️ Attenzione: stai per uscire dall'esercizio");
+        alert.setContentText("I tuoi progressi verranno salvati automaticamente.\n\n" +
+                "Vuoi continuare e uscire dall'esercizio?");
+
+        
+        ButtonType confirmButton = new ButtonType("✅ Sì, salva ed esci", ButtonBar.ButtonData.YES);
+        ButtonType cancelButton = new ButtonType("❌ No, continua esercizio", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == confirmButton) {
+                onConfirm.run();
+            }
+            
+        });
+    }
+
+  
     private void saveProgressBeforeExit() {
-        if (exercise instanceof CompareCode) {
-            CompareCode codeExercise = (CompareCode) exercise;
+        if (exercise instanceof CompleteCode) {
+            CompleteCode codeExercise = (CompleteCode) exercise;
             int correctCount = codeExercise.calculateScore();
             int totalQuestions = codeExercise.getTotalQuestions();
             int difficulty = exercise.getDifficulty();
@@ -332,10 +323,10 @@ public class ScreenCompareCode extends BaseScreen {
             correctCountMap.put(difficulty, correctCount);
 
             String currentUser = Main.getCurrentUser();
-            String type = "CompareCode";
+            String type = "CompleteCode";
             UserProgress.saveProgress(currentUser, type, difficulty, correctCount, totalQuestions);
 
-            System.out.println("✅ Progresso CompareCode salvato prima dell'uscita: " + correctCount + "/" + totalQuestions);
+            System.out.println("✅ Progresso salvato prima dell'uscita: " + correctCount + "/" + totalQuestions);
         }
     }
 
@@ -360,39 +351,38 @@ public class ScreenCompareCode extends BaseScreen {
     protected void configureScene(Scene scene) {
         super.configureScene(scene);
         if (stage != null) {
-            stage.setTitle("PLAY - " + (exercise != null ? exercise.getTitle() : "Confronta il Codice"));
+            stage.setTitle("PLAY - " + (exercise != null ? exercise.getTitle() : "Completa il Codice"));
         }
     }
 
-    //metodo per creare la scena//
-    public static Scene getScene(Stage stage, Scene returnScene, Exercise exercise) {
-        ScreenCompareCode screen = new ScreenCompareCode(stage, exercise, returnScene);
+    
+    public static Scene getScene(Stage stage, Scene anteprima, Exercise exercise) {
+        ScreenCompleteCode screen = new ScreenCompleteCode(stage, exercise, anteprima);
         return screen.createScene();
     }
 
-   
+    
     public int getCorrectCount(int difficulty) {
         return correctCountMap.getOrDefault(difficulty, 0);
     }
-   
-     //funzione per mostrare il resoconto finale post completamento livelli//
-    private void showFinalSummary() {
-        // Calcola statistiche totali//
-        String username = Main.getCurrentUser();
-        int level1Score = UserProgress.getCorrectAnswers(username, "CompareCode", 1);
-        int level2Score = UserProgress.getCorrectAnswers(username, "CompareCode", 2);
-        int level3Score = UserProgress.getCorrectAnswers(username, "CompareCode", 3);
-        int totalScore = level1Score + level2Score + level3Score;
 
-        // Crea la schermata finale usando FinalResultScreen//
+    /**
+     * Mostra la schermata finale quando tutti i livelli sono completati
+     */
+    private void showFinalSummary() {
+        CompleteCode codeExercise = (CompleteCode) exercise;
+        int correctCount = codeExercise.calculateScore();
+        int totalQuestions = codeExercise.getTotalQuestions();
+
+        // Crea la schermata finale
         ScrollPane finalScreen = application.components.FinalResultScreen.createFinalScreen(
-                exercise, totalScore, 9, true // 9 = 3 livelli x 3 confronti//
+                exercise, correctCount, totalQuestions, true
         );
 
-       
+        // Configura le azioni dei pulsanti
         application.components.FinalResultScreen.setupActions(finalScreen, exercise, stage, returnScene);
 
-        
+        // Sostituisci tutto il contenuto
         setCenter(finalScreen);
     }
 }
