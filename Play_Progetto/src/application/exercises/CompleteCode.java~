@@ -51,8 +51,9 @@ public class CompleteCode extends AbstractExercise {
         }
     }
 
-    // Inizializza le domande basandosi sul livello//
-     
+    /**
+     * Inizializza le domande basandosi sul livello
+     */
     private void initializeQuestions() {
         List<CodeSnippet> exercises;
         switch (difficulty) {
@@ -432,7 +433,7 @@ private String normalize(String s) {
 
                 // completa il costruttore per inizializzare name
                 public User(String name) {
-                    
+                    //
                 }
             }
             """, "this.name = name;"));

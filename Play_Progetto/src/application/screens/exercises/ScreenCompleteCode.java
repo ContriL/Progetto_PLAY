@@ -22,10 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Schermata per l'esercizio Complete Code.
- * 
- */
+//Schermata per l'esercizio Complete Code
 public class ScreenCompleteCode extends BaseScreen {
 
     private static final Map<Integer, Integer> correctCountMap = new HashMap<>();
@@ -127,9 +124,8 @@ public class ScreenCompleteCode extends BaseScreen {
         super.onShow();
     }
 
-    /**
-     * Crea il contenuto per l'esercizio Complete Code
-     */
+    //Crea il contenuto per l'esercizio Complete Code
+    
     private VBox createCompleteCodeContent(CompleteCode codeExercise) {
         codeContainer = new VBox(15);
         codeContainer.setPadding(new Insets(15));
@@ -221,7 +217,7 @@ public class ScreenCompleteCode extends BaseScreen {
         passToNextLevel.setDisable(true);
     }
 
- 
+ //setup tasto invio
     private void setupSubmitButton(CompleteCode codeExercise) {
         submitAll.setOnAction(e -> {
             int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
@@ -253,7 +249,7 @@ public class ScreenCompleteCode extends BaseScreen {
         });
     }
 
-   
+   //metodo salvataggio progressi
     private void saveCurrentProgress(CompleteCode codeExercise) {
         int correctCount = codeExercise.calculateScore();
         int totalQuestions = codeExercise.getTotalQuestions();
@@ -366,9 +362,8 @@ public class ScreenCompleteCode extends BaseScreen {
         return correctCountMap.getOrDefault(difficulty, 0);
     }
 
-    /**
-     * Mostra la schermata finale quando tutti i livelli sono completati
-     */
+    // Mostra la schermata finale quando tutti i livelli sono completati
+     
     private void showFinalSummary() {
         CompleteCode codeExercise = (CompleteCode) exercise;
         int correctCount = codeExercise.calculateScore();

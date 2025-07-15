@@ -82,6 +82,44 @@ public class CompareCode extends AbstractExercise {
 
 
         // --- Codice A ---
+      /*  VBox codeABox = new VBox(10);
+        Label codeATitle = new Label("VERSIONE A:");
+        codeATitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #dc2626;");
+
+        TextArea codeAText = new TextArea(current.codeA);
+        codeAText.setEditable(false);
+        codeAText.setWrapText(true);
+        codeAText.setStyle(
+                "-fx-font-family: 'monospace'; -fx-font-size: 12px;"
+                        + " -fx-background-color: #f8f9fa; -fx-border-color: #dc2626;"
+                        + " -fx-border-width: 2; -fx-border-radius: 5;"
+        );
+        codeAText.setPrefWidth(600);
+        codeAText.setPrefHeight(400);
+        codeAText.setPadding(new Insets(10));
+
+        codeABox.getChildren().addAll(codeATitle, codeAText);
+
+        // --- Codice B ---
+        VBox codeBBox = new VBox(10);
+        Label codeBTitle = new Label("VERSIONE B:");
+        codeBTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #16a34a;");
+
+        TextArea codeBText = new TextArea(current.codeB);
+        codeBText.setEditable(false);
+        codeBText.setWrapText(true);
+        codeBText.setStyle(
+                "-fx-font-family: 'monospace'; -fx-font-size: 12px;"
+                        + " -fx-background-color: #f8f9fa; -fx-border-color: #16a34a;"
+                        + " -fx-border-width: 2; -fx-border-radius: 5;"
+        );
+        codeBText.setPrefWidth(600);
+        codeBText.setPrefHeight(400);
+        codeBText.setPadding(new Insets(10));
+
+        codeBBox.getChildren().addAll(codeBTitle, codeBText);*/
+
+        // --- Codice A ---
         VBox codeABox = new VBox(10);
         Label codeATitle = new Label("VERSIONE A:");
         codeATitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #dc2626;");
@@ -205,7 +243,20 @@ public class CompareCode extends AbstractExercise {
 
         readabilityBox.getChildren().addAll(readabilityLabel, aMoreReadable, bMoreReadable, sameReadability);
 
-        questionsContainer.getChildren().addAll(correctnessBox, efficiencyBox, readabilityBox); // ← AGGIUNGI QUESTA RIGA
+        // 4. Campo per la motivazione
+        VBox motivationBox = new VBox(8);
+        Label motivationLabel = new Label("4. Motiva le tue scelte (spiega le differenze che hai notato):");
+        motivationLabel.setStyle("-fx-font-weight: bold;");
+
+        TextArea motivationArea = new TextArea();
+        motivationArea.setPromptText("Spiega le tue valutazioni: quali errori/differenze hai notato? Perché una versione è migliore dell'altra?");
+        motivationArea.setPrefRowCount(4);
+        motivationArea.setPrefWidth(700);
+        currentResponse.motivationArea = motivationArea;
+
+        motivationBox.getChildren().addAll(motivationLabel, motivationArea);
+
+        questionsContainer.getChildren().addAll(correctnessBox, efficiencyBox, readabilityBox, motivationBox);
 
         return questionsContainer;
     }
@@ -344,7 +395,9 @@ public class CompareCode extends AbstractExercise {
             if (response.readabilityGroup != null && response.readabilityGroup.getSelectedToggle() != null) {
                 sb.append("Leggibilità: ").append(((RadioButton) response.readabilityGroup.getSelectedToggle()).getText()).append("\n");
             }
-            
+            if (response.motivationArea != null) {
+                sb.append("Motivazione: ").append(response.motivationArea.getText());
+            }
             
             responses.add(sb.toString());
         }
@@ -364,7 +417,17 @@ public class CompareCode extends AbstractExercise {
         return getCurrentQuestionUI();
     }
 
-   
+    public List<TextArea> getUserInputs() {
+        List<TextArea> inputs = new ArrayList<>();
+        for (UserResponse response : userResponses) {
+            if (response.motivationArea != null) {
+                inputs.add(response.motivationArea);
+            } else {
+                inputs.add(new TextArea());
+            }
+        }
+        return inputs;
+    }
 
     public List<String> getAnswers() {
         List<String> answers = new ArrayList<>();
@@ -715,7 +778,7 @@ public class CompareCode extends AbstractExercise {
         ToggleGroup correctnessGroup;
         ToggleGroup efficiencyGroup;
         ToggleGroup readabilityGroup;
-       
+        TextArea motivationArea;
 
         boolean isComplete() {
             return correctnessGroup != null && correctnessGroup.getSelectedToggle() != null &&
