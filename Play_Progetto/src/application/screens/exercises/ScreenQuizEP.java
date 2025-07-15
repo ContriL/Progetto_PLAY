@@ -190,7 +190,7 @@ public class ScreenQuizEP extends BaseScreen {
         setBottom(null); // Rimuovi la navigazione inferiore
     }
 
-    
+
 
     private static void confirmExit(Runnable exitAction) {
         DialogUtils.showExerciseExitConfirmation(
