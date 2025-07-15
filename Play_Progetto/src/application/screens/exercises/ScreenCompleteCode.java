@@ -218,35 +218,50 @@ public class ScreenCompleteCode extends BaseScreen {
     }
 
  //setup tasto invio
-    private void setupSubmitButton(CompleteCode codeExercise) {
-        submitAll.setOnAction(e -> {
-            int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
-            List<String> userAnswers = codeExercise.getUserAnswers();
-            
-            if (currentIndex < userAnswers.size()) {
-                String userAnswer = userAnswers.get(currentIndex); 
-                boolean isCorrect = codeExercise.checkAnswer(currentIndex, userAnswer);
-                
-                if (isCorrect) {
-                    resultLabel.setText("✔ Esercizio corretto!");
-                    resultLabel.setTextFill(Color.GREEN);
-                    
-                    
-                    if (!codeExercise.hasNextQuestion() && codeExercise.allQuestionsAttempted()) {
-                        int totalScore = codeExercise.calculateScore();
-                        if (totalScore == codeExercise.getTotalQuestions()) {
-                            passToNextLevel.setDisable(false);
-                        }
-                    }
-                } else {
-                    resultLabel.setText("✘ Esercizio non corretto. Riprova!");
-                    resultLabel.setTextFill(Color.RED);
-                }
+ private void setupSubmitButton(CompleteCode codeExercise) {
+     submitAll.setOnAction(e -> {
+         int currentIndex = ((CompleteCode) exercise).getCurrentQuestionNumber() - 1;
+         List<String> userAnswers = codeExercise.getUserAnswers();
 
-                
-                saveCurrentProgress(codeExercise);
-            }
-        });
+         if (currentIndex < userAnswers.size()) {
+             String userAnswer = userAnswers.get(currentIndex);
+             boolean isCorrect = codeExercise.checkAnswer(currentIndex, userAnswer);
+
+             if (isCorrect) {
+                 resultLabel.setText("✔ Esercizio corretto!");
+                 resultLabel.setTextFill(Color.GREEN);
+             } else {
+                 resultLabel.setText("✘ Esercizio non corretto. Riprova!");
+                 resultLabel.setTextFill(Color.RED);
+             }
+
+             // Controlla se tutti gli esercizi sono completati
+             if (!codeExercise.hasNextQuestion() && codeExercise.allQuestionsAttempted()) {
+                 int totalScore = codeExercise.calculateScore();
+                 int totalQuestions = codeExercise.getTotalQuestions();
+
+                 // Salva i progressi
+                 saveCurrentProgress(codeExercise);
+
+                 // Mostra FinalResultScreen
+                 showLevelCompleted(totalScore, totalQuestions);
+             } else {
+                 saveCurrentProgress(codeExercise);
+             }
+         }
+     });
+ }
+    /**
+     * Mostra FinalResultScreen quando un livello è completato
+     */
+    private void showLevelCompleted(int correctAnswers, int totalQuestions) {
+        ScrollPane finalScreen = application.components.FinalResultScreen.createFinalScreen(
+                exercise, correctAnswers, totalQuestions, true
+        );
+
+        application.components.FinalResultScreen.setupActions(finalScreen, exercise, stage, returnScene);
+
+        setCenter(finalScreen);
     }
 
    //metodo salvataggio progressi

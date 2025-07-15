@@ -175,65 +175,22 @@ public class ScreenQuizEP extends BaseScreen {
 
         int correct = currentQuiz.calculateScore();
         int total = currentQuiz.getTotalQuestions();
-        double percentage = (double) correct / total * 100;
 
-        questionContainer.setVisible(false);
-
-        String message = String.format(
-                "Bene hai superato l'esercizio e hai risposto correttamente a %d domande su %d.\n\n" +
-                        "Percentuale di successo: %.1f%%\n\n%s\n\nProva con un nuovo esercizio.",
-                correct, total, percentage,
-                percentage >= 60 ? "Congratulazioni! Hai superato il quiz." :
-                        "Continua a studiare per migliorare."
-        );
-
-        resultText.setText(message);
-        resultText.setFill(percentage >= 60 ? Color.GREEN : Color.ORANGE);
-        resultText.setVisible(true);
-
+        // Salva i progressi
         UserProgress.saveProgress(Main.getCurrentUser(), "quizEP", currentQuiz.getDifficulty(), correct, total);
 
-        questionCounterLabel.setText("Quiz completato - Progressi salvati!");
-        questionCounterLabel.setStyle("-fx-text-fill: green;");
+        // Mostra FinalResultScreen invece del sistema precedente
+        ScrollPane finalScreen = application.components.FinalResultScreen.createFinalScreen(
+                exercise, correct, total, true
+        );
 
-        replaceWithFinalButtons();
+        application.components.FinalResultScreen.setupActions(finalScreen, exercise, stage, returnScene);
+
+        setCenter(finalScreen);
+        setBottom(null); // Rimuovi la navigazione inferiore
     }
 
-    private void replaceWithFinalButtons() {
-        HBox box = new HBox(15);
-        box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(20));
-
-        Button newQuiz = new Button("Nuovo Esercizio");
-        Button nextLevel = new Button("Livello Successivo");
-
-        // Ricomincia stesso livello
-        newQuiz.setOnAction(e -> {
-            QuizEP q = new QuizEP(currentQuiz.getDifficulty());
-            stage.setScene(ScreenQuizEP.getScene(stage, returnScene, q));
-        });
-
-        // Prossimo livello se superato
-        nextLevel.setOnAction(e -> {
-            int level = currentQuiz.getDifficulty() + 1;
-            if (level <= 3) {
-                QuizEP q = new QuizEP(level);
-                stage.setScene(ScreenQuizEP.getScene(stage, returnScene, q));
-            } else {
-                showAlert("Hai già completato tutti i livelli disponibili!");
-            }
-        });
-
-        // Blocca il bottone se non ha superato il livello
-        double percentage = (double) currentQuiz.calculateScore() / currentQuiz.getTotalQuestions() * 100;
-        nextLevel.setDisable(percentage < 60 || currentQuiz.getDifficulty() >= 3);
-
-        exitButton.setText("Esci dall'esercizio");
-        exitButton.setOnAction(e -> confirmExit(() -> NavigationManager.getInstance().goToExerciseGrid()));
-
-        box.getChildren().addAll(newQuiz, nextLevel, exitButton);
-        setBottom(box);
-    }
+    
 
     private static void confirmExit(Runnable exitAction) {
         DialogUtils.showExerciseExitConfirmation(
