@@ -1,0 +1,6 @@
+# Ignora tutti i file .DS_Store ovunque nel progetto
+**/.DS_Store
+# Ignora file compilati Java ovunque
+**/*.class
+# Ignora intera cartella out/ ovunque
+**/out/
